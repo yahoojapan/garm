@@ -1,0 +1,61 @@
+version: v1.0.0
+logger:
+  log_path: /var/log/athenz/webhook.log
+  log_trace: server,athenz,mapping
+server:
+  port: 443
+  health_check_port: 8080
+  health_check_path: /healthz
+  timeout: 5s
+  shutdown_duration: 5s
+  probe_wait_time: 3s
+  tls:
+    enabled: true
+    cert_key: cert
+    key_key: key
+    ca_key: ca
+athenz:
+  auth_header: Athenz-Principal-Auth
+  url: https://www.athenz.com/zts/v1
+  timeout: 5s
+  root_ca: root_ca
+token:
+  athenz_domain: _athenz_domain_
+  service_name: _athenz_service_
+  ntoken_path: /tmp/ntoken
+  private_key_env_name: privateKEY
+  validate_token: false
+  refresh_duration: 10s
+  key_version: v1.0
+  expiration: 5s
+map_rule:
+  tld:
+    name: aks
+    platform:
+      name: aks
+      # service_athenz_domain: _tld_.k8s._segment_._uk-cluster_._namespace_._env_._k8s-cluster_._k8s-namespace_
+      service_athenz_domain: _kaas_namespace_.k8s._k8s_cluster_._namespace_ # max-length = 44
+      # service_athenz_domain: _namespace_.aks
+      # service_athenz_domain: _namespace_.k8s
+      resource_mappings:
+        k8sResource1: athenzResource1
+        # k8sResource2: athenzResource2
+        # k8sResource3: athenzResource3
+      verb_mappings:
+        verb1: action1
+        # verb2: action2
+        # verb3: action3
+      api_group_control: true
+      api_group_mappings:
+        "": "core"
+      empty_namespace: all-namespace
+      resource_name_control: true
+      resource_name_mappings:
+        "resource": "resource"
+      non_resource_api_group: nonres
+      non_resource_namespace: nonres
+      service_account_prefixes:
+        - "system:serviceaccount:" 
+        - "system-serviceaccount-"
+      athenz_user_prefix: user.
+      admin_athenz_domain: aks.admin
