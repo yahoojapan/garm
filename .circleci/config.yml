@@ -2,7 +2,7 @@ alias:
   default: &default
     working_directory: /go/src/github.com/yahoojapan/garm
     docker:
-      - image: circleci/golang:1.11.2
+      - image: circleci/golang:1.11.3
         environment:
           GOPATH: "/go"
           GO111MODULE: "on"
@@ -11,7 +11,7 @@ alias:
           GITHUB_API: "https://api.github.com/"
           DOCKER_USER: "yahoojapancorp"
   setup_remote_docker: &setup_remote_docker
-    version: 18.05.0-ce
+    version: 18.06.0-ce
     docker_layer_caching: true
 
 version: 2
@@ -43,8 +43,13 @@ jobs:
       - setup_remote_docker: *setup_remote_docker
       - checkout
       - run:
+          name: check docker version
+          command: |
+            docker version
+      - run:
           name: docker image build
           command: |
+            # env DOCKER_BUILDKIT=1 docker build -t ${REPO_NAME}/${IMAGE_NAME}:latest .
             docker build -t ${REPO_NAME}/${IMAGE_NAME}:latest .
       - run:
           name: save image
@@ -177,16 +182,15 @@ workflows:
   build:
     jobs:
       - test
-      - build:
+      - build
+      - publish_nightly:
           requires:
             - test
+            - build
           filters:
             branches:
               only:
                 - master
-      - publish_nightly:
-          requires:
-            - build
       - versioning:
           filters:
             branches:
