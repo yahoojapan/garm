@@ -58,7 +58,7 @@ func TestNew(t *testing.T) {
 		},
 		func() test {
 			keyKey := "dummyKey"
-			key := "./testdata/dummyServer.key"
+			key := "../service/testdata/dummyServer.key"
 
 			return test{
 				name: "Check error when new server",
@@ -86,7 +86,7 @@ func TestNew(t *testing.T) {
 		}(),
 		func() test {
 			keyKey := "dummyKey"
-			key := "./testdata/dummyServer.key"
+			key := "../service/testdata/dummyServer.key"
 			cfg := config.Config{
 				Token: config.Token{
 					AthenzDomain:      keyKey,
@@ -122,8 +122,8 @@ func TestNew(t *testing.T) {
 				},
 				want: func() GarmDaemon {
 					token, err := service.NewTokenService(cfg.Token)
-					if token == nil {
-						glg.Errorf("fsdf %v", err)
+					if token == nil || err != nil {
+						t.Errorf("fsdf %v", err)
 					}
 
 					resolver := service.NewResolver(cfg.Mapping)
@@ -196,9 +196,9 @@ func Test_garm_Start(t *testing.T) {
 	tests := []test{
 		func() test {
 			keyKey := "dummy_key"
-			key := "./testdata/dummyServer.key"
+			key := "../service/testdata/dummyServer.key"
 			certKey := "dummy_cert"
-			cert := "./testdata/dummyServer.crt"
+			cert := "../service/testdata/dummyServer.crt"
 
 			cfg := config.Config{
 				Token: config.Token{

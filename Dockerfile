@@ -32,8 +32,7 @@ RUN apk del build-dependencies --purge \
 
 # Start From Scratch For Running Environment
 FROM scratch
-# FROM alpine:latest
-LABEL maintainer "yusukato <yusukato@yahoo-corp.jp>"
+LABEL maintainer "kpango <i.can.feel.gravity@gmail.com>"
 
 ENV APP_NAME garm
 
