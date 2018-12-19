@@ -77,12 +77,12 @@ func TestNewResolver(t *testing.T) {
 			},
 		},
 		{
-			name: "Check NewResolver, platform = k8s",
+			name: "Check NewResolver, platform = eks",
 			args: args{
 				cfg: config.Mapping{
 					TLD: config.TLD{
 						Platform: config.Platform{
-							Name: "k8s",
+							Name: "eks",
 						},
 					},
 				},

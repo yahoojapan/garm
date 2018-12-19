@@ -648,6 +648,7 @@ func Test_token_loadToken(t *testing.T) {
 					tb.(*mockTokenBuilder).valueFunc = func() (string, error) {
 						return "", fmt.Errorf("Error")
 					}
+					tb.(*mockTokenBuilder).SetExpirationFunc = func(dur time.Duration) {}
 
 					return tb
 				}(),
@@ -667,6 +668,7 @@ func Test_token_loadToken(t *testing.T) {
 					tb.(*mockTokenBuilder).valueFunc = func() (string, error) {
 						return "token", nil
 					}
+					tb.(*mockTokenBuilder).SetExpirationFunc = func(dur time.Duration) {}
 
 					return tb
 				}(),
@@ -683,11 +685,19 @@ func Test_token_loadToken(t *testing.T) {
 			name: "Test tokenFilePath not exists error (Copper argos)",
 			fields: fields{
 				token:           new(atomic.Value),
-				tokenFilePath:   "notexists",
+				tokenFilePath:   "",
 				validateToken:   false,
 				tokenExpiration: time.Second,
 				refreshDuration: time.Second,
-				builder:         NewMockTokenBuilder(),
+				builder: func() zmssvctoken.TokenBuilder {
+					tb := NewMockTokenBuilder()
+					tb.(*mockTokenBuilder).valueFunc = func() (string, error) {
+						return "", fmt.Errorf("open notexists: no such file or directory")
+					}
+					tb.(*mockTokenBuilder).SetExpirationFunc = func(dur time.Duration) {}
+
+					return tb
+				}(),
 			},
 			wantErr: fmt.Errorf("open notexists: no such file or directory"),
 		},
@@ -699,7 +709,15 @@ func Test_token_loadToken(t *testing.T) {
 				validateToken:   false,
 				tokenExpiration: time.Second,
 				refreshDuration: time.Second,
-				builder:         NewMockTokenBuilder(),
+				builder: func() zmssvctoken.TokenBuilder {
+					tb := NewMockTokenBuilder()
+					tb.(*mockTokenBuilder).valueFunc = func() (string, error) {
+						return "token", nil
+					}
+					tb.(*mockTokenBuilder).SetExpirationFunc = func(dur time.Duration) {}
+
+					return tb
+				}(),
 			},
 			checkFunc: func(got, want string) error {
 				if got != want {
@@ -717,7 +735,15 @@ func Test_token_loadToken(t *testing.T) {
 				validateToken:   true,
 				tokenExpiration: time.Second,
 				refreshDuration: time.Second,
-				builder:         NewMockTokenBuilder(),
+				builder: func() zmssvctoken.TokenBuilder {
+					tb := NewMockTokenBuilder()
+					tb.(*mockTokenBuilder).valueFunc = func() (string, error) {
+						return "token", nil
+					}
+					tb.(*mockTokenBuilder).SetExpirationFunc = func(dur time.Duration) {}
+
+					return tb
+				}(),
 			},
 			wantErr: fmt.Errorf("invalid server identity token:	bad field in token 'dummy token'"),
 		},
