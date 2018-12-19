@@ -214,11 +214,10 @@ func TestNew(t *testing.T) {
 		path string
 	}
 	type test struct {
-		name      string
-		args      args
-		checkFunc func() error
-		want      *Config
-		wantErr   error
+		name    string
+		args    args
+		want    *Config
+		wantErr error
 	}
 	tests := []test{
 		test{

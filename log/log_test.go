@@ -18,7 +18,6 @@ package log
 
 import (
 	"bytes"
-	"crypto/tls"
 	"strings"
 	"testing"
 
@@ -31,11 +30,10 @@ func TestNew(t *testing.T) {
 		printValue string
 	}
 	tests := []struct {
-		name      string
-		args      args
-		want      Logger
-		checkFunc func(*tls.Config, *tls.Config) error
-		wantW     string
+		name  string
+		args  args
+		want  Logger
+		wantW string
 	}{
 		{
 			name: "log instance New test.",

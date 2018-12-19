@@ -18,18 +18,11 @@ package handler
 
 import (
 	"net/http"
-
-	"github.com/yahoojapan/garm/service"
 )
 
 type mockAthenz struct {
 	AthenzAuthorizerFunc    Func
 	AthenzAuthenticatorFunc Func
-}
-
-// NewMockAthenz creates a mock object of service.Athenz.
-func NewMockAthenz() service.Athenz {
-	return &mockAthenz{}
 }
 
 // AthenzAuthorizer returns a mock value of service.Athenz.AthenzAuthenticator() function.

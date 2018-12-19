@@ -262,8 +262,7 @@ func Test_athenz_AthenzAuthenticator(t *testing.T) {
 		w http.ResponseWriter
 		r *http.Request
 	}
-	var cmpResponse func(*httptest.ResponseRecorder, *httptest.ResponseRecorder) error
-	cmpResponse = func(got, want *httptest.ResponseRecorder) error {
+	cmpResponse := func(got, want *httptest.ResponseRecorder) error {
 		if got.Code != want.Code {
 			return fmt.Errorf("athenz.AthenzAuthenticator() code = %v, wanted code %v", got.Code, want.Code)
 		}
@@ -355,8 +354,7 @@ func Test_athenz_AthenzAuthorizer(t *testing.T) {
 		w http.ResponseWriter
 		r *http.Request
 	}
-	var cmpResponse func(*httptest.ResponseRecorder, *httptest.ResponseRecorder) error
-	cmpResponse = func(got, want *httptest.ResponseRecorder) error {
+	cmpResponse := func(got, want *httptest.ResponseRecorder) error {
 		if got.Code != want.Code {
 			return fmt.Errorf("athenz.AthenzAuthorizer() code = %v, wanted code %v", got.Code, want.Code)
 		}

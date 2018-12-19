@@ -45,11 +45,6 @@ func NewMockTokenBuilder() zmssvctoken.TokenBuilder {
 	return &mockTokenBuilder{}
 }
 
-// NewMockToken creates a mock object of zmssvctoken.Token.
-func NewMockToken() zmssvctoken.Token {
-	return &mockToken{}
-}
-
 // SetExpiration returns a mock value of zmssvctoken.TokenBuilder.SetExpiration() function.
 func (mt *mockTokenBuilder) SetExpiration(t time.Duration) {
 	mt.SetExpirationFunc(t)

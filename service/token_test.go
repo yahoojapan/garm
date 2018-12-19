@@ -229,14 +229,7 @@ func TestNewTokenService(t *testing.T) {
 }
 
 func Test_token_StartTokenUpdater(t *testing.T) {
-	type fields struct {
-		tokenFilePath   string
-		token           *atomic.Value
-		validateToken   bool
-		tokenExpiration time.Duration
-		refreshDuration time.Duration
-		builder         zmssvctoken.TokenBuilder
-	}
+
 	type args struct {
 		ctx context.Context
 	}
@@ -371,14 +364,6 @@ func Test_token_StartTokenUpdater(t *testing.T) {
 }
 
 func Test_token_GetToken(t *testing.T) {
-	type fields struct {
-		tokenFilePath   string
-		token           *atomic.Value
-		validateToken   bool
-		tokenExpiration time.Duration
-		refreshDuration time.Duration
-		builder         zmssvctoken.TokenBuilder
-	}
 	type test struct {
 		name       string
 		cfg        config.Token

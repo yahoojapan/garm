@@ -90,8 +90,7 @@ func NewTokenService(cfg config.Token) (TokenService, error) {
 // It starts a go routine to update the token periodically.
 func (t *token) StartTokenUpdater(ctx context.Context) TokenService {
 	go func() {
-		var err error
-		err = t.update()
+		err := t.update()
 		if err != nil {
 			glg.Error(err)
 		}
