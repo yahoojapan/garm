@@ -42,7 +42,12 @@ func TestNewLogger(t *testing.T) {
 
 	testFilePath := "/tmp/garm_logging_test.txt"
 	f, err := os.OpenFile(testFilePath, os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0600)
-	defer f.Close()
+	defer func() {
+		err = f.Close()
+		if err != nil {
+			t.Error(err)
+		}
+	}()
 	if err != nil {
 		t.Errorf("tmp file %s open error", testFilePath)
 	}

@@ -11,6 +11,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/pkg/errors v0.8.0
 	github.com/spf13/pflag v1.0.3 // indirect
+	github.com/stamblerre/gocode v0.0.0-20181212030458-2f9d39d8f31d // indirect
 	github.com/yahoo/athenz v1.8.4
 	github.com/yahoo/k8s-athenz-webhook v0.0.0-20180814044735-e443658b10d2
 	gopkg.in/inf.v0 v0.9.1 // indirect

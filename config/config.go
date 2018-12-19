@@ -246,7 +246,7 @@ type RequestInfo struct {
 	reg *regexp.Regexp
 
 	// once ensure that the reg is compiled only once.
-	once sync.Once
+	once *sync.Once
 }
 
 // Serialize returns RequestInfo in string format.
@@ -262,10 +262,18 @@ func (r RequestInfo) Serialize() string {
 // 3. replace `..* => .*`
 // return is regexp match
 func (r *RequestInfo) Match(req RequestInfo) bool {
+	if r.once == nil {
+		r.once = new(sync.Once)
+	}
 	r.once.Do(func() {
 		r.reg = regexp.MustCompile(strings.Replace(strings.Replace(r.Serialize(), "*", ".*", -1), "..*", ".*", -1))
 	})
-	return r.reg.Copy().MatchString(req.Serialize())
+
+	if r.reg != nil {
+		return r.reg.Copy().MatchString(req.Serialize())
+	}
+
+	return false
 }
 
 // New returns the decoded configuration YAML file as *Config struct. Returns non-nil error if any.
