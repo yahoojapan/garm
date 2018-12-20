@@ -24,6 +24,7 @@ import (
 	authn "k8s.io/api/authentication/v1beta1"
 )
 
+// UserMapper allows for mapping from Athenz principals to k8s objects.
 type UserMapper interface {
 	webhook.UserMapper
 }

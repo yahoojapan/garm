@@ -62,17 +62,17 @@ type resolve struct {
 	athenzDomain string
 }
 
-// Resolver implementation for K8S platform.
+// K8SResolve implementation for K8S platform.
 type K8SResolve struct {
 	resolve
 }
 
-// Resolver implementation for Azure AKS platform.
+// AKSResolve implementation for Azure AKS platform.
 type AKSResolve struct {
 	resolve
 }
 
-// Resolver implementation for Amazon EKS platform.
+// EKSResolve implementation for Amazon EKS platform.
 type EKSResolve struct {
 	resolve
 }

@@ -22,6 +22,7 @@ import (
 	"github.com/yahoojapan/garm/handler"
 )
 
+// Route represents the routing information from incoming request.
 type Route struct {
 	Name        string
 	Methods     []string

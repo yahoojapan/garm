@@ -173,10 +173,7 @@ func Test_server_ListenAndServe(t *testing.T) {
 					if err := os.Setenv(keyKey, key); err != nil {
 						return err
 					}
-					if err := os.Setenv(certKey, cert); err != nil {
-						return err
-					}
-					return nil
+					return os.Setenv(certKey, cert)
 				},
 				checkFunc: func(s *server, got chan []error, want error) error {
 					time.Sleep(time.Millisecond * 150)
@@ -280,10 +277,7 @@ func Test_server_ListenAndServe(t *testing.T) {
 					if err := os.Setenv(keyKey, key); err != nil {
 						return err
 					}
-					if err := os.Setenv(certKey, cert); err != nil {
-						return err
-					}
-					return nil
+					return os.Setenv(certKey, cert)
 				},
 				checkFunc: func(s *server, got chan []error, want error) error {
 					time.Sleep(time.Millisecond * 150)
@@ -387,10 +381,7 @@ func Test_server_ListenAndServe(t *testing.T) {
 					if err := os.Setenv(keyKey, key); err != nil {
 						return err
 					}
-					if err := os.Setenv(certKey, cert); err != nil {
-						return err
-					}
-					return nil
+					return os.Setenv(certKey, cert)
 				},
 				checkFunc: func(s *server, got chan []error, want error) error {
 					time.Sleep(time.Millisecond * 150)

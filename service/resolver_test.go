@@ -312,7 +312,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 					return nil
 				},
 				afterFunc: func() error {
-					for k := range env {
+					for k, _ := range env {
 						err := os.Unsetenv(k)
 						if err != nil {
 							return err
@@ -347,7 +347,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 					return nil
 				},
 				afterFunc: func() error {
-					for k := range env {
+					for k, _ := range env {
 						err := os.Unsetenv(k)
 						if err != nil {
 							return err
@@ -383,7 +383,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 					return nil
 				},
 				afterFunc: func() error {
-					for k := range env {
+					for k, _ := range env {
 						err := os.Unsetenv(k)
 						if err != nil {
 							return err
