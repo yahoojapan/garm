@@ -269,11 +269,7 @@ func (r *RequestInfo) Match(req RequestInfo) bool {
 		r.reg = regexp.MustCompile(strings.Replace(strings.Replace(r.Serialize(), "*", ".*", -1), "..*", ".*", -1))
 	})
 
-	if r.reg != nil {
-		return r.reg.Copy().MatchString(req.Serialize())
-	}
-
-	return false
+	return r.reg.Copy().MatchString(req.Serialize())
 }
 
 // New returns the decoded configuration YAML file as *Config struct. Returns non-nil error if any.
