@@ -18,8 +18,6 @@ package log
 
 import (
 	"io"
-	"log"
-	"runtime"
 
 	"github.com/kpango/glg"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
@@ -49,17 +47,6 @@ func New(w io.Writer, requestID string) Logger {
 func (l *logger) Printf(format string, args ...interface{}) {
 	err := l.log.Printf(format, args...)
 	if err != nil {
-		defer func() {
-			if err := recover(); err != nil {
-				if _, ok := err.(runtime.Error); ok {
-					panic(err)
-				}
-				err = glg.Error(err)
-				if err != nil {
-					log.Fatal(err)
-				}
-			}
-		}()
 		glg.Fatal(err)
 	}
 }
@@ -68,17 +55,6 @@ func (l *logger) Printf(format string, args ...interface{}) {
 func (l *logger) Println(args ...interface{}) {
 	err := l.log.Println(args...)
 	if err != nil {
-		defer func() {
-			if err := recover(); err != nil {
-				if _, ok := err.(runtime.Error); ok {
-					panic(err)
-				}
-				err = glg.Error(err)
-				if err != nil {
-					log.Fatal(err)
-				}
-			}
-		}()
 		glg.Fatal(err)
 	}
 }

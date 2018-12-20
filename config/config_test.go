@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"os"
 	"reflect"
-	"strings"
 	"testing"
 	"time"
 
@@ -214,10 +213,12 @@ func TestNew(t *testing.T) {
 		path string
 	}
 	type test struct {
-		name    string
-		args    args
-		want    *Config
-		wantErr error
+		name       string
+		args       args
+		beforeFunc func() error
+		afterFunc  func() error
+		want       *Config
+		wantErr    error
 	}
 	tests := []test{
 		{
@@ -225,7 +226,31 @@ func TestNew(t *testing.T) {
 			args: args{
 				path: "./testdata/not_valid_config.yaml",
 			},
-			wantErr: fmt.Errorf("yaml: unmarshal errors"),
+			wantErr: fmt.Errorf("yaml: line 11: could not find expected ':'"),
+		},
+		{
+			name: "Open file error",
+			args: args{
+				path: "./tmp",
+			},
+			beforeFunc: func() error {
+				f, err := os.Create("./tmp")
+				if err != nil {
+					return err
+				}
+				defer f.Close()
+
+				err = f.Chmod(0000)
+				if err != nil {
+					return err
+				}
+
+				return nil
+			},
+			afterFunc: func() error {
+				return os.Remove("./tmp")
+			},
+			wantErr: fmt.Errorf("open ./tmp: permission denied"),
 		},
 		{
 			name: "Test file content valid",
@@ -345,6 +370,21 @@ func TestNew(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			if tt.beforeFunc != nil {
+				err := tt.beforeFunc()
+				if err != nil {
+					t.Error(err)
+				}
+			}
+			if tt.afterFunc != nil {
+				defer func() {
+					err := tt.afterFunc()
+					if err != nil {
+						t.Error(err)
+					}
+				}()
+			}
+
 			got, err := New(tt.args.path)
 
 			if tt.wantErr == nil && err != nil {
@@ -356,8 +396,7 @@ func TestNew(t *testing.T) {
 					t.Errorf("want error: %v, got nil", tt.wantErr)
 					return
 				}
-				if strings.HasPrefix(err.Error(), tt.wantErr.Error()) {
-					//if err.Error() != tt.wantErr.Error() {
+				if err.Error() != tt.wantErr.Error() {
 					t.Errorf("New() error: %v, want: %v", err, tt.wantErr)
 					return
 				}
