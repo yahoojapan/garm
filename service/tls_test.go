@@ -54,7 +54,7 @@ func TestNewTLSConfig(t *testing.T) {
 		beforeFunc func(args args)
 		checkFunc  func(*tls.Config, *tls.Config) error
 		afterFunc  func(args args)
-		wantErr    bool
+		wantErr    error
 	}{
 		{
 			name: "return value MinVersion test.",
@@ -300,19 +300,8 @@ func TestNewTLSConfig(t *testing.T) {
 				Certificates:           nil,
 				ClientAuth:             tls.RequireAndVerifyClientCert,
 			},
-			beforeFunc: func(args args) {
-
-				// do nothing
-
-			},
-			afterFunc: func(args args) {
-
-				// do nothing
-			},
 			checkFunc: func(got, want *tls.Config) error {
-
 				if got.Certificates != nil {
-
 					return fmt.Errorf("Certificates not nil")
 				}
 
@@ -335,23 +324,14 @@ func TestNewTLSConfig(t *testing.T) {
 				ClientAuth:             tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-
-				os.Setenv(args.cfg.CertKey, args.CertKeyPath)
-
+				os.Setenv(args.cfg.CertKey, "notexists")
+				os.Setenv(args.cfg.KeyKey, args.KeyKeyPath)
 			},
 			afterFunc: func(args args) {
-
 				os.Unsetenv(args.cfg.CertKey)
+				os.Unsetenv(args.cfg.KeyKey)
 			},
-			checkFunc: func(got, want *tls.Config) error {
-
-				if got.Certificates != nil {
-
-					return fmt.Errorf("Certificates not nil")
-				}
-
-				return nil
-			},
+			wantErr: fmt.Errorf("open notexists: no such file or directory"),
 		},
 		{
 			name: "CA file not found return value ClientAuth test.",
@@ -372,39 +352,46 @@ func TestNewTLSConfig(t *testing.T) {
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-
 				os.Setenv(args.cfg.CertKey, args.CertKeyPath)
 				os.Setenv(args.cfg.KeyKey, args.KeyKeyPath)
+				os.Setenv(args.cfg.CAKey, "notexists")
 			},
 			afterFunc: func(args args) {
-
 				os.Unsetenv(args.cfg.CertKey)
 				os.Unsetenv(args.cfg.KeyKey)
+				os.Unsetenv(args.cfg.CAKey)
 			},
-			checkFunc: func(got, want *tls.Config) error {
-
-				if got.ClientAuth != 0 {
-					return fmt.Errorf("ClientAuth is :\t%d", got.ClientAuth)
-				}
-				return nil
-			},
+			wantErr: fmt.Errorf("open notexists: no such file or directory"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			if tt.beforeFunc != nil {
 				tt.beforeFunc(tt.args)
 			}
+			if tt.afterFunc != nil {
+				defer tt.afterFunc(tt.args)
+			}
 
 			got, err := NewTLSConfig(tt.args.cfg)
-			if err != nil {
-				t.Errorf("NewTLSConfig() error = %v, wantErr %v", err, tt.wantErr)
+
+			if tt.wantErr == nil && err != nil {
+				t.Errorf("NewTLSConfig() error: %v  wantErr: %v", err, tt.wantErr)
 				return
+			}
+			if tt.wantErr != nil {
+				if err == nil {
+					t.Errorf("Error should occur: want error: %v  want: %v", err, tt.wantErr)
+					return
+				}
+				// Here is comparing error message with expected
+				if err.Error() != tt.wantErr.Error() {
+					t.Errorf("Assertion failed: got: %v  want: %v", err, tt.wantErr)
+					return
+				}
 			}
 
 			if tt.checkFunc != nil {
-
 				err = tt.checkFunc(got, tt.want)
 				if err != nil {
 					t.Errorf("NewTLSConfig() error = %v", err)
@@ -414,7 +401,6 @@ func TestNewTLSConfig(t *testing.T) {
 
 			if tt.afterFunc != nil {
 				tt.afterFunc(tt.args)
-
 			}
 		})
 	}
