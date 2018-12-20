@@ -37,7 +37,7 @@ func TestNewResourceMapper(t *testing.T) {
 		want ResourceMapper
 	}
 	tests := []testcase{
-		testcase{
+		{
 			name: "Check NewResourceMapper, nil resolver",
 			args: args{
 				resolver: nil,
@@ -110,7 +110,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			},
 			wantIdentity: "",
 			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
-				webhook.AthenzAccessCheck{
+				{
 					Resource: "",
 					Action:   "",
 				},
@@ -140,7 +140,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			},
 			wantIdentity: "user-120",
 			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
-				webhook.AthenzAccessCheck{
+				{
 					Resource: "athenz-domain-106:path-117",
 					Action:   "verb-118",
 				},
@@ -174,7 +174,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			},
 			wantIdentity: "user-154",
 			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
-				webhook.AthenzAccessCheck{
+				{
 					Resource: "athenz-domain-138.empty-namespace-140:group-152.resource-150.sub-resource-151.name-147",
 					Action:   "verb-149",
 				},
@@ -219,7 +219,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			},
 			wantIdentity: "user-200",
 			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
-				webhook.AthenzAccessCheck{
+				{
 					Resource: "athenz-domain-171:mapped-group-182.athenz-resource-179.mapped-resource-name-185",
 					Action:   "athenz-action-176",
 				},
@@ -253,7 +253,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			},
 			wantIdentity: "athenz-domain-216.namespace-234.sub-domain-234.user-234",
 			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
-				webhook.AthenzAccessCheck{
+				{
 					Resource: "athenz-domain-216.namespace-228:group-232.resource-230.sub-resource-231.name-227",
 					Action:   "verb-229",
 				},
@@ -269,7 +269,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,
 						AdminAccessList: []*config.RequestInfo{
-							&config.RequestInfo{
+							{
 								Verb:      "verb-*",
 								Namespace: "namespace-*",
 								APIGroup:  "group-*",
@@ -295,11 +295,11 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			},
 			wantIdentity: "user-276",
 			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
-				webhook.AthenzAccessCheck{
+				{
 					Resource: "group-274.athenz-admin-domain-250.resource-272.sub-resource-273.name-269",
 					Action:   "verb-271",
 				},
-				webhook.AthenzAccessCheck{
+				{
 					Resource: "group-274.resource-272.sub-resource-273.name-269",
 					Action:   "verb-271",
 				},
@@ -315,7 +315,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,
 						BlackList: []*config.RequestInfo{
-							&config.RequestInfo{
+							{
 								Verb:      "verb-*",
 								Namespace: "namespace-*",
 								APIGroup:  "group-*",

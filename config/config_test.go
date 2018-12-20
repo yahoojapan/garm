@@ -220,14 +220,14 @@ func TestNew(t *testing.T) {
 		wantErr error
 	}
 	tests := []test{
-		test{
+		{
 			name: "Test file content not valid",
 			args: args{
 				path: "./testdata/not_valid_config.yaml",
 			},
 			wantErr: fmt.Errorf("yaml: unmarshal errors"),
 		},
-		test{
+		{
 			name: "Test file content valid",
 			args: args{
 				path: "./testdata/example_config.yaml",

@@ -90,13 +90,10 @@ func TestNewTLSConfig(t *testing.T) {
 			},
 			checkFunc: func(got, want *tls.Config) error {
 				if got.MinVersion != want.MinVersion {
-
 					return fmt.Errorf("MinVersion not Matched :\tgot %d\twant %d", got.MinVersion, want.MinVersion)
-
-				} else {
-
-					return nil
 				}
+
+				return nil
 			},
 		},
 		{
@@ -133,30 +130,24 @@ func TestNewTLSConfig(t *testing.T) {
 			},
 			checkFunc: func(got, want *tls.Config) error {
 				if len(got.CurvePreferences) != len(want.CurvePreferences) {
-
 					return fmt.Errorf("CurvePreferences not Matched length:\tgot %d\twant %d", len(got.CurvePreferences), len(want.CurvePreferences))
+				}
 
-				} else {
+				for _, actualValue := range got.CurvePreferences {
+					var match bool
 
-					for _, actualValue := range got.CurvePreferences {
-
-						var match bool
-
-						for _, expectedValue := range want.CurvePreferences {
-
-							if actualValue == expectedValue {
-
-								match = true
-								break
-							}
-						}
-
-						if !match {
-							return fmt.Errorf("CurvePreferences not Find :\twant %s", string(want.MinVersion))
+					for _, expectedValue := range want.CurvePreferences {
+						if actualValue == expectedValue {
+							match = true
+							break
 						}
 					}
-					return nil
+
+					if !match {
+						return fmt.Errorf("CurvePreferences not Find :\twant %s", string(want.MinVersion))
+					}
 				}
+				return nil
 			},
 		},
 		{
@@ -193,12 +184,9 @@ func TestNewTLSConfig(t *testing.T) {
 			},
 			checkFunc: func(got, want *tls.Config) error {
 				if got.SessionTicketsDisabled != want.SessionTicketsDisabled {
-
 					return fmt.Errorf("SessionTicketsDisabled not matched :\tgot %v\twant %v", got.SessionTicketsDisabled, want.SessionTicketsDisabled)
-
-				} else {
-					return nil
 				}
+				return nil
 			},
 		},
 		{

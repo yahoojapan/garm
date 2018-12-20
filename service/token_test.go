@@ -620,7 +620,7 @@ func Test_token_loadToken(t *testing.T) {
 		wantErr    error
 	}
 	tests := []test{
-		test{
+		{
 			name: "Test error tokenFilePath is empty (k8s secret)",
 			fields: fields{
 				token:           new(atomic.Value),
@@ -640,7 +640,7 @@ func Test_token_loadToken(t *testing.T) {
 			},
 			wantErr: fmt.Errorf("Error"),
 		},
-		test{
+		{
 			name: "Test success tokenFilePath is empty (k8s secret)",
 			fields: fields{
 				token:           new(atomic.Value),
@@ -666,7 +666,7 @@ func Test_token_loadToken(t *testing.T) {
 			},
 			want: "token",
 		},
-		test{
+		{
 			name: "Test tokenFilePath not exists error (Copper argos)",
 			fields: fields{
 				token:           new(atomic.Value),
@@ -686,7 +686,7 @@ func Test_token_loadToken(t *testing.T) {
 			},
 			wantErr: fmt.Errorf("open notexists: no such file or directory"),
 		},
-		test{
+		{
 			name: "Test tokenFilePath exists (Copper argos)",
 			fields: fields{
 				token:           new(atomic.Value),
@@ -712,7 +712,7 @@ func Test_token_loadToken(t *testing.T) {
 			},
 			want: "dummy token",
 		},
-		test{
+		{
 			name: "Test error validate token",
 			fields: fields{
 				token:           new(atomic.Value),

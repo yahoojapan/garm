@@ -35,13 +35,6 @@ type handler struct {
 	athenz service.Athenz
 }
 
-const (
-	ContentType     = "Content-Type"
-	ApplicationJSON = "application/json"
-	TextPlain       = "text/plain"
-	CharsetUTF8     = "charset=UTF-8"
-)
-
 // New returns a Handler with the given Athenz service.
 func New(a service.Athenz) Handler {
 	return &handler{

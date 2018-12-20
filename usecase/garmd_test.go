@@ -47,7 +47,7 @@ func TestNew(t *testing.T) {
 		wantErr    error
 	}
 	tests := []test{
-		test{
+		{
 			name: "Check error when new token service",
 			args: args{
 				cfg: config.Config{
