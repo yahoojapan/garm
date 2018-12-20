@@ -23,7 +23,7 @@ Requires go 1.11 or later.
     - Athenz server contains the user authorization information for access control
     - ask Athenz server is the user action is allowed based on pre-configurated policy
 
-Garm convert the K8s request to Athenz request based on the mapping rules in `config.yaml` ([example](./config/assets/example_config.yaml)).
+Garm convert the K8s request to Athenz request based on the mapping rules in `config.yaml` ([example](./config/testdata/example_config.yaml)).
   - [Conversion logic](./doc/garm-functional-overview.md)
   - [Config details](./doc/config-detail.md)
 
