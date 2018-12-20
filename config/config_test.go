@@ -425,10 +425,18 @@ func TestGetActualValue(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.beforeFunc != nil {
-				tt.beforeFunc()
+				err := tt.beforeFunc()
+				if err != nil {
+					t.Error(err)
+				}
 			}
 			if tt.afterFunc != nil {
-				defer tt.afterFunc()
+				defer func() {
+					err := tt.afterFunc()
+					if err != nil {
+						t.Error(err)
+					}
+				}()
 			}
 
 			if got := GetActualValue(tt.args.val); got != tt.want {

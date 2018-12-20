@@ -125,7 +125,11 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 	go func() {
 		s.mu.Lock()
 		s.srvRunning = true
-		glg.Info("garm api server starting")
+		err := glg.Info("garm api server starting")
+		if err != nil {
+			s.mu.Unlock()
+			return
+		}
 		s.mu.Unlock()
 		wg.Done()
 
@@ -133,15 +137,22 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 		close(sech)
 
 		s.mu.Lock()
-		glg.Info("garm api server returned")
 		s.srvRunning = false
 		s.mu.Unlock()
+		err = glg.Info("garm api server stopped")
+		if err != nil {
+			glg.Fatal(err)
+		}
 	}()
 
 	go func() {
 		s.mu.Lock()
 		s.hcrunning = true
-		glg.Info("garm health check server starting")
+		err := glg.Info("garm health check server starting")
+		if err != nil {
+			s.mu.Unlock()
+			return
+		}
 		s.mu.Unlock()
 		wg.Done()
 
@@ -149,9 +160,12 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 		close(hech)
 
 		s.mu.Lock()
-		glg.Info("garm health check server returned")
 		s.hcrunning = false
 		s.mu.Unlock()
+		err = glg.Info("garm health check server stopped")
+		if err != nil {
+			glg.Fatal(err)
+		}
 	}()
 
 	go func() {

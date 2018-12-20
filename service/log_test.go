@@ -37,9 +37,6 @@ func TestNewLogger(t *testing.T) {
 		cfg config.Logger
 	}
 
-	var flg webhook.LogFlags
-	flg |= webhook.LogTraceServer
-
 	testFilePath := "/tmp/garm_logging_test.txt"
 	f, err := os.OpenFile(testFilePath, os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0600)
 	defer func() {
