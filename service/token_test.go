@@ -229,7 +229,6 @@ func TestNewTokenService(t *testing.T) {
 }
 
 func Test_token_StartTokenUpdater(t *testing.T) {
-
 	type args struct {
 		ctx context.Context
 	}
@@ -331,6 +330,58 @@ func Test_token_StartTokenUpdater(t *testing.T) {
 				afterFunc: func() {
 					os.Unsetenv(keyKey)
 					cancel()
+				},
+			}
+		}(),
+		func() test {
+			keyKey := "dummyKey"
+			key := "./testdata/dummyServer.key"
+			cfg := config.Token{
+				AthenzDomain:      keyKey,
+				ServiceName:       keyKey,
+				NTokenPath:        "",
+				PrivateKeyEnvName: keyKey,
+				ValidateToken:     false,
+				RefreshDuration:   "100ms",
+				KeyVersion:        "1",
+				Expiration:        "1s",
+			}
+
+			return test{
+				name: "Check token will update periodically ",
+				args: args{
+					ctx: context.Background(),
+				},
+				cfg: cfg,
+				beforeFunc: func() {
+					os.Setenv(keyKey, key)
+				},
+				checkFunc: func(got TokenService) error {
+					// wait for the updater to update the token and get the first token
+					time.Sleep(time.Millisecond * 100)
+					g1, err := got.GetToken()
+					if err != nil {
+						return err
+					}
+					if len(g1) == 0 {
+						return fmt.Errorf("invalid token, got: %s", g1)
+					}
+
+					// sleep again and get the second token
+					time.Sleep(time.Millisecond * 120)
+					g2, err := got.GetToken()
+					if err != nil {
+						return err
+					}
+
+					if g1 == g2 {
+						return fmt.Errorf("Token did not refreshed, got1: %v, got2: %v", g1, g2)
+					}
+
+					return nil
+				},
+				afterFunc: func() {
+					os.Unsetenv(keyKey)
 				},
 			}
 		}(),
