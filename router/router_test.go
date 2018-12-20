@@ -214,8 +214,8 @@ func Test_routing(t *testing.T) {
 	tests := []testcase{
 		func() testcase {
 			handlerFunc := func(rw http.ResponseWriter, r *http.Request) error {
-				rw.Write([]byte("response-body-174"))
-				return nil
+				_, err := rw.Write([]byte("response-body-174"))
+				return err
 			}
 			want := "response-body-174"
 
@@ -239,6 +239,9 @@ func Test_routing(t *testing.T) {
 					response := recorder.Result()
 					defer response.Body.Close()
 					gotByte, err := ioutil.ReadAll(response.Body)
+					if err != nil {
+						return err
+					}
 
 					got := string(gotByte)
 					if got != want {
@@ -281,6 +284,9 @@ func Test_routing(t *testing.T) {
 					response := recorder.Result()
 					defer response.Body.Close()
 					gotByte, err := ioutil.ReadAll(response.Body)
+					if err != nil {
+						return err
+					}
 
 					got := string(gotByte)
 					if got != want {
@@ -314,6 +320,9 @@ func Test_routing(t *testing.T) {
 					response := recorder.Result()
 					defer response.Body.Close()
 					gotByte, err := ioutil.ReadAll(response.Body)
+					if err != nil {
+						return err
+					}
 
 					got := string(gotByte)
 					if got != want {
@@ -351,6 +360,9 @@ func Test_routing(t *testing.T) {
 					response := recorder.Result()
 					defer response.Body.Close()
 					gotByte, err := ioutil.ReadAll(response.Body)
+					if err != nil {
+						return err
+					}
 
 					got := string(gotByte)
 					if got != want {
@@ -363,8 +375,8 @@ func Test_routing(t *testing.T) {
 		}(),
 		func() testcase {
 			handlerFunc := func(rw http.ResponseWriter, r *http.Request) error {
-				rw.Write([]byte("response-body-321"))
-				return nil
+				_, err := rw.Write([]byte("response-body-321"))
+				return err
 			}
 			want := "response-body-321"
 
@@ -390,6 +402,9 @@ func Test_routing(t *testing.T) {
 						response := recorder.Result()
 						defer response.Body.Close()
 						gotByte, err := ioutil.ReadAll(response.Body)
+						if err != nil {
+							return err
+						}
 
 						got := string(gotByte)
 						if got != want {

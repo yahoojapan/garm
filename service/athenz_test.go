@@ -293,7 +293,10 @@ func Test_athenz_AthenzAuthenticator(t *testing.T) {
 
 					w.WriteHeader(http.StatusOK)
 					w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-					io.WriteString(w, r.URL.String()+" - "+string(body[:]))
+					_, err = io.WriteString(w, r.URL.String()+" - "+string(body[:]))
+					if err != nil {
+						t.Error(err)
+					}
 				}),
 			},
 			args: args{
@@ -385,7 +388,10 @@ func Test_athenz_AthenzAuthorizer(t *testing.T) {
 
 					w.WriteHeader(http.StatusOK)
 					w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-					io.WriteString(w, r.URL.String()+" - "+string(body[:]))
+					_, err = io.WriteString(w, r.URL.String()+" - "+string(body[:]))
+					if err != nil {
+						t.Error(err)
+					}
 				}),
 			},
 			args: args{

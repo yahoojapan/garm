@@ -82,7 +82,10 @@ func run(cfg config.Config) []error {
 		select {
 		case <-sigCh:
 			cancel()
-			glg.Warn("garm server shutdown...")
+			err = glg.Warn("garm server shutdown...")
+			if err != nil {
+				glg.Fatal(err)
+			}
 		case errs := <-ech:
 			return errs
 		}
@@ -95,7 +98,10 @@ func main() {
 			if _, ok := err.(runtime.Error); ok {
 				panic(err)
 			}
-			glg.Error(err)
+			err = glg.Error(err)
+			if err != nil {
+				glg.Fatal(err)
+			}
 		}
 	}()
 
@@ -109,7 +115,10 @@ func main() {
 	}
 
 	if p.showVersion {
-		glg.Infof("garm version -> %s", config.GetVersion())
+		err = glg.Infof("garm version -> %s", config.GetVersion())
+		if err != nil {
+			glg.Fatal(err)
+		}
 		return
 	}
 

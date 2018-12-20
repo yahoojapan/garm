@@ -125,7 +125,11 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 	go func() {
 		s.mu.Lock()
 		s.srvRunning = true
-		glg.Info("garm api server starting")
+		err := glg.Info("garm api server starting")
+		if err != nil {
+			s.mu.Unlock()
+			return
+		}
 		s.mu.Unlock()
 		wg.Done()
 
@@ -133,15 +137,22 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 		close(sech)
 
 		s.mu.Lock()
-		glg.Info("garm api server returned")
 		s.srvRunning = false
 		s.mu.Unlock()
+		err = glg.Info("garm api server stopped")
+		if err != nil {
+			glg.Fatal(err)
+		}
 	}()
 
 	go func() {
 		s.mu.Lock()
 		s.hcrunning = true
-		glg.Info("garm health check server starting")
+		err := glg.Info("garm health check server starting")
+		if err != nil {
+			s.mu.Unlock()
+			return
+		}
 		s.mu.Unlock()
 		wg.Done()
 
@@ -149,9 +160,12 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 		close(hech)
 
 		s.mu.Lock()
-		glg.Info("garm health check server returned")
 		s.hcrunning = false
 		s.mu.Unlock()
+		err = glg.Info("garm health check server stopped")
+		if err != nil {
+			glg.Fatal(err)
+		}
 	}()
 
 	go func() {
@@ -171,11 +185,17 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 			case <-ctx.Done(): // when context receives Done signal, closes running servers and returns any errors
 				s.mu.RLock()
 				if s.hcrunning {
-					glg.Info("garm health check server will shutdown")
+					err := glg.Info("garm health check server will shutdown")
+					if err != nil {
+						errs = appendErr(errs, err)
+					}
 					errs = appendErr(errs, s.hcShutdown(context.Background()))
 				}
 				if s.srvRunning {
-					glg.Info("garm api server will shutdown")
+					err := glg.Info("garm api server will shutdown")
+					if err != nil {
+						errs = appendErr(errs, err)
+					}
 					errs = appendErr(errs, s.apiShutdown(context.Background()))
 				}
 				s.mu.RUnlock()
@@ -190,7 +210,10 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 
 				s.mu.RLock()
 				if s.hcrunning {
-					glg.Info("garm health check server will shutdown")
+					err = glg.Info("garm health check server will shutdown")
+					if err != nil {
+						errs = appendErr(errs, err)
+					}
 					errs = appendErr(errs, s.hcShutdown(ctx))
 				}
 				s.mu.RUnlock()
@@ -204,7 +227,10 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 
 				s.mu.RLock()
 				if s.srvRunning {
-					glg.Info("garm api server will shutdown")
+					err = glg.Info("garm api server will shutdown")
+					if err != nil {
+						errs = appendErr(errs, err)
+					}
 					errs = appendErr(errs, s.apiShutdown(ctx))
 				}
 				s.mu.RUnlock()
@@ -260,7 +286,10 @@ func (s *server) listenAndServeAPI() error {
 		s.srv.TLSConfig = cfg
 	}
 	if err != nil {
-		glg.Error(err)
+		err = glg.Error(err)
+		if err != nil {
+			return err
+		}
 	}
 	return s.srv.ListenAndServeTLS("", "")
 }

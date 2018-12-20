@@ -18,6 +18,7 @@ package log
 
 import (
 	"io"
+	"log"
 	"runtime"
 
 	"github.com/kpango/glg"
@@ -53,7 +54,10 @@ func (l *logger) Printf(format string, args ...interface{}) {
 				if _, ok := err.(runtime.Error); ok {
 					panic(err)
 				}
-				glg.Error(err)
+				err = glg.Error(err)
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
 		}()
 		glg.Fatal(err)
@@ -69,7 +73,10 @@ func (l *logger) Println(args ...interface{}) {
 				if _, ok := err.(runtime.Error); ok {
 					panic(err)
 				}
-				glg.Error(err)
+				err = glg.Error(err)
+				if err != nil {
+					log.Fatal(err)
+				}
 			}
 		}()
 		glg.Fatal(err)

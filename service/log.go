@@ -95,7 +95,10 @@ func newLogTraceFlag(traces []string) webhook.LogFlags {
 		case "mapping":
 			flgs |= webhook.LogVerboseMapping
 		default:
-			glg.Errorf("unsupported trace event, %v, ignored", t)
+			err := glg.Errorf("unsupported trace event, %v, ignored", t)
+			if err != nil {
+				glg.Fatal(err)
+			}
 		}
 	}
 	return flgs

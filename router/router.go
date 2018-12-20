@@ -86,12 +86,18 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 									err.Error(),
 									http.StatusText(http.StatusInternalServerError)),
 								http.StatusInternalServerError)
-							glg.Error(err)
+							err = glg.Error(err)
+							if err != nil {
+								glg.Fatal(err)
+							}
 						}
 						return
 					case <-ctx.Done():
 						// timeout passed or parent context canceled first, it is the responsibility for handler to response to the user
-						glg.Errorf("Handler Time Out: %v", time.Since(start))
+						err := glg.Errorf("Handler Time Out: %v", time.Since(start))
+						if err != nil {
+							glg.Fatal(err)
+						}
 						return
 					}
 				}

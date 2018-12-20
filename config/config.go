@@ -252,7 +252,7 @@ type RequestInfo struct {
 // Serialize returns RequestInfo in string format.
 // 1. replacedAPIGroup = replace `. => _` in r.APIGroup
 // 2. output format: `${r.Verb}-${r.Namespace}-${replacedAPIGroup}-${r.Resource}-${r.Name}`
-func (r RequestInfo) Serialize() string {
+func (r *RequestInfo) Serialize() string {
 	return strings.Join([]string{r.Verb, r.Namespace, strings.Replace(r.APIGroup, ".", "_", -1), r.Resource, r.Name}, "-")
 }
 
