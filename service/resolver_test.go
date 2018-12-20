@@ -312,7 +312,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 					return nil
 				},
 				afterFunc: func() error {
-					for k, _ := range env {
+					for k := range env {
 						err := os.Unsetenv(k)
 						if err != nil {
 							return err
@@ -347,7 +347,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 					return nil
 				},
 				afterFunc: func() error {
-					for k, _ := range env {
+					for k := range env {
 						err := os.Unsetenv(k)
 						if err != nil {
 							return err
@@ -383,7 +383,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 					return nil
 				},
 				afterFunc: func() error {
-					for k, _ := range env {
+					for k := range env {
 						err := os.Unsetenv(k)
 						if err != nil {
 							return err
@@ -1018,7 +1018,7 @@ func Test_resolve_IsAllowed(t *testing.T) {
 				cfg: config.Platform{
 					WhiteList: []*config.RequestInfo{},
 					BlackList: []*config.RequestInfo{
-						&config.RequestInfo{
+						{
 							Verb:      "verb*",
 							Namespace: "namespace*",
 							APIGroup:  "apiGroup*",
@@ -1042,7 +1042,7 @@ func Test_resolve_IsAllowed(t *testing.T) {
 			fields: fields{
 				cfg: config.Platform{
 					WhiteList: []*config.RequestInfo{
-						&config.RequestInfo{
+						{
 							Verb:      "verb*",
 							Namespace: "namespace*",
 							APIGroup:  "apiGroup*",
@@ -1066,7 +1066,7 @@ func Test_resolve_IsAllowed(t *testing.T) {
 			fields: fields{
 				cfg: config.Platform{
 					WhiteList: []*config.RequestInfo{
-						&config.RequestInfo{
+						{
 							Verb:      "verb*",
 							Namespace: "namespace*",
 							APIGroup:  "apiGroup*",
@@ -1074,7 +1074,7 @@ func Test_resolve_IsAllowed(t *testing.T) {
 							Name:      "name*",
 						}},
 					BlackList: []*config.RequestInfo{
-						&config.RequestInfo{
+						{
 							Verb:      "verb*",
 							Namespace: "namespace*",
 							APIGroup:  "apiGroup*",
@@ -1145,7 +1145,7 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 			fields: fields{
 				cfg: config.Platform{
 					AdminAccessList: []*config.RequestInfo{
-						&config.RequestInfo{
+						{
 							Verb:      "verb-406",
 							Namespace: "namespace-407",
 							APIGroup:  "apiGroup-408",
@@ -1169,14 +1169,14 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 			fields: fields{
 				cfg: config.Platform{
 					AdminAccessList: []*config.RequestInfo{
-						&config.RequestInfo{
+						{
 							Verb:      "verb-430",
 							Namespace: "namespace-431",
 							APIGroup:  "apiGroup-432",
 							Resource:  "resource-433",
 							Name:      "name-434",
 						},
-						&config.RequestInfo{
+						{
 							Verb:      "verb-437",
 							Namespace: "namespace-438",
 							APIGroup:  "apiGroup-439",
@@ -1200,7 +1200,7 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 			fields: fields{
 				cfg: config.Platform{
 					AdminAccessList: []*config.RequestInfo{
-						&config.RequestInfo{
+						{
 							Verb:      "verb-461",
 							Namespace: "namespace-462",
 							APIGroup:  "apiGroup-463",
@@ -1224,7 +1224,7 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 			fields: fields{
 				cfg: config.Platform{
 					AdminAccessList: []*config.RequestInfo{
-						&config.RequestInfo{
+						{
 							Verb:      "verb-484",
 							Namespace: "namespace-485",
 							APIGroup:  "apiGroup-.*",
@@ -1248,7 +1248,7 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 			fields: fields{
 				cfg: config.Platform{
 					AdminAccessList: []*config.RequestInfo{
-						&config.RequestInfo{
+						{
 							Verb:      "verb-509",
 							Namespace: "namespace-510",
 							APIGroup:  "apiGroup-.*",

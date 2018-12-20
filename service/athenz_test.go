@@ -51,11 +51,11 @@ type dummyMapper string
 func (dummyMapper) MapResource(ctx context.Context, spec authz.SubjectAccessReviewSpec) (principal string, checks []webhook.AthenzAccessCheck, err error) {
 	principal = "principal"
 	checks = []webhook.AthenzAccessCheck{
-		webhook.AthenzAccessCheck{
+		{
 			Action:   "action_1",
 			Resource: "resource_1",
 		},
-		webhook.AthenzAccessCheck{
+		{
 			Action:   "action_2",
 			Resource: "resource_2",
 		},
