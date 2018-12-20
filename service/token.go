@@ -107,7 +107,10 @@ func (t *token) StartTokenUpdater(ctx context.Context) TokenService {
 			case <-ticker.C:
 				err = t.update()
 				if err != nil {
-					glg.Error(err)
+					err = glg.Error(err)
+					if err != nil {
+						glg.Fatal(err)
+					}
 				}
 			}
 		}
