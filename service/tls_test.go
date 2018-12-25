@@ -331,7 +331,7 @@ func TestNewTLSConfig(t *testing.T) {
 				os.Unsetenv(args.cfg.CertKey)
 				os.Unsetenv(args.cfg.KeyKey)
 			},
-			wantErr: fmt.Errorf("open notexists: no such file or directory"),
+			wantErr: fmt.Errorf("failed to load x509 key pair: open notexists: no such file or directory"),
 		},
 		{
 			name: "CA file not found return value ClientAuth test.",
@@ -361,7 +361,7 @@ func TestNewTLSConfig(t *testing.T) {
 				os.Unsetenv(args.cfg.KeyKey)
 				os.Unsetenv(args.cfg.CAKey)
 			},
-			wantErr: fmt.Errorf("open notexists: no such file or directory"),
+			wantErr: fmt.Errorf("failed to load x509 ca: failed to read pem file: open notexists: no such file or directory"),
 		},
 	}
 	for _, tt := range tests {

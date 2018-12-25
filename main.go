@@ -65,7 +65,7 @@ func run(cfg config.Config) []error {
 
 	daemon, err := usecase.New(cfg)
 	if err != nil {
-		return []error{err}
+		return []error{errors.Wrap(err, "failed to instantiate daemon")}
 	}
 
 	ech := daemon.Start(ctx)
@@ -86,6 +86,7 @@ func run(cfg config.Config) []error {
 			if err != nil {
 				glg.Fatal(err)
 			}
+			return nil
 		case errs := <-ech:
 			return errs
 		}

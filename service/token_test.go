@@ -52,7 +52,7 @@ func TestNewTokenService(t *testing.T) {
 					RefreshDuration: "test",
 				},
 			},
-			wantErr: fmt.Errorf("invalid token refresh duration %s, %v", "test", "time: invalid duration test"),
+			wantErr: fmt.Errorf("invalid token refresh duration %s: %v", "test", "time: invalid duration test"),
 		},
 		{
 			name: "Test error invalid expiration",
@@ -62,7 +62,7 @@ func TestNewTokenService(t *testing.T) {
 					Expiration:      "test",
 				},
 			},
-			wantErr: fmt.Errorf("invalid token expiration %s, %v", "test", "time: invalid duration test"),
+			wantErr: fmt.Errorf("invalid token expiration %s: %v", "test", "time: invalid duration test"),
 		},
 		func() test {
 			keyKey := "dummyKey"
@@ -85,7 +85,7 @@ func TestNewTokenService(t *testing.T) {
 				afterFunc: func() {
 					os.Unsetenv(keyKey)
 				},
-				wantErr: fmt.Errorf("invalid token certificate open %v", "notexists: no such file or directory"),
+				wantErr: fmt.Errorf("invalid token certificate: open %v", "notexists: no such file or directory"),
 			}
 		}(),
 		func() test {
@@ -111,7 +111,7 @@ func TestNewTokenService(t *testing.T) {
 				afterFunc: func() {
 					os.Unsetenv(keyKey)
 				},
-				wantErr: fmt.Errorf("invalid token certificate open %v", "notexists: no such file or directory"),
+				wantErr: fmt.Errorf("invalid token certificate: open %v", "notexists: no such file or directory"),
 			}
 		}(),
 		func() test {
@@ -598,8 +598,7 @@ func Test_token_createTokenBuilder(t *testing.T) {
 				wantErr: fmt.Errorf(`failed to create ZMS SVC Token Builder
 AthenzDomain:	athenz
 ServiceName:	service
-KeyVersion:	1
-Error: Unable to create signer: Unable to load private key`),
+KeyVersion:	1: Unable to create signer: Unable to load private key`),
 			}
 		}(),
 	}
@@ -689,7 +688,7 @@ func Test_token_loadToken(t *testing.T) {
 					return tb
 				}(),
 			},
-			wantErr: fmt.Errorf("Error"),
+			wantErr: fmt.Errorf("token builder.Token().Value() load failed: Error"),
 		},
 		{
 			name: "Test success tokenFilePath is empty (k8s secret)",
@@ -735,7 +734,7 @@ func Test_token_loadToken(t *testing.T) {
 					return tb
 				}(),
 			},
-			wantErr: fmt.Errorf("open notexists: no such file or directory"),
+			wantErr: fmt.Errorf("token builder.Token().Value() load failed: open notexists: no such file or directory"),
 		},
 		{
 			name: "Test tokenFilePath exists (Copper argos)",
@@ -781,7 +780,7 @@ func Test_token_loadToken(t *testing.T) {
 					return tb
 				}(),
 			},
-			wantErr: fmt.Errorf("invalid server identity token:	bad field in token 'dummy token'"),
+			wantErr: fmt.Errorf("invalid server identity token: bad field in token 'dummy token'"),
 		},
 	}
 
@@ -883,7 +882,7 @@ func Test_token_update(t *testing.T) {
 				refreshDuration: time.Second,
 				builder:         NewMockTokenBuilder(),
 			},
-			wantErr: fmt.Errorf("open notexists: no such file or directory"),
+			wantErr: fmt.Errorf("loadToken failed: load token from filepath failed: open notexists: no such file or directory"),
 		},
 	}
 	for _, tt := range tests {

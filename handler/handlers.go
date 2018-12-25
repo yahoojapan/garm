@@ -19,6 +19,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/pkg/errors"
 	"github.com/yahoojapan/garm/service"
 )
 
@@ -45,11 +46,19 @@ func New(a service.Athenz) Handler {
 // Authenticate returns an error if any.
 // The function will handle HTTP request, authenticate the N-token, and write the result into ResponseWriter.
 func (h *handler) Authenticate(w http.ResponseWriter, r *http.Request) error {
-	return h.athenz.AthenzAuthenticator(w, r)
+	err := h.athenz.AthenzAuthenticator(w, r)
+	if err != nil {
+		return errors.Wrap(err, "Authenticate Webhook Handler failed")
+	}
+	return nil
 }
 
 // Authorize returns an error if any.
 // The function will handle HTTP request, authorize the result, and write the result into ResponseWriter.
 func (h *handler) Authorize(w http.ResponseWriter, r *http.Request) error {
-	return h.athenz.AthenzAuthorizer(w, r)
+	err := h.athenz.AthenzAuthorizer(w, r)
+	if err != nil {
+		return errors.Wrap(err, "Authorization Webhook Handler failed")
+	}
+	return nil
 }

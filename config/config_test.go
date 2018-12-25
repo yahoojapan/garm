@@ -226,7 +226,7 @@ func TestNew(t *testing.T) {
 			args: args{
 				path: "./testdata/not_valid_config.yaml",
 			},
-			wantErr: fmt.Errorf("yaml: line 11: could not find expected ':'"),
+			wantErr: fmt.Errorf("yaml parse failed: yaml: line 11: could not find expected ':'"),
 		},
 		{
 			name: "Open file error",
@@ -250,7 +250,7 @@ func TestNew(t *testing.T) {
 			afterFunc: func() error {
 				return os.Remove("./tmp")
 			},
-			wantErr: fmt.Errorf("open ./tmp: permission denied"),
+			wantErr: fmt.Errorf("config read failed: open ./tmp: permission denied"),
 		},
 		{
 			name: "Test file content valid",

@@ -77,7 +77,7 @@ func Test_handler_Authenticate(t *testing.T) {
 				},
 			},
 			args:    args{},
-			wantErr: fmt.Errorf("Test error"),
+			wantErr: fmt.Errorf("Authenticate Webhook Handler failed: Test error"),
 		},
 		{
 			name: "Test return success",
@@ -132,7 +132,7 @@ func Test_handler_Authorize(t *testing.T) {
 				},
 			},
 			args:    args{},
-			wantErr: fmt.Errorf("Test"),
+			wantErr: fmt.Errorf("Authorization Webhook Handler failed: Test"),
 		},
 		{
 			name: "Test return success",

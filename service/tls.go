@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/kpango/glg"
 	"github.com/pkg/errors"
 	"github.com/yahoojapan/garm/config"
 )
@@ -76,7 +77,7 @@ func NewTLSConfig(cfg config.TLS) (*tls.Config, error) {
 	if cert != "" && key != "" {
 		crt, err := tls.LoadX509KeyPair(cert, key)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "failed to load x509 key pair")
 		}
 		t.Certificates = make([]tls.Certificate, 1)
 		t.Certificates[0] = crt
@@ -85,7 +86,7 @@ func NewTLSConfig(cfg config.TLS) (*tls.Config, error) {
 	if ca != "" {
 		pool, err := NewX509CertPool(ca)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap(err, "failed to load x509 ca")
 		}
 		t.ClientCAs = pool
 		t.ClientAuth = tls.RequireAndVerifyClientCert
@@ -103,11 +104,16 @@ func NewX509CertPool(path string) (*x509.CertPool, error) {
 	if err == nil && c != nil {
 		pool, err = x509.SystemCertPool()
 		if err != nil || pool == nil {
+			err = glg.Error(errors.Wrap(err, "SystemCertPool not found"))
+			if err != nil {
+				glg.Fatal(errors.Wrap(err, "timeout parse error out put failed"))
+			}
 			pool = x509.NewCertPool()
 		}
 		if !pool.AppendCertsFromPEM(c) {
 			err = errors.New("Certification Failed")
 		}
+		return pool, nil
 	}
-	return pool, err
+	return pool, errors.Wrap(err, "failed to read pem file")
 }
