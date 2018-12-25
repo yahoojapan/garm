@@ -19,6 +19,7 @@ package usecase
 import (
 	"context"
 
+	"github.com/pkg/errors"
 	"github.com/yahoojapan/garm/config"
 	"github.com/yahoojapan/garm/handler"
 	"github.com/yahoojapan/garm/router"
@@ -43,7 +44,7 @@ type garm struct {
 func New(cfg config.Config) (GarmDaemon, error) {
 	token, err := service.NewTokenService(cfg.Token)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "token service instantiate failed")
 	}
 
 	resolver := service.NewResolver(cfg.Mapping)
@@ -56,7 +57,7 @@ func New(cfg config.Config) (GarmDaemon, error) {
 
 	athenz, err := service.NewAthenz(cfg.Athenz, service.NewLogger(cfg.Logger))
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "athenz service instantiate failed")
 	}
 
 	return &garm{

@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/kpango/glg"
+	"github.com/pkg/errors"
 	"github.com/yahoojapan/garm/config"
 	"github.com/yahoojapan/garm/handler"
 )
@@ -51,6 +52,10 @@ func New(cfg config.Server, h handler.Handler) *http.ServeMux {
 func parseTimeout(timeout string) time.Duration {
 	dur, err := time.ParseDuration(timeout)
 	if err != nil {
+		err = glg.Errorf("Invalid timeout value: %s", timeout)
+		if err != nil {
+			glg.Fatal(errors.Wrap(err, "timeout parse error out put failed"))
+		}
 		dur = time.Second * 3
 	}
 	return dur
@@ -81,6 +86,7 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 					case err := <-ech:
 						// handler finished first, may have error returned
 						if err != nil {
+							err = errors.Wrap(err, "handler error occurred")
 							http.Error(w,
 								fmt.Sprintf("Error: %s\t%s",
 									err.Error(),
@@ -88,7 +94,7 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 								http.StatusInternalServerError)
 							err = glg.Error(err)
 							if err != nil {
-								glg.Fatal(err)
+								glg.Fatal(errors.Wrap(err, "handler error out put failed"))
 							}
 						}
 						return
@@ -96,7 +102,7 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 						// timeout passed or parent context canceled first, it is the responsibility for handler to response to the user
 						err := glg.Errorf("Handler Time Out: %v", time.Since(start))
 						if err != nil {
-							glg.Fatal(err)
+							glg.Fatal(errors.Wrap(err, "timeout error out put failed"))
 						}
 						return
 					}
@@ -107,8 +113,11 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 		// flush and close the request body; for GET method, r.Body may be nil
 		err := flushAndClose(r.Body)
 		if err != nil {
-			// exit the program here
-			glg.Fatalln(err)
+			err = glg.Error(errors.Wrap(err, "request body flush & close failed"))
+			if err != nil {
+				// exit the program here
+				glg.Fatal(errors.Wrap(err, "request body flush/close error output failed"))
+			}
 		}
 
 		http.Error(w,
@@ -126,10 +135,13 @@ func flushAndClose(rc io.ReadCloser) error {
 		// flush
 		_, err := io.Copy(ioutil.Discard, rc)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "request body flush failed")
 		}
 		// close
-		return rc.Close()
+		err = rc.Close()
+		if err != nil {
+			return errors.Wrap(err, "request body close failed")
+		}
 	}
 	return nil
 }

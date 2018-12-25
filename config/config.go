@@ -22,6 +22,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/pkg/errors"
 	"github.com/yahoo/k8s-athenz-webhook"
 	"gopkg.in/yaml.v2"
 )
@@ -276,12 +277,12 @@ func (r *RequestInfo) Match(req RequestInfo) bool {
 func New(path string) (*Config, error) {
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDONLY, 0600)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "config read failed")
 	}
 	cfg := new(Config)
 	err = yaml.NewDecoder(f).Decode(&cfg)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "yaml parse failed")
 	}
 	return cfg, nil
 }

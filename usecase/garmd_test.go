@@ -54,7 +54,7 @@ func TestNew(t *testing.T) {
 					Token: config.Token{},
 				},
 			},
-			wantErr: fmt.Errorf("invalid token refresh duration , time: invalid duration "),
+			wantErr: fmt.Errorf("token service instantiate failed: invalid token refresh duration : time: invalid duration "),
 		},
 		func() test {
 			keyKey := "dummyKey"
@@ -81,7 +81,7 @@ func TestNew(t *testing.T) {
 				afterFunc: func() {
 					os.Unsetenv(keyKey)
 				},
-				wantErr: fmt.Errorf("time: invalid duration "),
+				wantErr: fmt.Errorf("athenz service instantiate failed: athenz timeout parse failed: time: invalid duration "),
 			}
 		}(),
 		func() test {

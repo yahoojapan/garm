@@ -199,7 +199,7 @@ func TestNewAthenz(t *testing.T) {
 			name:      "Check NewAthenz fail with nil cfg",
 			args:      args{},
 			want:      nil,
-			wantError: fmt.Errorf("time: invalid duration "),
+			wantError: fmt.Errorf("athenz timeout parse failed: time: invalid duration "),
 		},
 		{
 			name: "Check NewAthenz fail with invalid timeout duration",
@@ -209,7 +209,7 @@ func TestNewAthenz(t *testing.T) {
 				},
 			},
 			want:      nil,
-			wantError: fmt.Errorf("time: invalid duration %s", "xxxtimeout"),
+			wantError: fmt.Errorf("athenz timeout parse failed: time: invalid duration %s", "xxxtimeout"),
 		},
 		{
 			name: "Check NewAthenz fail with unknown timeout unit",
@@ -219,7 +219,7 @@ func TestNewAthenz(t *testing.T) {
 				},
 			},
 			want:      nil,
-			wantError: fmt.Errorf("time: unknown unit %s in duration %s", "ss", "10ss"),
+			wantError: fmt.Errorf("athenz timeout parse failed: time: unknown unit %s in duration %s", "ss", "10ss"),
 		},
 		{
 			name: "Check NewAthenz fail with timeout having no units",
@@ -229,13 +229,19 @@ func TestNewAthenz(t *testing.T) {
 				},
 			},
 			want:      nil,
-			wantError: fmt.Errorf("time: missing unit in duration %s", "99"),
+			wantError: fmt.Errorf("athenz timeout parse failed: time: missing unit in duration %s", "99"),
 		},
+	}
+	errToStr := func(err error) string {
+		if err != nil {
+			return err.Error()
+		}
+		return ""
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := NewAthenz(tt.args.cfg, tt.args.log)
-			if !reflect.DeepEqual(err, tt.wantError) {
+			if !reflect.DeepEqual(errToStr(err), errToStr(tt.wantError)) {
 				t.Errorf("NewAthenz() error = %v, wantError %v", err, tt.wantError)
 				return
 			}

@@ -22,6 +22,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/pkg/errors"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
 	"github.com/yahoojapan/garm/config"
 )
@@ -49,7 +50,7 @@ type athenz struct {
 func NewAthenz(cfg config.Athenz, log Logger) (Athenz, error) {
 	athenzTimeout, err := time.ParseDuration(cfg.Timeout)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "athenz timeout parse failed")
 	}
 
 	c := webhook.Config{
@@ -64,6 +65,9 @@ func NewAthenz(cfg config.Athenz, log Logger) (Athenz, error) {
 	cfg.AuthZ.Config = c
 	cfg.AuthZ.AthenzX509 = func() (*tls.Config, error) {
 		pool, err := NewX509CertPool(os.Getenv(cfg.AthenzRootCAKey))
+		if err != nil {
+			err = errors.Wrap(err, "authorization x509 certpool error")
+		}
 		return &tls.Config{RootCAs: pool}, err
 	}
 

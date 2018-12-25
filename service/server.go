@@ -18,13 +18,13 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/kpango/glg"
+	"github.com/pkg/errors"
 	"github.com/yahoojapan/garm/config"
 )
 
@@ -91,11 +91,21 @@ func NewServer(cfg config.Server, h http.Handler) Server {
 
 	dur, err := time.ParseDuration(cfg.ShutdownDuration)
 	if err != nil {
+		err = glg.Error(errors.Wrapf(err, "invalid shutdown duration %s", cfg.ShutdownDuration))
+		if err != nil {
+			glg.Fatal(errors.Wrap(err, "shutdown duration parse error log output failed"))
+			return nil
+		}
 		dur = time.Second * 5
 	}
 
 	pwt, err := time.ParseDuration(cfg.ProbeWaitTime)
 	if err != nil {
+		err = glg.Error(errors.Wrapf(err, "invalid ProbeWaitTime duration %s", cfg.ProbeWaitTime))
+		if err != nil {
+			glg.Fatal(errors.Wrap(err, "ProbeWaitTime duration parse error log output failed"))
+			return nil
+		}
 		pwt = time.Second * 3
 	}
 
@@ -124,12 +134,17 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 	// start both webhook server and health check server
 	go func() {
 		s.mu.Lock()
-		s.srvRunning = true
 		err := glg.Info("garm api server starting")
 		if err != nil {
+			err = glg.Error(errors.Wrap(err, "garm api server start message output failed"))
+			if err != nil {
+				glg.Fatal(errors.Wrap(err, "error log output failed"))
+			}
 			s.mu.Unlock()
+			sech <- err
 			return
 		}
+		s.srvRunning = true
 		s.mu.Unlock()
 		wg.Done()
 
@@ -141,18 +156,26 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 		s.mu.Unlock()
 		err = glg.Info("garm api server stopped")
 		if err != nil {
-			glg.Fatal(err)
+			err = glg.Error(errors.Wrap(err, "garm api server stop message output failed"))
+			if err != nil {
+				glg.Fatal(errors.Wrap(err, "error log output failed"))
+			}
 		}
 	}()
 
 	go func() {
 		s.mu.Lock()
-		s.hcrunning = true
 		err := glg.Info("garm health check server starting")
 		if err != nil {
+			err = glg.Error(errors.Wrap(err, "garm health check server start message output failed"))
+			if err != nil {
+				glg.Fatal(errors.Wrap(err, "error log output failed"))
+			}
 			s.mu.Unlock()
+			hech <- err
 			return
 		}
+		s.hcrunning = true
 		s.mu.Unlock()
 		wg.Done()
 
@@ -164,7 +187,10 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 		s.mu.Unlock()
 		err = glg.Info("garm health check server stopped")
 		if err != nil {
-			glg.Fatal(err)
+			err = glg.Error(errors.Wrap(err, "garm health check server stop message output failed"))
+			if err != nil {
+				glg.Fatal(errors.Wrap(err, "error log output failed"))
+			}
 		}
 	}()
 
@@ -187,16 +213,22 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 				if s.hcrunning {
 					err := glg.Info("garm health check server will shutdown")
 					if err != nil {
-						errs = appendErr(errs, err)
+						errs = appendErr(errs, errors.Wrap(err, "garm health check server shutdowm message output failed"))
 					}
-					errs = appendErr(errs, s.hcShutdown(context.Background()))
+					err = s.hcShutdown(context.Background())
+					if err != nil {
+						errs = appendErr(errs, errors.Wrap(err, "garm health check server shutdown failed"))
+					}
 				}
 				if s.srvRunning {
 					err := glg.Info("garm api server will shutdown")
 					if err != nil {
-						errs = appendErr(errs, err)
+						errs = appendErr(errs, errors.Wrap(err, "garm api server shutdowm message output failed"))
 					}
-					errs = appendErr(errs, s.apiShutdown(context.Background()))
+					err = s.apiShutdown(context.Background())
+					if err != nil {
+						errs = appendErr(errs, errors.Wrap(err, "garm api server shutdown failed"))
+					}
 				}
 				s.mu.RUnlock()
 
@@ -212,9 +244,12 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 				if s.hcrunning {
 					err = glg.Info("garm health check server will shutdown")
 					if err != nil {
-						errs = appendErr(errs, err)
+						errs = appendErr(errs, errors.Wrap(err, "garm health check server shutdowm message output failed"))
 					}
-					errs = appendErr(errs, s.hcShutdown(ctx))
+					err = s.hcShutdown(ctx)
+					if err != nil {
+						errs = appendErr(errs, errors.Wrap(err, "garm health check server shutdown failed"))
+					}
 				}
 				s.mu.RUnlock()
 				echan <- errs
@@ -229,9 +264,12 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 				if s.srvRunning {
 					err = glg.Info("garm api server will shutdown")
 					if err != nil {
-						errs = appendErr(errs, err)
+						errs = appendErr(errs, errors.Wrap(err, "garm api server shutdowm message output failed"))
 					}
-					errs = appendErr(errs, s.apiShutdown(ctx))
+					err = s.apiShutdown(ctx)
+					if err != nil {
+						errs = appendErr(errs, errors.Wrap(err, "garm api server shutdown failed"))
+					}
 				}
 				s.mu.RUnlock()
 				echan <- errs
@@ -274,21 +312,28 @@ func handleHealthCheckRequest(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set(ContentType, fmt.Sprintf("%s;%s", TextPlain, CharsetUTF8))
 		_, err := fmt.Fprint(w, http.StatusText(http.StatusOK))
 		if err != nil {
-			glg.Fatal(err)
+			err = glg.Error(errors.Wrap(err, "health check response failed"))
+			if err != nil {
+				glg.Fatal(errors.Wrap(err, "error log output failed"))
+			}
 		}
 	}
 }
 
 // listenAndServeAPI returns any errors on starting the HTTPS server, including any errors on loading TLS certificate.
 func (s *server) listenAndServeAPI() error {
+	if !s.cfg.TLS.Enabled {
+		return s.srv.ListenAndServe()
+	}
+
 	cfg, err := NewTLSConfig(s.cfg.TLS)
 	if err == nil && cfg != nil {
 		s.srv.TLSConfig = cfg
 	}
 	if err != nil {
-		err = glg.Error(err)
+		err = glg.Error(errors.Wrap(err, "tls configuration failed"))
 		if err != nil {
-			return err
+			return errors.Wrap(err, "tls config error output failed")
 		}
 	}
 	return s.srv.ListenAndServeTLS("", "")

@@ -159,7 +159,7 @@ func Test_server_ListenAndServe(t *testing.T) {
 					cfg: config.Server{
 						Port: apiSrvPort,
 						TLS: config.TLS{
-							Enabled: false,
+							Enabled: true,
 							CertKey: certKey,
 							KeyKey:  keyKey,
 						},

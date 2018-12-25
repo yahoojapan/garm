@@ -257,7 +257,7 @@ func Test_routing(t *testing.T) {
 			handlerFunc := func(rw http.ResponseWriter, r *http.Request) error {
 				return fmt.Errorf("error-response-body-%d", 215)
 			}
-			want := "Error: error-response-body-215\t" + http.StatusText(http.StatusInternalServerError) + "\n"
+			want := "Error: handler error occurred: error-response-body-215\t" + http.StatusText(http.StatusInternalServerError) + "\n"
 
 			return testcase{
 				name: "Check routing, returned Handler can handle handler.Func error correctly",
@@ -614,7 +614,7 @@ func Test_flushAndClose(t *testing.T) {
 					},
 				},
 			},
-			wantError: fmt.Errorf("read-error-579"),
+			wantError: fmt.Errorf("request body flush failed: read-error-579"),
 		},
 		{
 			name: "Check flushAndClose, close fail",
@@ -628,7 +628,7 @@ func Test_flushAndClose(t *testing.T) {
 					},
 				},
 			},
-			wantError: fmt.Errorf("close-error-596"),
+			wantError: fmt.Errorf("request body close failed: close-error-596"),
 		},
 		{
 			name: "Check flushAndClose, flush & close fail",
@@ -642,14 +642,20 @@ func Test_flushAndClose(t *testing.T) {
 					},
 				},
 			},
-			wantError: fmt.Errorf("read-error-607"),
+			wantError: fmt.Errorf("request body flush failed: read-error-607"),
 		},
 	}
 
+	errToStr := func(err error) string {
+		if err != nil {
+			return err.Error()
+		}
+		return ""
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotError := flushAndClose(tt.args.readCloser)
-			if !reflect.DeepEqual(gotError, tt.wantError) {
+			if !reflect.DeepEqual(errToStr(gotError), errToStr(tt.wantError)) {
 				t.Errorf("flushAndClose() error = %v, want %v", gotError, tt.wantError)
 			}
 		})

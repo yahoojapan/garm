@@ -18,8 +18,6 @@ package service
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -28,6 +26,7 @@ import (
 	"unsafe"
 
 	"github.com/kpango/glg"
+	"github.com/pkg/errors"
 	"github.com/yahoo/athenz/libs/go/zmssvctoken"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
 	"github.com/yahoojapan/garm/config"
@@ -59,18 +58,18 @@ var (
 func NewTokenService(cfg config.Token) (TokenService, error) {
 	dur, err := time.ParseDuration(cfg.RefreshDuration) // example: 1s, 1m
 	if err != nil {
-		return nil, fmt.Errorf("invalid token refresh duration %s, %v", cfg.RefreshDuration, err)
+		return nil, errors.Wrapf(err, "invalid token refresh duration %s", cfg.RefreshDuration)
 	}
 
 	exp, err := time.ParseDuration(cfg.Expiration) // example: 1s, 1m
 	if err != nil {
-		return nil, fmt.Errorf("invalid token expiration %s, %v", cfg.Expiration, err)
+		return nil, errors.Wrapf(err, "invalid token expiration %s", cfg.Expiration)
 	}
 
 	keyData, err := ioutil.ReadFile(os.Getenv(cfg.PrivateKeyEnvName))
 	if err != nil && keyData == nil {
 		if cfg.NTokenPath == "" {
-			return nil, fmt.Errorf("invalid token certificate %v", err)
+			return nil, errors.Wrap(err, "invalid token certificate")
 		}
 	}
 
@@ -92,7 +91,7 @@ func (t *token) StartTokenUpdater(ctx context.Context) TokenService {
 	go func() {
 		err := t.update()
 		if err != nil {
-			err = glg.Error(err)
+			err = glg.Error(errors.Wrap(err, "token first update failed"))
 			if err != nil {
 				glg.Fatal(err)
 			}
@@ -107,7 +106,7 @@ func (t *token) StartTokenUpdater(ctx context.Context) TokenService {
 			case <-ticker.C:
 				err = t.update()
 				if err != nil {
-					err = glg.Error(err)
+					err = glg.Error(errors.Wrap(err, "token update failed"))
 					if err != nil {
 						glg.Fatal(err)
 					}
@@ -139,7 +138,7 @@ func (t *token) createTokenBuilder(athenzDomain, serviceName, keyVersion string,
 		keyVersion)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to create ZMS SVC Token Builder\nAthenzDomain:\t%s\nServiceName:\t%s\nKeyVersion:\t%s\nError: %v", athenzDomain, serviceName, keyVersion, err)
+		return nil, errors.Wrapf(err, "failed to create ZMS SVC Token Builder\nAthenzDomain:\t%s\nServiceName:\t%s\nKeyVersion:\t%s", athenzDomain, serviceName, keyVersion)
 	}
 
 	t.builder = builder
@@ -160,14 +159,14 @@ func (t *token) loadToken() (ntoken string, err error) {
 		// generate new token from token builder
 		ntoken, err = t.builder.Token().Value()
 		if err != nil {
-			return "", err
+			return "", errors.Wrap(err, "token builder.Token().Value() load failed")
 		}
 
 	} else {
 		// Copper Argos
 		tok, err := ioutil.ReadFile(t.tokenFilePath)
 		if err != nil {
-			return "", err
+			return "", errors.Wrap(err, "load token from filepath failed")
 		}
 
 		ntoken = strings.TrimRight(*(*string)(unsafe.Pointer(&tok)), "\r\n")
@@ -176,7 +175,7 @@ func (t *token) loadToken() (ntoken string, err error) {
 	if t.validateToken {
 		err = webhook.VerifyToken(ntoken, false)
 		if err != nil {
-			return "", fmt.Errorf("invalid server identity token:\t%s", err.Error())
+			return "", errors.Wrap(err, "invalid server identity token")
 		}
 	}
 	return ntoken, nil
@@ -187,7 +186,7 @@ func (t *token) loadToken() (ntoken string, err error) {
 func (t *token) update() error {
 	token, err := t.loadToken()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "loadToken failed")
 	}
 	t.setToken(token)
 	return nil
