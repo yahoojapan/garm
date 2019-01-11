@@ -97,7 +97,7 @@ func NewResolver(cfg config.Mapping) Resolver {
 	case "eks":
 		return &EKSResolve{res}
 	}
-	return nil
+	return &res
 }
 
 // MapVerbAction returns mapped value in cfg.VerbMappings,

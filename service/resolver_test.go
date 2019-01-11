@@ -44,7 +44,7 @@ func TestNewResolver(t *testing.T) {
 					},
 				},
 			},
-			want: nil,
+			want: &resolve{},
 		},
 		{
 			name: "Check NewResolver, platform = k8s",
