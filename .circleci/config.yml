@@ -111,6 +111,7 @@ jobs:
       - run:
           name: check
           command: |
+            mkdir -p $HOME/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             LAST_COMMIT=`git log -1 --pretty=%B`
             VERSION=`git describe --abbrev=0 --tags`
             touch ./.tag
@@ -142,6 +143,7 @@ jobs:
       - run:
           name: check
           command: |
+            mkdir -p $HOME/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             TAG=`cat ./.tag`
             if [ ! -z "$TAG" ]; then
               echo $TAG
@@ -151,7 +153,7 @@ jobs:
               touch ./.pr_body
               if [ ! -z "${PR_NUM}" ]; then
                 PR_INFO=`curl ${GITHUB_API}repos/${REPO_NAME}/${IMAGE_NAME}/pulls/${PR_NUM}`
-                PR_BODY=`echo $PR_INFO | jq .body -r`
+                PR_BODY=`echo ${PR_INFO} | jq .body -r`
                 echo "PR body: ${PR_BODY}"
                 echo "${PR_BODY}" > ./.pr_body
               fi
@@ -168,11 +170,12 @@ jobs:
       - run:
           name: check
           command: |
+            mkdir -p $HOME/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             TAG=`cat ./.tag`
             if [ ! -z "$TAG" ]; then
               PR_BODY=`cat ./.pr_body`
               echo "Create release: ${TAG}"
-              curl -H "Authorization: bearer $GITHUB_ACCESS_TOKEN" \
+              curl -H "Authorization: bearer ${GITHUB_ACCESS_TOKEN}" \
                    -X POST \
                    -d "{\"tag_name\": \"${TAG}\", \"body\": \"${PR_BODY}\"}" \
                    ${GITHUB_API}repos/${REPO_NAME}/${IMAGE_NAME}/releases
