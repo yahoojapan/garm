@@ -175,7 +175,7 @@ jobs:
             if [ ! -z "$TAG" ]; then
               PR_BODY=`cat ./.pr_body`
               echo "Create release: ${TAG}"
-              curl -H "Authorization: bearer ${GITHUB_ACCESS_TOKEN}" \
+              curl -H "Authorization: token ${GITHUB_ACCESS_TOKEN}" \
                    -X POST \
                    -d "{\"tag_name\": \"${TAG}\", \"body\": \"${PR_BODY}\"}" \
                    ${GITHUB_API}repos/${REPO_NAME}/${IMAGE_NAME}/releases
