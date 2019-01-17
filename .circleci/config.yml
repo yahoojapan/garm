@@ -141,7 +141,7 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: check
+          name: push tag and check PR body
           command: |
             mkdir -p $HOME/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             TAG=`cat ./.tag`
@@ -168,7 +168,7 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: check
+          name: release
           command: |
             mkdir -p $HOME/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             TAG=`cat ./.tag`
