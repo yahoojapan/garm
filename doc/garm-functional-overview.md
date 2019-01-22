@@ -75,7 +75,7 @@
 			+ `service_account_prefixes = []string{"service_a"}`
 			+ `namespace = kaas_namespace`
 		- `service_b:service_c:k8s_user` => `service_c.k8s_user`
-			+ `service_account_prefixes = []str\ing{"service_b", "service_c"}`
+			+ `service_account_prefixes = []string{"service_b", "service_c"}`
 		- `service_b:k8s_user` => `k8s_user`
 			+ `service_account_prefixes = []string{"service_a", "service_b"}`
 		- `k8s_user` => `user.k8s_user`
