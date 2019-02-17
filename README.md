@@ -16,6 +16,7 @@ Requires go 1.11 or later.
 ## Use case
 ### Authorization
 ![Use case](./doc/assets/use-case.png)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fyahoojapan%2Fgarm.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fyahoojapan%2Fgarm?ref=badge_shield)
 
  1. K8s webhook request (SubjectAccessReview) ([Webhook Mode - Kubernetes](https://kubernetes.io/docs/reference/access-authn-authz/webhook/))
     - the K8s API server wants to know if the user is allowed to do the requested action
@@ -64,6 +65,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fyahoojapan%2Fgarm.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fyahoojapan%2Fgarm?ref=badge_large)
 
 ## Contributor License Agreement
 
