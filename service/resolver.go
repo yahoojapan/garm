@@ -17,7 +17,6 @@ limitations under the License.
 package service
 
 import (
-	"os"
 	"strings"
 
 	"github.com/yahoojapan/garm/config"
@@ -123,14 +122,14 @@ func (r *resolve) MapK8sResourceAthenzResource(k8sRes string) string {
 // createAthenzDomain use cfg.ServiceAthenzDomain;
 
 // split it with ".";
-// for each token, if it match /^_.*_$/ but not "_namespace_", replace the token with os.Getenv(token);
+// for each token, if it match /^_.*_$/ but not "_namespace_", replace the token with config.GetActualValue(token);
 // and then return the processed value
 func (r *resolve) createAthenzDomain() string {
 	reps := make([]string, 0, strings.Count(r.cfg.ServiceAthenzDomain, ".")+1)
 	for _, v := range strings.Split(r.cfg.ServiceAthenzDomain, ".") {
 		if v != "_namespace_" && strings.HasPrefix(v, "_") && strings.HasSuffix(v, "_") {
 			// Note: If deploying in a different namespace than the kube-public namespace, change it to get information from kube api
-			reps = append(reps, v, os.Getenv(strings.TrimSuffix(strings.TrimPrefix(v, "_"), "_")))
+			reps = append(reps, v, config.GetActualValue(v))
 		}
 	}
 	return strings.NewReplacer(reps...).Replace(r.cfg.ServiceAthenzDomain)

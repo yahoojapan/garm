@@ -21,5 +21,5 @@ clean:
 	rm -rf ./*.log
 
 test:
-	GOCACHE=off go test --race -coverprofile=cover.out ./...
+	go test --race -coverprofile=cover.out ./...
 

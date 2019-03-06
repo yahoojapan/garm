@@ -29,6 +29,10 @@ import (
 	"github.com/yahoojapan/garm/config"
 )
 
+func trim(str string) string {
+	return strings.TrimRight(strings.TrimLeft(str, "_"), "_")
+}
+
 func TestNewTLSConfig(t *testing.T) {
 	type args struct {
 		CertKeyPath string
@@ -41,9 +45,9 @@ func TestNewTLSConfig(t *testing.T) {
 		KeyKeyPath:  "./testdata/dummyServer.key",
 		CAKeyPath:   "./testdata/dummyCa.pem",
 		cfg: config.TLS{
-			CertKey: "test1_CertKey",
-			KeyKey:  "test1_KeyKey",
-			CAKey:   "test1_CAKey",
+			CertKey: "_test1_CertKey_",
+			KeyKey:  "_test1_KeyKey_",
+			CAKey:   "_test1_CAKey_",
 		},
 	}
 
@@ -75,17 +79,14 @@ func TestNewTLSConfig(t *testing.T) {
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-
-				os.Setenv(args.cfg.CertKey, args.CertKeyPath)
-				os.Setenv(args.cfg.KeyKey, args.KeyKeyPath)
-				os.Setenv(args.cfg.CAKey, args.CAKeyPath)
-
+				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
+				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
+				os.Setenv(trim(args.cfg.CAKey), args.CAKeyPath)
 			},
 			afterFunc: func(args args) {
-
-				os.Unsetenv(args.cfg.CertKey)
-				os.Unsetenv(args.cfg.KeyKey)
-				os.Unsetenv(args.cfg.CAKey)
+				os.Unsetenv(trim(args.cfg.CertKey))
+				os.Unsetenv(trim(args.cfg.KeyKey))
+				os.Unsetenv(trim(args.cfg.CAKey))
 
 			},
 			checkFunc: func(got, want *tls.Config) error {
@@ -115,18 +116,14 @@ func TestNewTLSConfig(t *testing.T) {
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-
-				os.Setenv(args.cfg.CertKey, args.CertKeyPath)
-				os.Setenv(args.cfg.KeyKey, args.KeyKeyPath)
-				os.Setenv(args.cfg.CAKey, args.CAKeyPath)
-
+				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
+				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
+				os.Setenv(trim(args.cfg.CAKey), args.CAKeyPath)
 			},
 			afterFunc: func(args args) {
-
-				os.Unsetenv(args.cfg.CertKey)
-				os.Unsetenv(args.cfg.KeyKey)
-				os.Unsetenv(args.cfg.CAKey)
-
+				os.Unsetenv(trim(args.cfg.CertKey))
+				os.Unsetenv(trim(args.cfg.KeyKey))
+				os.Unsetenv(trim(args.cfg.CAKey))
 			},
 			checkFunc: func(got, want *tls.Config) error {
 				if len(got.CurvePreferences) != len(want.CurvePreferences) {
@@ -169,18 +166,14 @@ func TestNewTLSConfig(t *testing.T) {
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-
-				os.Setenv(args.cfg.CertKey, args.CertKeyPath)
-				os.Setenv(args.cfg.KeyKey, args.KeyKeyPath)
-				os.Setenv(args.cfg.CAKey, args.CAKeyPath)
-
+				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
+				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
+				os.Setenv(trim(args.cfg.CAKey), args.CAKeyPath)
 			},
 			afterFunc: func(args args) {
-
-				os.Unsetenv(args.cfg.CertKey)
-				os.Unsetenv(args.cfg.KeyKey)
-				os.Unsetenv(args.cfg.CAKey)
-
+				os.Unsetenv(trim(args.cfg.CertKey))
+				os.Unsetenv(trim(args.cfg.KeyKey))
+				os.Unsetenv(trim(args.cfg.CAKey))
 			},
 			checkFunc: func(got, want *tls.Config) error {
 				if got.SessionTicketsDisabled != want.SessionTicketsDisabled {
@@ -208,18 +201,14 @@ func TestNewTLSConfig(t *testing.T) {
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-
-				os.Setenv(args.cfg.CertKey, args.CertKeyPath)
-				os.Setenv(args.cfg.KeyKey, args.KeyKeyPath)
-				os.Setenv(args.cfg.CAKey, args.CAKeyPath)
-
+				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
+				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
+				os.Setenv(trim(args.cfg.CAKey), args.CAKeyPath)
 			},
 			afterFunc: func(args args) {
-
-				os.Unsetenv(args.cfg.CertKey)
-				os.Unsetenv(args.cfg.KeyKey)
-				os.Unsetenv(args.cfg.CAKey)
-
+				os.Unsetenv(trim(args.cfg.CertKey))
+				os.Unsetenv(trim(args.cfg.KeyKey))
+				os.Unsetenv(trim(args.cfg.CAKey))
 			},
 			checkFunc: func(got, want *tls.Config) error {
 
@@ -262,18 +251,14 @@ func TestNewTLSConfig(t *testing.T) {
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-
-				os.Setenv(args.cfg.CertKey, args.CertKeyPath)
-				os.Setenv(args.cfg.KeyKey, args.KeyKeyPath)
-				os.Setenv(args.cfg.CAKey, args.CAKeyPath)
-
+				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
+				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
+				os.Setenv(trim(args.cfg.CAKey), args.CAKeyPath)
 			},
 			afterFunc: func(args args) {
-
-				os.Unsetenv(args.cfg.CertKey)
-				os.Unsetenv(args.cfg.KeyKey)
-				os.Unsetenv(args.cfg.CAKey)
-
+				os.Unsetenv(trim(args.cfg.CertKey))
+				os.Unsetenv(trim(args.cfg.KeyKey))
+				os.Unsetenv(trim(args.cfg.CAKey))
 			},
 			checkFunc: func(got, want *tls.Config) error {
 
@@ -324,12 +309,12 @@ func TestNewTLSConfig(t *testing.T) {
 				ClientAuth:             tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-				os.Setenv(args.cfg.CertKey, "notexists")
-				os.Setenv(args.cfg.KeyKey, args.KeyKeyPath)
+				os.Setenv(trim(args.cfg.CertKey), "notexists")
+				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
 			},
 			afterFunc: func(args args) {
-				os.Unsetenv(args.cfg.CertKey)
-				os.Unsetenv(args.cfg.KeyKey)
+				os.Unsetenv(trim(args.cfg.CertKey))
+				os.Unsetenv(trim(args.cfg.KeyKey))
 			},
 			wantErr: fmt.Errorf("failed to load x509 key pair: open notexists: no such file or directory"),
 		},
@@ -352,14 +337,14 @@ func TestNewTLSConfig(t *testing.T) {
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-				os.Setenv(args.cfg.CertKey, args.CertKeyPath)
-				os.Setenv(args.cfg.KeyKey, args.KeyKeyPath)
-				os.Setenv(args.cfg.CAKey, "notexists")
+				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
+				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
+				os.Setenv(trim(args.cfg.CAKey), "notexists")
 			},
 			afterFunc: func(args args) {
-				os.Unsetenv(args.cfg.CertKey)
-				os.Unsetenv(args.cfg.KeyKey)
-				os.Unsetenv(args.cfg.CAKey)
+				os.Unsetenv(trim(args.cfg.CertKey))
+				os.Unsetenv(trim(args.cfg.KeyKey))
+				os.Unsetenv(trim(args.cfg.CAKey))
 			},
 			wantErr: fmt.Errorf("failed to load x509 ca: failed to read pem file: open notexists: no such file or directory"),
 		},
