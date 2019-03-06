@@ -19,7 +19,6 @@ package service
 import (
 	"crypto/tls"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/pkg/errors"
@@ -64,7 +63,7 @@ func NewAthenz(cfg config.Athenz, log Logger) (Athenz, error) {
 	cfg.AuthN.Config = c
 	cfg.AuthZ.Config = c
 	cfg.AuthZ.AthenzX509 = func() (*tls.Config, error) {
-		pool, err := NewX509CertPool(os.Getenv(cfg.AthenzRootCAKey))
+		pool, err := NewX509CertPool(config.GetActualValue(cfg.AthenzRootCAKey))
 		if err != nil {
 			err = errors.Wrap(err, "authorization x509 certpool error")
 		}

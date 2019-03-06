@@ -19,7 +19,6 @@ package service
 import (
 	"context"
 	"io/ioutil"
-	"os"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -66,7 +65,7 @@ func NewTokenService(cfg config.Token) (TokenService, error) {
 		return nil, errors.Wrapf(err, "invalid token expiration %s", cfg.Expiration)
 	}
 
-	keyData, err := ioutil.ReadFile(os.Getenv(cfg.PrivateKeyEnvName))
+	keyData, err := ioutil.ReadFile(config.GetActualValue(cfg.PrivateKeyEnvName))
 	if err != nil && keyData == nil {
 		if cfg.NTokenPath == "" {
 			return nil, errors.Wrap(err, "invalid token certificate")

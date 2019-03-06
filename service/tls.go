@@ -20,7 +20,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"io/ioutil"
-	"os"
 
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
@@ -70,9 +69,9 @@ func NewTLSConfig(cfg config.TLS) (*tls.Config, error) {
 		ClientAuth: tls.NoClientCert,
 	}
 
-	cert := os.Getenv(cfg.CertKey)
-	key := os.Getenv(cfg.KeyKey)
-	ca := os.Getenv(cfg.CAKey)
+	cert := config.GetActualValue(cfg.CertKey)
+	key := config.GetActualValue(cfg.KeyKey)
+	ca := config.GetActualValue(cfg.CAKey)
 
 	if cert != "" && key != "" {
 		crt, err := tls.LoadX509KeyPair(cert, key)

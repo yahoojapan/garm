@@ -160,8 +160,8 @@ func Test_server_ListenAndServe(t *testing.T) {
 						Port: apiSrvPort,
 						TLS: config.TLS{
 							Enabled: true,
-							CertKey: certKey,
-							KeyKey:  keyKey,
+							CertKey: "_" + certKey + "_",
+							KeyKey:  "_" + keyKey + "_",
 						},
 					},
 					mu: &sync.RWMutex{},
@@ -264,8 +264,8 @@ func Test_server_ListenAndServe(t *testing.T) {
 						Port: apiSrvPort,
 						TLS: config.TLS{
 							Enabled: true,
-							CertKey: certKey,
-							KeyKey:  keyKey,
+							CertKey: "_" + certKey + "_",
+							KeyKey:  "_" + keyKey + "_",
 						},
 					},
 					mu: &sync.RWMutex{},
@@ -368,8 +368,8 @@ func Test_server_ListenAndServe(t *testing.T) {
 						Port: apiSrvPort,
 						TLS: config.TLS{
 							Enabled: true,
-							CertKey: certKey,
-							KeyKey:  keyKey,
+							CertKey: "_" + certKey + "_",
+							KeyKey:  "_" + keyKey + "_",
 						},
 					},
 					mu: &sync.RWMutex{},
@@ -780,8 +780,8 @@ func Test_server_listenAndServeAPI(t *testing.T) {
 						Port: 9999,
 						TLS: config.TLS{
 							Enabled: true,
-							CertKey: certKey,
-							KeyKey:  keyKey,
+							CertKey: "_" + certKey + "_",
+							KeyKey:  "_" + keyKey + "_",
 						},
 					},
 				},

@@ -57,7 +57,7 @@
 		1. for each token matches `_.*_`, subsitute with env. variable (except `_namespace_`)
 	- example
 		- `_k8s_cluster_._namespace_.athenz.service.domain` => `SANDBOX._namespace_.athenz.service.domain`
-			+ `os.Getenv("k8s_cluster") == "SANDBOX"`
+			+ `config.GetActualValue("k8s_cluster") == "SANDBOX"`
 - Map namespace in Athenz admain (both admin & service domain)
 	- expectation
 		1. subsitute `_namespace_` string in `map_rule.tld.platform.admin_athenz_domain` with garm resource attributes `namespace`
