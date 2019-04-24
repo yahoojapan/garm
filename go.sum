@@ -26,8 +26,8 @@ github.com/jawher/mow.cli v1.0.5/go.mod h1:rZZcz2ygDSemQyV66jOaCszjT/zAL3FcEGNj5
 github.com/json-iterator/go v0.0.0-20180701071628-ab8a2e0c74be/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/kpango/fastime v1.0.8 h1:Wif5eocdsIXmMG+8HHfRP/jD6UUl+/OVTJ+sMzvA1+E=
 github.com/kpango/fastime v1.0.8/go.mod h1:Y5XY5bLG5yc7g2XmMUzc22XYV1XaH+KgUOHkDvLp4SA=
-github.com/kpango/glg v1.3.1 h1:tOwfDQWkmy8WuubZGBz1kcYO2+tJj8WnAan0WpBrb0g=
-github.com/kpango/glg v1.3.1/go.mod h1:7zzaAoMqvngad+sagWLjr00EQMJaqyGONdg0WYBAO3M=
+github.com/kpango/glg v1.3.2 h1:daEbLGtRspX5MYne4ppkl2StRN/hc8hE+ntnu38tsOI=
+github.com/kpango/glg v1.3.2/go.mod h1:7zzaAoMqvngad+sagWLjr00EQMJaqyGONdg0WYBAO3M=
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f/go.mod h1:ZdcZmHo+o7JKHSa8/e818NopupXU1YMK5fe1lsApnBw=
