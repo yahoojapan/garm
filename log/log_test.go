@@ -43,7 +43,7 @@ func TestNew(t *testing.T) {
 			},
 			want: &logger{
 				log: glg.New().
-					SetPrefix("prefix-29").
+					SetPrefix(glg.PRINT, "prefix-29").
 					SetLevelWriter(glg.PRINT, bytes.NewBuffer(nil)).
 					SetLevelMode(glg.PRINT, glg.WRITER),
 			},
@@ -133,7 +133,7 @@ func Test_logger_Printf(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			l := &logger{
 				log: glg.New().
-					SetPrefix(tt.fieldsArgs.prefix).
+					SetPrefix(glg.PRINT, tt.fieldsArgs.prefix).
 					SetLevelWriter(glg.PRINT, tt.fieldsArgs.buffer).
 					SetLevelMode(glg.PRINT, glg.WRITER),
 			}
@@ -196,7 +196,7 @@ func Test_logger_Println(t *testing.T) {
 	for _, tt := range tests {
 		l := &logger{
 			log: glg.New().
-				SetPrefix(tt.fieldsArgs.prefix).
+				SetPrefix(glg.PRINT, tt.fieldsArgs.prefix).
 				SetLevelWriter(glg.PRINT, tt.fieldsArgs.buffer).
 				SetLevelMode(glg.PRINT, glg.WRITER),
 		}

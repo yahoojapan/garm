@@ -37,7 +37,7 @@ type logger struct {
 func New(w io.Writer, requestID string) Logger {
 	return &logger{
 		log: glg.New().
-			SetPrefix(requestID).
+			SetPrefix(glg.PRINT, requestID).
 			SetLevelWriter(glg.PRINT, w).
 			SetLevelMode(glg.PRINT, glg.WRITER),
 	}
