@@ -1,6 +1,6 @@
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/ardielle/ardielle-go v1.5.2/go.mod h1:I4hy1n795cUhaVt/ojz83SNVCYIGsAFAONtv2Dr7HUI=
-github.com/ardielle/ardielle-tools v1.5.3/go.mod h1:oZN+JRMnqGiIhrzkRN9l26Cej9dEx4jeNG6A+AdkShk=
+github.com/ardielle/ardielle-tools v1.5.4/go.mod h1:oZN+JRMnqGiIhrzkRN9l26Cej9dEx4jeNG6A+AdkShk=
 github.com/boynton/repl v0.0.0-20170116235056-348863958e3e/go.mod h1:Crc/GCZ3NXDVCio7Yr0o+SSrytpcFhLmVCIzi0s49t4=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -13,6 +13,7 @@ github.com/gogo/protobuf v0.0.0-20171007142547-342cbe0a0415 h1:WSBJMqJbLxsn+bTCP
 github.com/gogo/protobuf v0.0.0-20171007142547-342cbe0a0415/go.mod h1:r8qH/GZQm5c6nD/R0oafs1akxWv10x8SbQlK7atdtwQ=
 github.com/golang/groupcache v0.0.0-20160516000752-02826c3e7903/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
+github.com/google/go-cmp v0.3.0/go.mod h1:8QqcDgzrUqlUb/G2PQTWiueGozuR1884gddMywk6iLU=
 github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf h1:+RRA9JqSOZFfKrOeqr2z77+8R2RKyh8PG66dcu1V0ck=
 github.com/google/gofuzz v0.0.0-20170612174753-24818f796faf/go.mod h1:HP5RmnzzSNb993RKQDq4+1A4ia9nllfqcQFTQJedwGI=
 github.com/google/uuid v1.0.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
@@ -41,8 +42,8 @@ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
-github.com/yahoo/athenz v1.8.20 h1:P61OC0mAz9osVQtVeJXB8Hr+oLmzIBk6oprUgmC9Fnw=
-github.com/yahoo/athenz v1.8.20/go.mod h1:34WOkSrNFTD2SBTaTWzlQ3H0azp1trg33OLXEOhX6gk=
+github.com/yahoo/athenz v1.8.21 h1:ZVkEM/2x8ugbPX3RFFVKCaJjLBbaPlcQZi8eqeeu1ZU=
+github.com/yahoo/athenz v1.8.21/go.mod h1:z1pPk+tEv9SFocYyk1cUB4YXJSs54L1UJA71cDh99wk=
 github.com/yahoo/k8s-athenz-webhook v0.0.0-20180814044735-e443658b10d2 h1:fceLUE6tlgOChBDXN9XyM6KUfifWbANH4bXBbUgEJR8=
 github.com/yahoo/k8s-athenz-webhook v0.0.0-20180814044735-e443658b10d2/go.mod h1:R3l9OwPQPPcFTxedyVlU6wGwGgs2Dn84dY09ulJPiV0=
 golang.org/x/crypto v0.0.0-20180910181607-0e37d006457b/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
@@ -68,10 +69,10 @@ gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7/go.mod h1:dt/ZhP58zS4L8KSrWD
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.2 h1:ZCJp+EgiOT7lHqUV2J862kp8Qj64Jo6az82+3Td9dZw=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
-k8s.io/api v0.0.0-20190503110853-61630f889b3c h1:y1nbvZVlOyUa+p4RVXqQj+s6W+FjZZNVkgG5pvYpFhU=
-k8s.io/api v0.0.0-20190503110853-61630f889b3c/go.mod h1:42M1T54fVvXj2R/yqB+v9ksH4xI41q6XU/NUlo3hyjk=
-k8s.io/apimachinery v0.0.0-20190502092502-a44ef629a3c9 h1:yifHers09F6RIgsGgAYt1yi0pNbQfQB289Pe4y7XX2s=
-k8s.io/apimachinery v0.0.0-20190502092502-a44ef629a3c9/go.mod h1:5CBnzrKYGHzv9ZsSKmQ8wHt4XI4/TUBPDwYM9FlZMyw=
+k8s.io/api v0.0.0-20190515023547-db5a9d1c40eb h1:z1fFVKHVQNtGcAPbYljoW2rZT+0ITuj99cmGH9RBrWE=
+k8s.io/api v0.0.0-20190515023547-db5a9d1c40eb/go.mod h1:fbdFiGtx7GQ3+vkBAYto3QsSImiYIJdpH3YfaclST/U=
+k8s.io/apimachinery v0.0.0-20190515023456-b74e4c97951f h1:cBrF1gFrJrvimOHZzyEHrvtlfqPV+KM7QZt3M0mepEg=
+k8s.io/apimachinery v0.0.0-20190515023456-b74e4c97951f/go.mod h1:Ew3b/24/JSgJdn4RsnrLskv3LvMZDlZ1Fl1xopsJftY=
 k8s.io/klog v0.3.0 h1:0VPpR+sizsiivjIfIAQH/rl8tan6jvWkS7lU+0di3lE=
 k8s.io/klog v0.3.0/go.mod h1:Gq+BEi5rUBO/HRz0bTSXDUcqjScdoY3a9IHpCEIOOfk=
 k8s.io/kube-openapi v0.0.0-20190228160746-b3a7cee44a30/go.mod h1:BXM9ceUBTj2QnfH2MK1odQs778ajze1RxcmP6S8RVVc=

@@ -23,7 +23,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"github.com/yahoo/k8s-athenz-webhook"
+	webhook "github.com/yahoo/k8s-athenz-webhook"
 	"gopkg.in/yaml.v2"
 )
 
@@ -37,6 +37,9 @@ const (
 type Config struct {
 	// Version represents configuration file version.
 	Version string `yaml:"version"`
+
+	// EnableColorLogging represents if user want to enable colorized logging.
+	EnableColorLogging bool `yaml:"enable_log_color"`
 
 	// Logger represents logging configuration for Garm application.
 	Logger Logger `yaml:"logger"`
