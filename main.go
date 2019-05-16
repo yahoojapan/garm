@@ -60,13 +60,17 @@ func parseParams() (*params, error) {
 
 // run starts the daemon and listens for OS signal.
 func run(cfg config.Config) []error {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	if !cfg.EnableColorLogging {
+		glg.Get().DisableColor()
+	}
 
 	daemon, err := usecase.New(cfg)
 	if err != nil {
 		return []error{errors.Wrap(err, "failed to instantiate daemon")}
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	ech := daemon.Start(ctx)
 	sigCh := make(chan os.Signal, 1)
