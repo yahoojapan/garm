@@ -9,7 +9,6 @@ server:
   timeout: 5s
   shutdown_durati
   on: 5s
-  probe_wait_time: 3s
   tls:
     enabled: true
     cet_key: cert

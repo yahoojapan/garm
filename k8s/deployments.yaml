@@ -63,16 +63,16 @@ spec:
               name: garm-extapi
         image: yahoojapan/garm:latest
         imagePullPolicy: Always
-        livenessProbe:
-          failureThreshold: 3
+        readinessProbe:
           httpGet:
             path: /healthz
             port: 8080
             scheme: HTTP
           initialDelaySeconds: 3
-          periodSeconds: 3
+          timeoutSeconds: 2
           successThreshold: 1
-          timeoutSeconds: 1
+          failureThreshold: 2
+          periodSeconds: 3
         name: garm
         ports:
         - containerPort: 443
