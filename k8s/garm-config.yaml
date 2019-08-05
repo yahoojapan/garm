@@ -11,8 +11,8 @@ data:
       health_check_port: 8080
       health_check_path: /healthz
       timeout: 30s
-      shutdown_duration: 30s
-      probe_wait_time: 3s
+      shutdown_duration: 10s
+      probe_wait_time: 9s
       tls:
         enabled: true
         cert_key: cert

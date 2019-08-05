@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yahoo/k8s-athenz-webhook"
+	webhook "github.com/yahoo/k8s-athenz-webhook"
 )
 
 func Test_requestInfo_Serialize(t *testing.T) {
@@ -224,7 +224,7 @@ func TestNew(t *testing.T) {
 		{
 			name: "Test file content not valid",
 			args: args{
-				path: "./testdata/not_valid_config.yaml",
+				path: "./testdata/invalid_config.yaml",
 			},
 			wantErr: fmt.Errorf("yaml parse failed: yaml: line 11: could not find expected ':'"),
 		},

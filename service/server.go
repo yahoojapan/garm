@@ -91,22 +91,20 @@ func NewServer(cfg config.Server, h http.Handler) Server {
 
 	dur, err := time.ParseDuration(cfg.ShutdownDuration)
 	if err != nil {
-		err = glg.Error(errors.Wrapf(err, "invalid shutdown duration %s", cfg.ShutdownDuration))
+		err = glg.Warn(err)
 		if err != nil {
-			glg.Fatal(errors.Wrap(err, "shutdown duration parse error log output failed"))
+			glg.Fatal(errors.Wrap(err, "shutdown_duration parse error log output failed"))
 			return nil
 		}
-		dur = time.Second * 5
 	}
 
 	pwt, err := time.ParseDuration(cfg.ProbeWaitTime)
 	if err != nil {
-		err = glg.Error(errors.Wrapf(err, "invalid ProbeWaitTime duration %s", cfg.ProbeWaitTime))
+		err = glg.Warn(err)
 		if err != nil {
-			glg.Fatal(errors.Wrap(err, "ProbeWaitTime duration parse error log output failed"))
+			glg.Fatal(errors.Wrap(err, "probe_wait_time duration parse error log output failed"))
 			return nil
 		}
-		pwt = time.Second * 3
 	}
 
 	return &server{
@@ -213,7 +211,7 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 				if s.hcrunning {
 					err := glg.Info("garm health check server will shutdown")
 					if err != nil {
-						errs = appendErr(errs, errors.Wrap(err, "garm health check server shutdowm message output failed"))
+						errs = appendErr(errs, errors.Wrap(err, "garm health check server shutdown message output failed"))
 					}
 					err = s.hcShutdown(context.Background())
 					if err != nil {
@@ -223,7 +221,7 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 				if s.srvRunning {
 					err := glg.Info("garm api server will shutdown")
 					if err != nil {
-						errs = appendErr(errs, errors.Wrap(err, "garm api server shutdowm message output failed"))
+						errs = appendErr(errs, errors.Wrap(err, "garm api server shutdown message output failed"))
 					}
 					err = s.apiShutdown(context.Background())
 					if err != nil {
@@ -244,7 +242,7 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 				if s.hcrunning {
 					err = glg.Info("garm health check server will shutdown")
 					if err != nil {
-						errs = appendErr(errs, errors.Wrap(err, "garm health check server shutdowm message output failed"))
+						errs = appendErr(errs, errors.Wrap(err, "garm health check server shutdown message output failed"))
 					}
 					err = s.hcShutdown(ctx)
 					if err != nil {
@@ -264,7 +262,7 @@ func (s *server) ListenAndServe(ctx context.Context) chan []error {
 				if s.srvRunning {
 					err = glg.Info("garm api server will shutdown")
 					if err != nil {
-						errs = appendErr(errs, errors.Wrap(err, "garm api server shutdowm message output failed"))
+						errs = appendErr(errs, errors.Wrap(err, "garm api server shutdown message output failed"))
 					}
 					err = s.apiShutdown(ctx)
 					if err != nil {
