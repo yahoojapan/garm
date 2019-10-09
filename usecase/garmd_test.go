@@ -202,14 +202,14 @@ func Test_garm_Start(t *testing.T) {
 
 			cfg := config.Config{
 				Token: config.Token{
-					AthenzDomain: keyKey,
-					ServiceName:  keyKey,
-					NTokenPath:   "",
-					//		PrivateKeyEnvName: "_" + keyKey + "_",
-					ValidateToken:   false,
-					RefreshDuration: "1m",
-					KeyVersion:      "1",
-					Expiration:      "1m",
+					AthenzDomain:      keyKey,
+					ServiceName:       keyKey,
+					NTokenPath:        "",
+					PrivateKeyEnvName: keyKey,
+					ValidateToken:     false,
+					RefreshDuration:   "1m",
+					KeyVersion:        "1",
+					Expiration:        "1m",
 				},
 				Athenz: config.Athenz{
 					Timeout: "1m",
