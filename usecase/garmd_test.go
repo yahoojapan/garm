@@ -205,7 +205,7 @@ func Test_garm_Start(t *testing.T) {
 					AthenzDomain:      keyKey,
 					ServiceName:       keyKey,
 					NTokenPath:        "",
-					PrivateKeyEnvName: keyKey,
+					PrivateKeyEnvName: "_" + keyKey + "_",
 					ValidateToken:     false,
 					RefreshDuration:   "1m",
 					KeyVersion:        "1",
