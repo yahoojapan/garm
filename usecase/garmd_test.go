@@ -43,7 +43,7 @@ func TestNew(t *testing.T) {
 		beforeFunc func()
 		checkFunc  func(GarmDaemon, GarmDaemon) error
 		afterFunc  func()
-		want       GarmDaemon
+		want       func() GarmDaemon
 		wantErr    error
 	}
 	tests := []test{
@@ -107,8 +107,6 @@ func TestNew(t *testing.T) {
 				},
 			}
 
-			os.Setenv(keyKey, key)
-
 			return test{
 				name: "Check new garm daemon return correct",
 				args: args{
@@ -139,7 +137,7 @@ func TestNew(t *testing.T) {
 						athenz: athenz,
 						server: server,
 					}
-				}(),
+				},
 			}
 		}(),
 	}
@@ -163,7 +161,7 @@ func TestNew(t *testing.T) {
 			}
 
 			if tt.checkFunc != nil {
-				err = tt.checkFunc(got, tt.want)
+				err = tt.checkFunc(got, tt.want())
 				if tt.wantErr == nil && err != nil {
 					t.Errorf("compare check failed, err: %v", err)
 					return
@@ -186,7 +184,7 @@ func Test_garm_Start(t *testing.T) {
 	}
 	type test struct {
 		name       string
-		fields     fields
+		fields     func() fields
 		args       args
 		beforeFunc func()
 		checkFunc  func(chan []error, []error) error
@@ -226,8 +224,6 @@ func Test_garm_Start(t *testing.T) {
 			}
 			ctx, cancelFunc := context.WithCancel(context.Background())
 
-			os.Setenv(keyKey, key)
-
 			return test{
 				name: "Check success start garm daemon",
 				args: args{
@@ -249,10 +245,15 @@ func Test_garm_Start(t *testing.T) {
 						athenz: athenz,
 						server: server,
 					}
-				}(),
+				},
 				beforeFunc: func() {
 					os.Setenv(certKey, cert)
 					os.Setenv(keyKey, key)
+				},
+				afterFunc: func() {
+					os.Unsetenv(keyKey)
+					os.Unsetenv(certKey)
+					cancelFunc()
 				},
 				checkFunc: func(got chan []error, want []error) error {
 					cancelFunc()
@@ -264,11 +265,6 @@ func Test_garm_Start(t *testing.T) {
 					}
 					return nil
 
-				},
-				afterFunc: func() {
-					os.Unsetenv(keyKey)
-					os.Setenv(certKey, cert)
-					cancelFunc()
 				},
 				want: []error{context.Canceled},
 			}
@@ -284,11 +280,12 @@ func Test_garm_Start(t *testing.T) {
 				tt.beforeFunc()
 			}
 
+			fields := tt.fields()
 			g := &garm{
-				cfg:    tt.fields.cfg,
-				token:  tt.fields.token,
-				athenz: tt.fields.athenz,
-				server: tt.fields.server,
+				cfg:    fields.cfg,
+				token:  fields.token,
+				athenz: fields.athenz,
+				server: fields.server,
 			}
 			got := g.Start(tt.args.ctx)
 			if err := tt.checkFunc(got, tt.want); err != nil {
