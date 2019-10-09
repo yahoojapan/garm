@@ -43,7 +43,7 @@ func TestNew(t *testing.T) {
 		beforeFunc func()
 		checkFunc  func(GarmDaemon, GarmDaemon) error
 		afterFunc  func()
-		want       func() GarmDaemon
+		want       GarmDaemon
 		wantErr    error
 	}
 	tests := []test{
@@ -85,14 +85,13 @@ func TestNew(t *testing.T) {
 			}
 		}(),
 		func() test {
-			keyKey := "dummyKey"
 			key := "../service/testdata/dummyServer.key"
 			cfg := config.Config{
 				Token: config.Token{
-					AthenzDomain:      keyKey,
-					ServiceName:       keyKey,
+					AthenzDomain:      "dummyDomain",
+					ServiceName:       "dummyService",
 					NTokenPath:        "",
-					PrivateKeyEnvName: "_" + keyKey + "_",
+					PrivateKeyEnvName: key,
 					ValidateToken:     false,
 					RefreshDuration:   "1m",
 					KeyVersion:        "1",
@@ -112,16 +111,11 @@ func TestNew(t *testing.T) {
 				args: args{
 					cfg: cfg,
 				},
-				beforeFunc: func() {
-					os.Setenv(keyKey, key)
-				},
-				afterFunc: func() {
-					os.Unsetenv(keyKey)
-				},
 				want: func() GarmDaemon {
 					token, err := service.NewTokenService(cfg.Token)
 					if token == nil || err != nil {
-						t.Errorf("fsdf %v", err)
+						t.Errorf("%v", err)
+						t.Fail()
 					}
 
 					resolver := service.NewResolver(cfg.Mapping)
@@ -137,7 +131,8 @@ func TestNew(t *testing.T) {
 						athenz: athenz,
 						server: server,
 					}
-				},
+
+				}(),
 			}
 		}(),
 	}
@@ -161,7 +156,7 @@ func TestNew(t *testing.T) {
 			}
 
 			if tt.checkFunc != nil {
-				err = tt.checkFunc(got, tt.want())
+				err = tt.checkFunc(got, tt.want)
 				if tt.wantErr == nil && err != nil {
 					t.Errorf("compare check failed, err: %v", err)
 					return
@@ -184,7 +179,7 @@ func Test_garm_Start(t *testing.T) {
 	}
 	type test struct {
 		name       string
-		fields     func() fields
+		fields     fields
 		args       args
 		beforeFunc func()
 		checkFunc  func(chan []error, []error) error
@@ -200,10 +195,10 @@ func Test_garm_Start(t *testing.T) {
 
 			cfg := config.Config{
 				Token: config.Token{
-					AthenzDomain:      keyKey,
-					ServiceName:       keyKey,
+					AthenzDomain:      "dummyDomain",
+					ServiceName:       "dummyService",
 					NTokenPath:        "",
-					PrivateKeyEnvName: "_" + keyKey + "_",
+					PrivateKeyEnvName: key,
 					ValidateToken:     false,
 					RefreshDuration:   "1m",
 					KeyVersion:        "1",
@@ -230,6 +225,13 @@ func Test_garm_Start(t *testing.T) {
 					ctx: ctx,
 				},
 				fields: func() fields {
+					os.Setenv(certKey, cert)
+					os.Setenv(keyKey, key)
+					defer func() {
+						os.Unsetenv(keyKey)
+						os.Unsetenv(certKey)
+					}()
+
 					token, _ := service.NewTokenService(cfg.Token)
 
 					resolver := service.NewResolver(cfg.Mapping)
@@ -245,14 +247,8 @@ func Test_garm_Start(t *testing.T) {
 						athenz: athenz,
 						server: server,
 					}
-				},
-				beforeFunc: func() {
-					os.Setenv(certKey, cert)
-					os.Setenv(keyKey, key)
-				},
+				}(),
 				afterFunc: func() {
-					os.Unsetenv(keyKey)
-					os.Unsetenv(certKey)
 					cancelFunc()
 				},
 				checkFunc: func(got chan []error, want []error) error {
@@ -280,7 +276,7 @@ func Test_garm_Start(t *testing.T) {
 				tt.beforeFunc()
 			}
 
-			fields := tt.fields()
+			fields := tt.fields
 			g := &garm{
 				cfg:    fields.cfg,
 				token:  fields.token,
