@@ -79,6 +79,7 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 				go func() {
 					// it is the responsibility for handler to close the request
 					ech <- h(w, r.WithContext(ctx))
+					close(ech)
 				}()
 
 				for {
