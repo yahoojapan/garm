@@ -29,7 +29,7 @@ type Resolver interface {
 	// MapK8sResourceAthenzResource maps K8s resources to resources in Athenz resource.
 	MapK8sResourceAthenzResource(string) string
 	// BuildDomainFromNamespace creates Athenz domain with namespace.
-	BuildDomainFromNamespace(string) string
+	BuildDomainFromNamespace(string) []string
 	// PrincipalFromUser creates principal name from user.
 	PrincipalFromUser(string) string
 	// GetAdminDomain creates Athenz admin domain with namespace.
@@ -58,7 +58,7 @@ type resolve struct {
 	// cfg specifies the mapping rules and platform specific information.
 	cfg config.Platform
 	// athenzDomain specifies the Athenz domain for request to Athenz.
-	athenzDomain string
+	athenzDomain []string
 }
 
 // K8SResolve implementation for K8S platform.
@@ -121,38 +121,47 @@ func (r *resolve) MapK8sResourceAthenzResource(k8sRes string) string {
 
 // createAthenzDomain use cfg.ServiceAthenzDomain;
 
+// do the following for each cfg.ServiceAthenzDomain
 // split it with ".";
 // for each token, if it match /^_.*_$/ but not "_namespace_", replace the token with config.GetActualValue(token);
 // and then return the processed value
-func (r *resolve) createAthenzDomain() string {
-	reps := make([]string, 0, strings.Count(r.cfg.ServiceAthenzDomain, ".")+1)
-	for _, v := range strings.Split(r.cfg.ServiceAthenzDomain, ".") {
-		if v != "_namespace_" && strings.HasPrefix(v, "_") && strings.HasSuffix(v, "_") {
-			// Note: If deploying in a different namespace than the kube-public namespace, change it to get information from kube api
-			reps = append(reps, v, config.GetActualValue(v))
+func (r *resolve) createAthenzDomain() []string {
+	domains := []string{}
+	for _, domain := range r.cfg.ServiceAthenzDomain {
+		reps := make([]string, 0, strings.Count(domain, ".")+1)
+		for _, v := range strings.Split(domain, ".") {
+			if v != "_namespace_" && strings.HasPrefix(v, "_") && strings.HasSuffix(v, "_") {
+				// Note: If deploying in a different namespace than the kube-public namespace, change it to get information from kube api
+				reps = append(reps, v, config.GetActualValue(v))
+			}
 		}
+		domains = append(domains, strings.NewReplacer(reps...).Replace(domain))
 	}
-	return strings.NewReplacer(reps...).Replace(r.cfg.ServiceAthenzDomain)
+	return domains
 }
 
-// BuildDomainFromNamespace return domain by processing athenzDomain.
+// BuildDomainFromNamespace return domains by processing athenzDomains.
 // if namespace != "", replace `/ = .`, then `.. => -`, then replace "_namespace_" in athenzDomain with namespace;
 // else replace "._namespace_" in athenzDomain with namespace;
 // trim ".", then "-", then ":"
-func (r *resolve) BuildDomainFromNamespace(namespace string) string {
+func (r *resolve) BuildDomainFromNamespace(namespace string) []string {
+	domains := []string{}
+	for _, domain := range r.athenzDomain {
+		if namespace == "" {
+			domains = append(domains, strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
+				strings.Replace(domain, "._namespace_", namespace, -1),
+				"."), "."), "-"), "-"), ":"), ":"))
+			continue
+		}
 
-	if namespace == "" {
-		return strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
-			strings.Replace(r.athenzDomain, "._namespace_", namespace, -1),
-			"."), "."), "-"), "-"), ":"), ":")
+		domains = append(domains, strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
+			strings.Replace(domain, "_namespace_", strings.Replace(strings.Replace(namespace,
+				"/", ".", -1),
+				"..", "-", -1),
+				-1),
+			"."), "."), "-"), "-"), ":"), ":"))
 	}
-
-	return strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
-		strings.Replace(r.athenzDomain, "_namespace_", strings.Replace(strings.Replace(namespace,
-			"/", ".", -1),
-			"..", "-", -1),
-			-1),
-		"."), "."), "-"), "-"), ":"), ":")
+	return domains
 }
 
 // MapAPIGroup returns "" if cfg.APIGroupControlEnabled == false;
@@ -211,9 +220,8 @@ func (r *resolve) PrincipalFromUser(user string) string {
 		if strings.HasPrefix(user, prefix) {
 			parts := strings.Split(strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":"), ":")
 			if len(parts) >= 2 {
-				return strings.TrimPrefix(strings.TrimSuffix(strings.Join(append([]string{
-					r.BuildDomainFromNamespace(parts[0]),
-				}, parts[1:]...), "."), ":"), ":")
+				return strings.TrimPrefix(strings.TrimSuffix(strings.Join(
+					append(r.BuildDomainFromNamespace(parts[0]), parts[1:]...), "."), ":"), ":")
 			}
 			return strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":")
 		}
