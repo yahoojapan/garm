@@ -97,31 +97,29 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 }
 
 func (m *resourceMapper) createAdminAcessCheck(adminDomain, group, resource, name, verb string, domains []string) []webhook.AthenzAccessCheck {
-	accessChecks := []webhook.AthenzAccessCheck{}
+	accessChecks := make([]webhook.AthenzAccessCheck, 0, len(domains)*2)
 	for _, domain := range domains {
-		accessCheck := []webhook.AthenzAccessCheck{
-			{
+		accessChecks = append(accessChecks,
+			webhook.AthenzAccessCheck{
 				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s.%s", adminDomain, group, domain, resource, name)),
 				Action:   verb,
 			},
-			{
+			webhook.AthenzAccessCheck{
 				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s", adminDomain, group, resource, name)),
 				Action:   verb,
-			},
-		}
-		accessChecks = append(accessChecks, accessCheck...)
+			})
 	}
 	return accessChecks
 }
 
 func (m *resourceMapper) createAcessCheck(group, resource, name, verb string, domains []string) []webhook.AthenzAccessCheck {
-	accessChecks := []webhook.AthenzAccessCheck{}
+	accessChecks := make([]webhook.AthenzAccessCheck, 0, len(domains))
 	for _, domain := range domains {
-		accessCheck := webhook.AthenzAccessCheck{
-			Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s", domain, group, resource, name)),
-			Action:   verb,
-		}
-		accessChecks = append(accessChecks, accessCheck)
+		accessChecks = append(accessChecks,
+			webhook.AthenzAccessCheck{
+				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s", domain, group, resource, name)),
+				Action:   verb,
+			})
 	}
 	return accessChecks
 }
