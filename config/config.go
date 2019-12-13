@@ -177,8 +177,8 @@ type Platform struct {
 	// Name represents the platform name. Currently, it supports "k8s", "aks" and "k8s".
 	Name string `yaml:"name"`
 
-	// ServiceAthenzDomain represents the Athenz domain name used for non-administrative K8s webhook requests.
-	ServiceAthenzDomain []string `yaml:"service_athenz_domain"`
+	// ServiceAthenzDomains represents the Athenz domain name used for non-administrative K8s webhook requests.
+	ServiceAthenzDomains []string `yaml:"service_athenz_domains"`
 
 	// ResourceMappings maps the K8s webhook request "resource" to the "resource" part of Athenz resource name.
 	ResourceMappings map[string]string `yaml:"resource_mappings,omitempty"`

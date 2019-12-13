@@ -126,8 +126,8 @@ func (r *resolve) MapK8sResourceAthenzResource(k8sRes string) string {
 // for each token, if it match /^_.*_$/ but not "_namespace_", replace the token with config.GetActualValue(token);
 // and then return the processed value
 func (r *resolve) createAthenzDomain() []string {
-	domains := make([]string, 0, len(r.cfg.ServiceAthenzDomain))
-	for _, domain := range r.cfg.ServiceAthenzDomain {
+	domains := make([]string, 0, len(r.cfg.ServiceAthenzDomains))
+	for _, domain := range r.cfg.ServiceAthenzDomains {
 		reps := make([]string, 0, strings.Count(domain, ".")+1)
 		for _, v := range strings.Split(domain, ".") {
 			if v != "_namespace_" && strings.HasPrefix(v, "_") && strings.HasSuffix(v, "_") {
