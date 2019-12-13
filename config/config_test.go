@@ -334,8 +334,10 @@ func TestNew(t *testing.T) {
 					TLD: TLD{
 						Name: "aks",
 						Platform: Platform{
-							Name:                 "aks",
-							ServiceAthenzDomains: []string{"_kaas_namespace_.k8s._k8s_cluster_._namespace_"},
+							Name: "aks",
+							ServiceAthenzDomains: []string{
+								"_kaas_namespace_.k8s._k8s_cluster_1._namespace_",
+								"_kaas_namespace_.k8s._k8s_cluster_2._namespace_"},
 							ResourceMappings: map[string]string{
 								"k8sResource1": "athenzResource1",
 							},
