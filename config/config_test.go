@@ -334,8 +334,8 @@ func TestNew(t *testing.T) {
 					TLD: TLD{
 						Name: "aks",
 						Platform: Platform{
-							Name:                "aks",
-							ServiceAthenzDomain: "_kaas_namespace_.k8s._k8s_cluster_._namespace_",
+							Name:                 "aks",
+							ServiceAthenzDomains: []string{"_kaas_namespace_.k8s._k8s_cluster_._namespace_"},
 							ResourceMappings: map[string]string{
 								"k8sResource1": "athenzResource1",
 							},
@@ -417,7 +417,7 @@ func TestGetVersion(t *testing.T) {
 	}{
 		{
 			name: "Test get version return garm version",
-			want: "v1.0.0",
+			want: "v2.0.0",
 		},
 	}
 	for _, tt := range tests {

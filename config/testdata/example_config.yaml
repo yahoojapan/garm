@@ -1,4 +1,4 @@
-version: v1.0.0
+version: v2.0.0
 logger:
   log_path: /var/log/athenz/webhook.log
   log_trace: server,athenz,mapping
@@ -33,8 +33,10 @@ map_rule:
     name: aks
     platform:
       name: aks
-      # service_athenz_domain: _tld_.k8s._segment_._uk-cluster_._namespace_._env_._k8s-cluster_._k8s-namespace_
-      service_athenz_domain: _kaas_namespace_.k8s._k8s_cluster_._namespace_ # max-length = 44
+      # service_athenz_domains: 
+        # - _tld_.k8s._segment_._uk-cluster_._namespace_._env_._k8s-cluster_._k8s-namespace_
+      service_athenz_domains:
+        - _kaas_namespace_.k8s._k8s_cluster_._namespace_ # max-length = 44
       # service_athenz_domain: _namespace_.aks
       # service_athenz_domain: _namespace_.k8s
       resource_mappings:
