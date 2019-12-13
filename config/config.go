@@ -29,7 +29,7 @@ import (
 
 const (
 	// currentVersion represents the configuration version.
-	currentVersion = "v1.0.0"
+	currentVersion = "v2.0.0"
 )
 
 // Config represents an application configuration content (config.yaml).
