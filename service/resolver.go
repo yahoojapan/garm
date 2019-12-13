@@ -57,8 +57,8 @@ type Resolver interface {
 type resolve struct {
 	// cfg specifies the mapping rules and platform specific information.
 	cfg config.Platform
-	// athenzDomain specifies the Athenz domain for request to Athenz.
-	athenzDomain []string
+	// athenzDomains specifies the Athenz domain for request to Athenz.
+	athenzDomains []string
 }
 
 // K8SResolve implementation for K8S platform.
@@ -86,7 +86,7 @@ func NewResolver(cfg config.Mapping) Resolver {
 		cfg: cfg.TLD.Platform,
 	}
 
-	res.athenzDomain = res.createAthenzDomain()
+	res.athenzDomains = res.createAthenzDomain()
 
 	switch res.cfg.Name {
 	case "k8s":
@@ -145,8 +145,8 @@ func (r *resolve) createAthenzDomain() []string {
 // else replace "._namespace_" in athenzDomain with namespace;
 // trim ".", then "-", then ":"
 func (r *resolve) BuildDomainFromNamespace(namespace string) []string {
-	domains := make([]string, 0, len(r.athenzDomain))
-	for _, domain := range r.athenzDomain {
+	domains := make([]string, 0, len(r.athenzDomains))
+	for _, domain := range r.athenzDomains {
 		if namespace == "" {
 			domains = append(domains, strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
 				strings.Replace(domain, "._namespace_", namespace, -1),
