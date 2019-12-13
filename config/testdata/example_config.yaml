@@ -36,9 +36,12 @@ map_rule:
       # service_athenz_domains: 
         # - _tld_.k8s._segment_._uk-cluster_._namespace_._env_._k8s-cluster_._k8s-namespace_
       service_athenz_domains:
-        - _kaas_namespace_.k8s._k8s_cluster_._namespace_ # max-length = 44
-      # service_athenz_domain: _namespace_.aks
-      # service_athenz_domain: _namespace_.k8s
+        - _kaas_namespace_.k8s._k8s_cluster_1._namespace_ # max-length = 44
+        - _kaas_namespace_.k8s._k8s_cluster_2._namespace_ # max-length = 44
+      # service_athenz_domain:
+        # - _namespace_.aks
+      # service_athenz_domain:
+        # - _namespace_.k8s
       resource_mappings:
         k8sResource1: athenzResource1
         # k8sResource2: athenzResource2
