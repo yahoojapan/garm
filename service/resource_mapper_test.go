@@ -46,7 +46,7 @@ func TestNewResourceMapper(t *testing.T) {
 		},
 		func() testcase {
 			resolver := &resolve{
-				athenzDomain: "athenzDomain-24",
+				athenzDomains: []string{"athenzDomain-24"},
 			}
 			return testcase{
 				name: "Check NewResourceMapper",
@@ -88,7 +88,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, all empty",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "",
+					athenzDomains: []string{""},
 				},
 			},
 			args: args{
@@ -121,7 +121,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, nil ResourceAttributes, use non-resources attributes",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-domain-106",
+					athenzDomains: []string{"athenz-domain-106"},
 					cfg: config.Platform{
 						NonResourceAPIGroup:  "non-resource-api-group-108",
 						NonResourceNamespace: "non-resource-namespace-109",
@@ -151,7 +151,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, ResourceAttributes with empty namespace & non-empty sub-resource",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-domain-138._namespace_",
+					athenzDomains: []string{"athenz-domain-138._namespace_"},
 					cfg: config.Platform{
 						EmptyNamespace:             "empty-namespace-140",
 						APIGroupControlEnabled:     true,
@@ -185,7 +185,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, mapping verb & resource & group & name OK",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-domain-171",
+					athenzDomains: []string{"athenz-domain-171"},
 					cfg: config.Platform{
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,
@@ -230,7 +230,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, domain from namespace & principal from user",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-domain-216._namespace_",
+					athenzDomains: []string{"athenz-domain-216._namespace_"},
 					cfg: config.Platform{
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,
@@ -264,7 +264,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, admin access",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-admin-domain-250",
+					athenzDomains: []string{"athenz-admin-domain-250"},
 					cfg: config.Platform{
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,
@@ -310,7 +310,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, not allowed, directly reject",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-domain-296",
+					athenzDomains: []string{"athenz-domain-296"},
 					cfg: config.Platform{
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,
