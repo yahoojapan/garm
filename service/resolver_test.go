@@ -476,6 +476,22 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 			want: []string{"athenz-domain-140"},
 		},
 		{
+			name: "Check resolve BuildDomainFromNamespace, empty namespace, multi athenzDomains no replace & trim ",
+			fields: fields{
+				athenzDomains: []string{
+					"athenz-domain-482",
+					"athenz-domain-483",
+				},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{
+				"athenz-domain-482",
+				"athenz-domain-483",
+			},
+		},
+		{
 			name: "Check resolve BuildDomainFromNamespace, empty namespace, athenzDomains no replace, full trim",
 			fields: fields{
 				athenzDomains: []string{".-:athenz-domain-150:-."},
