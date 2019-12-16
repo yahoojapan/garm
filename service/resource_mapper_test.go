@@ -46,7 +46,10 @@ func TestNewResourceMapper(t *testing.T) {
 		},
 		func() testcase {
 			resolver := &resolve{
-				athenzDomains: []string{"athenzDomain-24"},
+				athenzDomains: []string{
+					"athenzDomain-24",
+					"athenzDomain-25",
+				},
 			}
 			return testcase{
 				name: "Check NewResourceMapper",
