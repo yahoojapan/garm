@@ -151,6 +151,43 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			wantError: nil,
 		},
 		{
+			name: "Check resourceMapper MapResource, nil ResourceAttributes, use non-resources attributes, multi domain",
+			fields: fields{
+				res: &resolve{
+					athenzDomains: []string{
+						"athenz-domain-158",
+						"athenz-domain-159",
+					},
+					cfg: config.Platform{
+						NonResourceAPIGroup:  "non-resource-api-group-162",
+						NonResourceNamespace: "non-resource-namespace-163",
+					},
+				},
+			},
+			args: args{
+				spec: authz.SubjectAccessReviewSpec{
+					ResourceAttributes: nil,
+					NonResourceAttributes: &authz.NonResourceAttributes{
+						Path: "path-171",
+						Verb: "verb-172",
+					},
+					User: "user-174",
+				},
+			},
+			wantIdentity: "user-174",
+			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
+				{
+					Resource: "athenz-domain-158:path-171",
+					Action:   "verb-172",
+				},
+				{
+					Resource: "athenz-domain-159:path-171",
+					Action:   "verb-172",
+				},
+			},
+			wantError: nil,
+		},
+		{
 			name: "Check resourceMapper MapResource, ResourceAttributes with empty namespace & non-empty sub-resource",
 			fields: fields{
 				res: &resolve{
