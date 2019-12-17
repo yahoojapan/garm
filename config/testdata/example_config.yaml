@@ -63,4 +63,5 @@ map_rule:
         - "system:serviceaccount:" 
         - "system-serviceaccount-"
       athenz_user_prefix: user.
+      athenz_service_account_prefix: _kaas_namespace_.k8s._k8s_cluster_2._namespace_.service_account.
       admin_athenz_domain: aks.admin
