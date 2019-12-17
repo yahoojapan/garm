@@ -216,6 +216,9 @@ type Platform struct {
 	// AthenzUserPrefix represents the Athenz user prefix used when the K8s webhook request is from a user account.
 	AthenzUserPrefix string `yaml:"athenz_user_prefix"`
 
+	// AthenzServiceAccountPrefix represents the Athenz service account prefix used when the K8s webhook request is from a service account.
+	AthenzServiceAccountPrefix string `yaml:"athenz_service_account_prefix"`
+
 	// AdminAthenzDomain represents the Athenz domain name used for administrative K8s webhook requests.
 	AdminAthenzDomain string `yaml:"admin_athenz_domain"`
 
