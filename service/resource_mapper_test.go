@@ -275,6 +275,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,
 						ServiceAccountPrefixes:     []string{"user."},
+						AthenzServiceAccountPrefix: "athenz-domain-278._namespace_.",
 					},
 				},
 			},
@@ -291,7 +292,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 					User: "user.namespace-234:sub-domain-234:user-234",
 				},
 			},
-			wantIdentity: "athenz-domain-216.namespace-234.sub-domain-234.user-234",
+			wantIdentity: "athenz-domain-278.namespace-234.sub-domain-234.user-234",
 			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
 				{
 					Resource: "athenz-domain-216.namespace-228:group-232.resource-230.sub-resource-231.name-227",
