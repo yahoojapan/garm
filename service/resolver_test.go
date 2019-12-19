@@ -590,18 +590,6 @@ func Test_resolve_BuildServiceAccountPrefixFromNamespace(t *testing.T) {
 			want: []string{""},
 		},
 		{
-			name: "dot test",
-			fields: fields{
-				cfg: config.Platform{
-					AthenzServiceAccountPrefix: "athenz-_namespace_-domain-668",
-				},
-			},
-			args: args{
-				namespace: "hoge.fuga",
-			},
-			want: []string{"athenz-hoge.fuga-domain668"},
-		},
-		{
 			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, AthenzServiceAccountPrefix no replace & trim",
 			fields: fields{
 				cfg: config.Platform{
