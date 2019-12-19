@@ -33,7 +33,7 @@ map_rule:
     name: aks
     platform:
       name: aks
-      # service_athenz_domains: 
+      # service_athenz_domains:
         # - _tld_.k8s._segment_._uk-cluster_._namespace_._env_._k8s-cluster_._k8s-namespace_
       service_athenz_domains:
         - _kaas_namespace_.k8s._k8s_cluster_1._namespace_ # max-length = 44
