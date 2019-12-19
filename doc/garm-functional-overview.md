@@ -81,7 +81,7 @@
 		- `k8s_user` => `user.k8s_user`
 			+ `athenz_user_prefix = "user."`
 
-P.S. It may be easier to read the code directly. [createAthenzDomain()](../service/resolver.go#L110), [GetAdminDomain()](../service/resolver.go#280), [BuildDomainFromNamespace()](../service/resolver.go#125), [PrincipalFromUser()](../service/resolver.go#L187)
+P.S. It may be easier to read the code directly. [createAthenzDomains()](../service/resolver.go#L110), [GetAdminDomain()](../service/resolver.go#280), [BuildDomainFromNamespace()](../service/resolver.go#125), [PrincipalFromUser()](../service/resolver.go#L187)
 
 <a id="filter-k8s-request"></a>
 ## Filter k8s request

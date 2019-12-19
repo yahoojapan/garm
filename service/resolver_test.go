@@ -257,7 +257,7 @@ func Test_resolve_MapK8sResourceAthenzResource(t *testing.T) {
 	}
 }
 
-func Test_resolve_createAthenzDomain(t *testing.T) {
+func Test_resolve_createAthenzDomains(t *testing.T) {
 	type fields struct {
 		cfg           config.Platform
 		athenzDomains []string
@@ -271,7 +271,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 	}
 	tests := []testcase{
 		{
-			name: "Check resolve createAthenzDomain, empty serviceAthenzDomains",
+			name: "Check resolve createAthenzDomains, empty serviceAthenzDomains",
 			fields: fields{
 				cfg: config.Platform{
 					ServiceAthenzDomains: []string{""},
@@ -280,7 +280,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 			want: []string{""},
 		},
 		{
-			name: "Check resolve createAthenzDomain, serviceAthenzDomains no split, no replace",
+			name: "Check resolve createAthenzDomains, serviceAthenzDomains no split, no replace",
 			fields: fields{
 				cfg: config.Platform{
 					ServiceAthenzDomains: []string{"service-athenz-domain-192"},
@@ -289,7 +289,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 			want: []string{"service-athenz-domain-192"},
 		},
 		{
-			name: "Check resolve createAthenzDomain, multi serviceAthenzDomains",
+			name: "Check resolve createAthenzDomains, multi serviceAthenzDomains",
 			fields: fields{
 				cfg: config.Platform{
 					ServiceAthenzDomains: []string{
@@ -311,7 +311,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 			serviceAthenzDomains := []string{"_namespace_._env-200_._env-199_"}
 
 			return testcase{
-				name: "Check resolve createAthenzDomain, serviceAthenzDomains, multiple replace, skip _namespace_",
+				name: "Check resolve createAthenzDomains, serviceAthenzDomains, multiple replace, skip _namespace_",
 				fields: fields{
 					cfg: config.Platform{
 						ServiceAthenzDomains: serviceAthenzDomains,
@@ -346,7 +346,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 			serviceAthenzDomains := []string{"_env-236_.env-235."}
 
 			return testcase{
-				name: "Check resolve createAthenzDomain, serviceAthenzDomains, single replace",
+				name: "Check resolve createAthenzDomains, serviceAthenzDomains, single replace",
 				fields: fields{
 					cfg: config.Platform{
 						ServiceAthenzDomains: serviceAthenzDomains,
@@ -382,7 +382,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 			serviceAthenzDomains := []string{".env-270.env-271.env-272"}
 
 			return testcase{
-				name: "Check resolve createAthenzDomain, serviceAthenzDomains, split but no replace",
+				name: "Check resolve createAthenzDomains, serviceAthenzDomains, split but no replace",
 				fields: fields{
 					cfg: config.Platform{
 						ServiceAthenzDomains: serviceAthenzDomains,
@@ -433,8 +433,8 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 				cfg:           tt.fields.cfg,
 				athenzDomains: tt.fields.athenzDomains,
 			}
-			if got := r.createAthenzDomain(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("resolve.createAthenzDomain() = %v, want %v", got, tt.want)
+			if got := r.createAthenzDomains(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("resolve.createAthenzDomains() = %v, want %v", got, tt.want)
 				return
 			}
 		})

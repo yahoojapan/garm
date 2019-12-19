@@ -86,7 +86,7 @@ func NewResolver(cfg config.Mapping) Resolver {
 		cfg: cfg.TLD.Platform,
 	}
 
-	res.athenzDomains = res.createAthenzDomain()
+	res.athenzDomains = res.createAthenzDomains()
 
 	switch res.cfg.Name {
 	case "k8s":
@@ -119,13 +119,13 @@ func (r *resolve) MapK8sResourceAthenzResource(k8sRes string) string {
 	return athenzRes
 }
 
-// createAthenzDomain use cfg.ServiceAthenzDomains;
+// createAthenzDomains use cfg.ServiceAthenzDomains;
 
 // do the following for each cfg.ServiceAthenzDomains
 // split it with ".";
 // for each token, if it match /^_.*_$/ but not "_namespace_", replace the token with config.GetActualValue(token);
 // and then return the processed value
-func (r *resolve) createAthenzDomain() []string {
+func (r *resolve) createAthenzDomains() []string {
 	domains := make([]string, 0, len(r.cfg.ServiceAthenzDomains))
 	for _, domain := range r.cfg.ServiceAthenzDomains {
 		reps := make([]string, 0, strings.Count(domain, ".")+1)
