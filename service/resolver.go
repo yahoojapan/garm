@@ -119,9 +119,9 @@ func (r *resolve) MapK8sResourceAthenzResource(k8sRes string) string {
 	return athenzRes
 }
 
-// createAthenzDomain use cfg.ServiceAthenzDomain;
+// createAthenzDomain use cfg.ServiceAthenzDomains;
 
-// do the following for each cfg.ServiceAthenzDomain
+// do the following for each cfg.ServiceAthenzDomains
 // split it with ".";
 // for each token, if it match /^_.*_$/ but not "_namespace_", replace the token with config.GetActualValue(token);
 // and then return the processed value
@@ -141,27 +141,37 @@ func (r *resolve) createAthenzDomain() []string {
 }
 
 // BuildDomainFromNamespace return domains by processing athenzDomains.
-// if namespace != "", replace `/ = .`, then `.. => -`, then replace "_namespace_" in athenzDomain with namespace;
-// else replace "._namespace_" in athenzDomain with namespace;
-// trim ".", then "-", then ":"
 func (r *resolve) BuildDomainFromNamespace(namespace string) []string {
-	domains := make([]string, 0, len(r.athenzDomains))
-	for _, domain := range r.athenzDomains {
+	return r.buildAthenzDomain(r.athenzDomains, namespace)
+}
+
+//  BuildServiceAccountPrefixFromNamespace return domains by processing AthenzServiceACcountPrefix.
+func (r *resolve) BuildServiceAccountPrefixFromNamespace(namespace string) []string {
+	return r.buildAthenzDomain([]string{r.cfg.AthenzServiceAccountPrefix}, namespace)
+}
+
+// buildAthenzDomain return builtDomains by processing domains.
+// if namespace != "", replace `/ = .`, then `.. => -`, then replace "_namespace_" in domain with namespace;
+// else replace "._namespace_" in domain with namespace;
+// trim ".", then "-", then ":"
+func (r *resolve) buildAthenzDomain(domains []string, namespace string) []string {
+	builtDomains := make([]string, 0, len(domains))
+	for _, domain := range domains {
 		if namespace == "" {
-			domains = append(domains, strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
+			builtDomains = append(builtDomains, strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
 				strings.Replace(domain, "._namespace_", namespace, -1),
 				"."), "."), "-"), "-"), ":"), ":"))
 			continue
 		}
 
-		domains = append(domains, strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
+		builtDomains = append(builtDomains, strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
 			strings.Replace(domain, "_namespace_", strings.Replace(strings.Replace(namespace,
 				"/", ".", -1),
 				"..", "-", -1),
 				-1),
 			"."), "."), "-"), "-"), ":"), ":"))
 	}
-	return domains
+	return builtDomains
 }
 
 // MapAPIGroup returns "" if cfg.APIGroupControlEnabled == false;
@@ -221,9 +231,9 @@ func (r *resolve) PrincipalFromUser(user string) string {
 			parts := strings.Split(strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":"), ":")
 			if len(parts) >= 2 {
 				return strings.TrimPrefix(strings.TrimSuffix(strings.Join(
-					append(r.BuildDomainFromNamespace(parts[0]), parts[1:]...), "."), ":"), ":")
+					append(r.BuildServiceAccountPrefixFromNamespace(parts[0]), parts[1:]...), "."), ":"), ":")
 			}
-			return strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":")
+			return r.cfg.AthenzServiceAccountPrefix + strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":")
 		}
 	}
 

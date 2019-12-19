@@ -564,6 +564,139 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 		})
 	}
 }
+func Test_resolve_BuildServiceAccountPrefixFromNamespace(t *testing.T) {
+	type fields struct {
+		cfg config.Platform
+	}
+	type args struct {
+		namespace string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   []string
+	}{
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, empty AthenzServiceAccountPrefix",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "",
+				},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{""},
+		},
+		{
+			name: "dot test",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "athenz-_namespace_-domain-668",
+				},
+			},
+			args: args{
+				namespace: "hoge.fuga",
+			},
+			want: []string{"athenz-hoge.fuga-domain668"},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, AthenzServiceAccountPrefix no replace & trim",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "athenz-domain-506",
+				},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{"athenz-domain-506"},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, AthenzServiceAccountPrefix no replace, full trim",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: ".-:athenz-domain-608:-.",
+				},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{"athenz-domain-608"},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, AthenzServiceAccountPrefix no replace, partially trim",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: ":-.athenz-domain-620.:-",
+				},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{"-.athenz-domain-620."},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, AthenzServiceAccountPrefix no trim, replace",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "athenz-|._namespace_||._namespace_|-domain-632",
+				},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{"athenz-||||-domain-632"},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, AthenzServiceAccountPrefix no trim, no replace namespace",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "athenz-|.namespace||.namespace|-domain-644",
+				},
+			},
+			args: args{
+				namespace: "namespace-648",
+			},
+			want: []string{"athenz-|.namespace||.namespace|-domain-644"},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, AthenzServiceAccountPrefix no trim, replace namespace",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "athenz-|._namespace_||._namespace_|-domain-656",
+				},
+			},
+			args: args{
+				namespace: "namespace-660",
+			},
+			want: []string{"athenz-|.namespace-660||.namespace-660|-domain-656"},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, namspace replace, AthenzServiceAccountPrefix no trim, replace namespace",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "athenz-<._namespace_>-domain-668",
+				},
+			},
+			args: args{
+				namespace: "namespace|//|/./|./.././../.|./n-s/.ns/../nn-ss//sss|-672",
+			},
+			want: []string{"athenz-<.namespace|-|-.|-----.|-n-s-ns--nn-ss-sss|-672>-domain-668"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &resolve{
+				cfg: tt.fields.cfg,
+			}
+			if got := r.BuildServiceAccountPrefixFromNamespace(tt.args.namespace); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("resolve.BuildServiceAccountPrefixFromNamespace() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 
 func Test_resolve_MapAPIGroup(t *testing.T) {
 	type fields struct {
@@ -899,9 +1032,9 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 		{
 			name: "Check resolve PrincipalFromUser ServiceAccountPrefixes match user prefix, multiple parts, empty namespace",
 			fields: fields{
-				athenzDomains: []string{"athenz-|._namespace_||._namespace_|-domain-342"},
 				cfg: config.Platform{
-					ServiceAccountPrefixes: []string{"prefix-not-match", "prefix-344"},
+					ServiceAccountPrefixes:     []string{"prefix-not-match", "prefix-344"},
+					AthenzServiceAccountPrefix: "athenz-|._namespace_||._namespace_|-domain-342",
 				},
 			},
 			args: args{
@@ -912,9 +1045,9 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 		{
 			name: "Check resolve PrincipalFromUser ServiceAccountPrefixes match user prefix, multiple parts, non-empty namespace",
 			fields: fields{
-				athenzDomains: []string{"athenz-|._namespace_||._namespace_|-domain-356"},
 				cfg: config.Platform{
-					ServiceAccountPrefixes: []string{"prefix-not-match", "prefix-358"},
+					ServiceAccountPrefixes:     []string{"prefix-not-match", "prefix-358"},
+					AthenzServiceAccountPrefix: "athenz-|._namespace_||._namespace_|-domain-356",
 				},
 			},
 			args: args{
