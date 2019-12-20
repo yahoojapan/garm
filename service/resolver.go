@@ -127,8 +127,12 @@ func (r *resolve) MapK8sResourceAthenzResource(k8sRes string) string {
 // and then return the processed value
 func (r *resolve) createAthenzDomains() []string {
 	domains := make([]string, 0, len(r.cfg.ServiceAthenzDomains))
+	// Default domain string length is 128. so, maxi domain depth is 64.
+	// If this size is exceeded, it is a slice, so there is no problem.
+	// https://github.com/yahoo/athenz/blob/b92bd87bf65cf605a1abc2c6263974d85b4bb5d1/servers/zms/conf/zms.properties#L269
+	reps := make([]string, 0, 64)
 	for _, domain := range r.cfg.ServiceAthenzDomains {
-		reps := make([]string, 0, strings.Count(domain, ".")+1)
+		reps = reps[:0]
 		for _, v := range strings.Split(domain, ".") {
 			if v != "_namespace_" && strings.HasPrefix(v, "_") && strings.HasSuffix(v, "_") {
 				// Note: If deploying in a different namespace than the kube-public namespace, change it to get information from kube api
