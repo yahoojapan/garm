@@ -162,20 +162,21 @@ func (r *resolve) buildAthenzDomain(domains []string, namespace string) []string
 	builtDomains := make([]string, 0, len(domains))
 	for _, domain := range domains {
 		if namespace == "" {
-			builtDomains = append(builtDomains, strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
-				strings.Replace(domain, "._namespace_", namespace, -1),
-				"."), "."), "-"), "-"), ":"), ":"))
+			builtDomains = append(builtDomains, r.trimToValidAsDomain(strings.Replace(domain, "._namespace_", namespace, -1)))
 			continue
 		}
 
-		builtDomains = append(builtDomains, strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
-			strings.Replace(domain, "_namespace_", strings.Replace(strings.Replace(namespace,
-				"/", ".", -1),
-				"..", "-", -1),
-				-1),
-			"."), "."), "-"), "-"), ":"), ":"))
+		builtDomains = append(builtDomains, r.trimToValidAsDomain(strings.Replace(domain, "_namespace_", r.replacePunctuationInNamespace(namespace), -1)))
 	}
 	return builtDomains
+}
+
+func (r *resolve) replacePunctuationInNamespace(namespace string) string {
+	return strings.Replace(strings.Replace(namespace, "/", ".", -1), "..", "-", -1)
+}
+
+func (r *resolve) trimToValidAsDomain(target string) string {
+	return strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(target, "."), "."), "-"), "-"), ":"), ":")
 }
 
 // MapAPIGroup returns "" if cfg.APIGroupControlEnabled == false;
