@@ -85,14 +85,13 @@ func TestNew(t *testing.T) {
 			}
 		}(),
 		func() test {
-			keyKey := "dummyKey"
 			key := "../service/testdata/dummyServer.key"
 			cfg := config.Config{
 				Token: config.Token{
-					AthenzDomain:      keyKey,
-					ServiceName:       keyKey,
+					AthenzDomain:      "dummyDomain",
+					ServiceName:       "dummyService",
 					NTokenPath:        "",
-					PrivateKeyEnvName: "_" + keyKey + "_",
+					PrivateKeyEnvName: key,
 					ValidateToken:     false,
 					RefreshDuration:   "1m",
 					KeyVersion:        "1",
@@ -107,23 +106,16 @@ func TestNew(t *testing.T) {
 				},
 			}
 
-			os.Setenv(keyKey, key)
-
 			return test{
 				name: "Check new garm daemon return correct",
 				args: args{
 					cfg: cfg,
 				},
-				beforeFunc: func() {
-					os.Setenv(keyKey, key)
-				},
-				afterFunc: func() {
-					os.Unsetenv(keyKey)
-				},
 				want: func() GarmDaemon {
 					token, err := service.NewTokenService(cfg.Token)
 					if token == nil || err != nil {
-						t.Errorf("fsdf %v", err)
+						t.Errorf("%v", err)
+						t.Fail()
 					}
 
 					resolver := service.NewResolver(cfg.Mapping)
@@ -139,6 +131,7 @@ func TestNew(t *testing.T) {
 						athenz: athenz,
 						server: server,
 					}
+
 				}(),
 			}
 		}(),
@@ -202,10 +195,10 @@ func Test_garm_Start(t *testing.T) {
 
 			cfg := config.Config{
 				Token: config.Token{
-					AthenzDomain:      keyKey,
-					ServiceName:       keyKey,
+					AthenzDomain:      "dummyDomain",
+					ServiceName:       "dummyService",
 					NTokenPath:        "",
-					PrivateKeyEnvName: "_" + keyKey + "_",
+					PrivateKeyEnvName: key,
 					ValidateToken:     false,
 					RefreshDuration:   "1m",
 					KeyVersion:        "1",
@@ -226,14 +219,19 @@ func Test_garm_Start(t *testing.T) {
 			}
 			ctx, cancelFunc := context.WithCancel(context.Background())
 
-			os.Setenv(keyKey, key)
-
 			return test{
 				name: "Check success start garm daemon",
 				args: args{
 					ctx: ctx,
 				},
 				fields: func() fields {
+					os.Setenv(certKey, cert)
+					os.Setenv(keyKey, key)
+					defer func() {
+						os.Unsetenv(keyKey)
+						os.Unsetenv(certKey)
+					}()
+
 					token, _ := service.NewTokenService(cfg.Token)
 
 					resolver := service.NewResolver(cfg.Mapping)
@@ -250,9 +248,8 @@ func Test_garm_Start(t *testing.T) {
 						server: server,
 					}
 				}(),
-				beforeFunc: func() {
-					os.Setenv(certKey, cert)
-					os.Setenv(keyKey, key)
+				afterFunc: func() {
+					cancelFunc()
 				},
 				checkFunc: func(got chan []error, want []error) error {
 					cancelFunc()
@@ -264,11 +261,6 @@ func Test_garm_Start(t *testing.T) {
 					}
 					return nil
 
-				},
-				afterFunc: func() {
-					os.Unsetenv(keyKey)
-					os.Setenv(certKey, cert)
-					cancelFunc()
 				},
 				want: []error{context.Canceled},
 			}
@@ -284,11 +276,12 @@ func Test_garm_Start(t *testing.T) {
 				tt.beforeFunc()
 			}
 
+			fields := tt.fields
 			g := &garm{
-				cfg:    tt.fields.cfg,
-				token:  tt.fields.token,
-				athenz: tt.fields.athenz,
-				server: tt.fields.server,
+				cfg:    fields.cfg,
+				token:  fields.token,
+				athenz: fields.athenz,
+				server: fields.server,
 			}
 			got := g.Start(tt.args.ctx)
 			if err := tt.checkFunc(got, tt.want); err != nil {
