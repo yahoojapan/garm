@@ -38,9 +38,9 @@ map_rule:
       service_athenz_domains:
         - _kaas_namespace_.k8s._k8s_cluster_1._namespace_ # max-length = 44
         - _kaas_namespace_.k8s._k8s_cluster_2._namespace_ # max-length = 44
-      # service_athenz_domain:
+      # service_athenz_domains:
         # - _namespace_.aks
-      # service_athenz_domain:
+      # service_athenz_domains:
         # - _namespace_.k8s
       resource_mappings:
         k8sResource1: athenzResource1
