@@ -79,7 +79,7 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 	name = m.res.MapResourceName(name)
 
 	adminDomain := m.res.GetAdminDomain(namespace)
-	domains := m.res.BuildDomainFromNamespace(namespace)
+	domains := m.res.BuildDomainsFromNamespace(namespace)
 
 	identity := m.res.PrincipalFromUser(spec.User)
 

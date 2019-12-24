@@ -441,7 +441,7 @@ func Test_resolve_createAthenzDomains(t *testing.T) {
 	}
 }
 
-func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
+func Test_resolve_BuildDomainsFromNamespace(t *testing.T) {
 	type fields struct {
 		cfg           config.Platform
 		athenzDomains []string
@@ -456,7 +456,7 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 		want   []string
 	}{
 		{
-			name: "Check resolve BuildDomainFromNamespace, empty namespace, empty athenzDomains",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, empty athenzDomains",
 			fields: fields{
 				athenzDomains: []string{""},
 			},
@@ -466,7 +466,7 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 			want: []string{""},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, empty namespace, athenzDomains no replace & trim",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, athenzDomains no replace & trim",
 			fields: fields{
 				athenzDomains: []string{"athenz-domain-140"},
 			},
@@ -476,7 +476,7 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 			want: []string{"athenz-domain-140"},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, empty namespace, multi athenzDomains no replace & trim ",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, multi athenzDomains no replace & trim ",
 			fields: fields{
 				athenzDomains: []string{
 					"athenz-domain-482",
@@ -492,7 +492,7 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 			},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, empty namespace, athenzDomains no replace, full trim",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, athenzDomains no replace, full trim",
 			fields: fields{
 				athenzDomains: []string{".-:athenz-domain-150:-."},
 			},
@@ -502,7 +502,7 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 			want: []string{"athenz-domain-150"},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, empty namespace, athenzDomains no replace, partially trim",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, athenzDomains no replace, partially trim",
 			fields: fields{
 				athenzDomains: []string{":-.athenz-domain-160.:-"},
 			},
@@ -512,7 +512,7 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 			want: []string{"-.athenz-domain-160."},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, empty namespace, athenzDomains no trim, replace",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, athenzDomains no trim, replace",
 			fields: fields{
 				athenzDomains: []string{"athenz-|._namespace_||._namespace_|-domain-170"},
 			},
@@ -522,7 +522,7 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 			want: []string{"athenz-||||-domain-170"},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, athenzDomains no trim, no replace namespace",
+			name: "Check resolve BuildDomainsFromNamespace, athenzDomains no trim, no replace namespace",
 			fields: fields{
 				athenzDomains: []string{"athenz-|.namespace||.namespace|-domain-180"},
 			},
@@ -532,7 +532,7 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 			want: []string{"athenz-|.namespace||.namespace|-domain-180"},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, athenzDomains no trim, replace namespace",
+			name: "Check resolve BuildDomainsFromNamespace, athenzDomains no trim, replace namespace",
 			fields: fields{
 				athenzDomains: []string{"athenz-|._namespace_||._namespace_|-domain-190"},
 			},
@@ -542,7 +542,7 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 			want: []string{"athenz-|.namespace-193||.namespace-193|-domain-190"},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, namspace replace, athenzDomains no trim, replace namespace",
+			name: "Check resolve BuildDomainsFromNamespace, namspace replace, athenzDomains no trim, replace namespace",
 			fields: fields{
 				athenzDomains: []string{"athenz-<._namespace_>-domain-200"},
 			},
@@ -558,8 +558,8 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 				cfg:           tt.fields.cfg,
 				athenzDomains: tt.fields.athenzDomains,
 			}
-			if got := r.BuildDomainFromNamespace(tt.args.namespace); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("resolve.BuildDomainFromNamespace() = %v, want %v", got, tt.want)
+			if got := r.BuildDomainsFromNamespace(tt.args.namespace); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("resolve.BuildDomainsFromNamespace() = %v, want %v", got, tt.want)
 			}
 		})
 	}

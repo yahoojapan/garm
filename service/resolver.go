@@ -28,8 +28,8 @@ type Resolver interface {
 	MapVerbAction(string) string
 	// MapK8sResourceAthenzResource maps K8s resources to resources in Athenz resource.
 	MapK8sResourceAthenzResource(string) string
-	// BuildDomainFromNamespace creates Athenz domain with namespace.
-	BuildDomainFromNamespace(string) []string
+	// BuildDomainsFromNamespace creates Athenz domain with namespace.
+	BuildDomainsFromNamespace(string) []string
 	// PrincipalFromUser creates principal name from user.
 	PrincipalFromUser(string) string
 	// GetAdminDomain creates Athenz admin domain with namespace.
@@ -144,8 +144,8 @@ func (r *resolve) createAthenzDomains() []string {
 	return domains
 }
 
-// BuildDomainFromNamespace return domains by processing athenzDomains.
-func (r *resolve) BuildDomainFromNamespace(namespace string) []string {
+// BuildDomainsFromNamespace return domains by processing athenzDomains.
+func (r *resolve) BuildDomainsFromNamespace(namespace string) []string {
 	return r.buildAthenzDomain(r.athenzDomains, namespace)
 }
 
