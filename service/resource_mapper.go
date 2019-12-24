@@ -96,11 +96,11 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 	identity := m.res.PrincipalFromUser(spec.User)
 
 	switch {
-	case !m.res.IsAllowed(verb, namespace, group, resource, name): // Not Allowed
+	case !m.res.IsAllowed(accessCheckParam.action, namespace, group, accessCheckParam.resource, accessCheckParam.name): // Not Allowed
 		return "", nil,
 			fmt.Errorf(
 				"----%s's request is not allowed----\nVerb:\t%s\nNamespaceb:\t%s\nAPI Group:\t%s\nResource:\t%s\nResource Name:\t%s\n",
-				identity, verb, namespace, group, resource, name)
+				identity, accessCheckParam.action, namespace, accessCheckParam.group, accessCheckParam.resource, accessCheckParam.name)
 	case m.res.IsAdminAccess(accessCheckParam.action, namespace, accessCheckParam.group, accessCheckParam.resource, accessCheckParam.name):
 		return identity, m.createAdminAccessCheck(accessCheckParam), nil
 	default:
