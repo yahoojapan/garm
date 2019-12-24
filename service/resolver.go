@@ -28,7 +28,7 @@ type Resolver interface {
 	MapVerbAction(string) string
 	// MapK8sResourceAthenzResource maps K8s resources to resources in Athenz resource.
 	MapK8sResourceAthenzResource(string) string
-	// BuildDomainsFromNamespace creates Athenz domain with namespace.
+	// BuildDomainsFromNamespace creates Athenz domains with namespace.
 	BuildDomainsFromNamespace(string) []string
 	// PrincipalFromUser creates principal name from user.
 	PrincipalFromUser(string) string
@@ -57,7 +57,7 @@ type Resolver interface {
 type resolve struct {
 	// cfg specifies the mapping rules and platform specific information.
 	cfg config.Platform
-	// athenzDomains specifies the Athenz domain for request to Athenz.
+	// athenzDomains specifies the Athenz domains for request to Athenz.
 	athenzDomains []string
 }
 
