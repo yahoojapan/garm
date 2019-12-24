@@ -159,7 +159,7 @@ func (r *resolve) BuildServiceAccountPrefixFromNamespace(namespace string) []str
 // else replace "._namespace_" in domain with namespace;
 // trim ".", then "-", then ":"
 func (r *resolve) buildAthenzDomain(domains []string, namespace string) []string {
-	builtDomains := make([]string, len(domains), len(domains))
+	builtDomains := make([]string, len(domains))
 	for i, domain := range domains {
 		if namespace == "" {
 			builtDomains[i] = r.trimToValidAsDomain(strings.Replace(domain, "._namespace_", namespace, -1))
