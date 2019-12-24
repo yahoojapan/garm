@@ -90,13 +90,13 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 				"----%s's request is not allowed----\nVerb:\t%s\nNamespaceb:\t%s\nAPI Group:\t%s\nResource:\t%s\nResource Name:\t%s\n",
 				identity, verb, namespace, group, resource, name)
 	case m.res.IsAdminAccess(verb, namespace, group, resource, name):
-		return identity, m.createAdminAcessCheck(adminDomain, group, resource, name, verb, domains), nil
+		return identity, m.createAdminAccessCheck(adminDomain, group, resource, name, verb, domains), nil
 	default:
-		return identity, m.createAcessCheck(group, resource, name, verb, domains), nil
+		return identity, m.createAccessCheck(group, resource, name, verb, domains), nil
 	}
 }
 
-func (m *resourceMapper) createAdminAcessCheck(adminDomain, group, resource, name, verb string, domains []string) []webhook.AthenzAccessCheck {
+func (m *resourceMapper) createAdminAccessCheck(adminDomain, group, resource, name, verb string, domains []string) []webhook.AthenzAccessCheck {
 	accessChecks := make([]webhook.AthenzAccessCheck, 0, len(domains)*2)
 	for _, domain := range domains {
 		accessChecks = append(accessChecks,
@@ -112,7 +112,7 @@ func (m *resourceMapper) createAdminAcessCheck(adminDomain, group, resource, nam
 	return accessChecks
 }
 
-func (m *resourceMapper) createAcessCheck(group, resource, name, verb string, domains []string) []webhook.AthenzAccessCheck {
+func (m *resourceMapper) createAccessCheck(group, resource, name, verb string, domains []string) []webhook.AthenzAccessCheck {
 	accessChecks := make([]webhook.AthenzAccessCheck, 0, len(domains))
 	for _, domain := range domains {
 		accessChecks = append(accessChecks,
