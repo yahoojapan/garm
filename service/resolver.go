@@ -149,7 +149,7 @@ func (r *resolve) BuildDomainsFromNamespace(namespace string) []string {
 	return r.buildAthenzDomain(r.athenzDomains, namespace)
 }
 
-//  BuildServiceAccountPrefixFromNamespace return domains by processing AthenzServiceACcountPrefix.
+//  BuildServiceAccountPrefixFromNamespace return domains by processing AthenzServiceAccountPrefix.
 func (r *resolve) BuildServiceAccountPrefixFromNamespace(namespace string) []string {
 	return r.buildAthenzDomain([]string{r.cfg.AthenzServiceAccountPrefix}, namespace)
 }
@@ -159,14 +159,14 @@ func (r *resolve) BuildServiceAccountPrefixFromNamespace(namespace string) []str
 // else replace "._namespace_" in domain with namespace;
 // trim ".", then "-", then ":"
 func (r *resolve) buildAthenzDomain(domains []string, namespace string) []string {
-	builtDomains := make([]string, 0, len(domains))
-	for _, domain := range domains {
+	builtDomains := make([]string, len(domains), len(domains))
+	for i, domain := range domains {
 		if namespace == "" {
-			builtDomains = append(builtDomains, r.trimToValidAsDomain(strings.Replace(domain, "._namespace_", namespace, -1)))
+			builtDomains[i] = r.trimToValidAsDomain(strings.Replace(domain, "._namespace_", namespace, -1))
 			continue
 		}
 
-		builtDomains = append(builtDomains, r.trimToValidAsDomain(strings.Replace(domain, "_namespace_", r.replacePunctuationInNamespace(namespace), -1)))
+		builtDomains[i] = r.trimToValidAsDomain(strings.Replace(domain, "_namespace_", r.replacePunctuationInNamespace(namespace), -1))
 	}
 	return builtDomains
 }
