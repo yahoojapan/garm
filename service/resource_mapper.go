@@ -90,39 +90,34 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 				"----%s's request is not allowed----\nVerb:\t%s\nNamespaceb:\t%s\nAPI Group:\t%s\nResource:\t%s\nResource Name:\t%s\n",
 				identity, verb, namespace, group, resource, name)
 	case m.res.IsAdminAccess(verb, namespace, group, resource, name):
-		return identity, m.createAdminAcessCheck(fmt.Sprintf("%s:%s.%s.%s", adminDomain, group, resource, name), fmt.Sprintf("%s:%s.%%s.%s.%s", adminDomain, group, resource, name), verb, domains), nil
+		return identity, m.createAdminAcessCheck(adminDomain, group, resource, name, verb, domains), nil
 	default:
-		return identity, m.createAcessCheck(fmt.Sprintf("%%s:%s.%s.%s", group, resource, name), verb, domains), nil
+		return identity, m.createAcessCheck(group, resource, name, verb, domains), nil
 	}
 }
 
-// createAdminAccessCheck return access checks for admin athenz domain.
-// resourceString is a string formatted with "{domain}:{group}.{resource}.{name}".
-// resourceStringWithDomainTemplate is a string formatted with "{domain}:{group}.%s.{resource}.{name}".
-func (m *resourceMapper) createAdminAcessCheck(resourceString, resourceStringWithDomainTemplate, verb string, domains []string) []webhook.AthenzAccessCheck {
+func (m *resourceMapper) createAdminAcessCheck(adminDomain, group, resource, name, verb string, domains []string) []webhook.AthenzAccessCheck {
 	accessChecks := make([]webhook.AthenzAccessCheck, 0, len(domains)*2)
 	for _, domain := range domains {
 		accessChecks = append(accessChecks,
 			webhook.AthenzAccessCheck{
-				Resource: m.res.TrimResource(fmt.Sprintf(resourceStringWithDomainTemplate, domain)),
+				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s.%s", adminDomain, group, domain, resource, name)),
 				Action:   verb,
 			},
 			webhook.AthenzAccessCheck{
-				Resource: m.res.TrimResource(resourceString),
+				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s", adminDomain, group, resource, name)),
 				Action:   verb,
 			})
 	}
 	return accessChecks
 }
 
-// createAccess return access checks for service athenz domain.
-// resourceStringWithDomainTemplate is a string formatted with "%s:{group}.{resource}.{name}".
-func (m *resourceMapper) createAcessCheck(resourceStringWithDomainTemplate, verb string, domains []string) []webhook.AthenzAccessCheck {
+func (m *resourceMapper) createAcessCheck(group, resource, name, verb string, domains []string) []webhook.AthenzAccessCheck {
 	accessChecks := make([]webhook.AthenzAccessCheck, 0, len(domains))
 	for _, domain := range domains {
 		accessChecks = append(accessChecks,
 			webhook.AthenzAccessCheck{
-				Resource: m.res.TrimResource(fmt.Sprintf(resourceStringWithDomainTemplate, domain)),
+				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s", domain, group, resource, name)),
 				Action:   verb,
 			})
 	}
