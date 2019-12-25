@@ -348,6 +348,60 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			wantError: nil,
 		},
 		{
+			name: "Check resourceMapper MapResource, admin access, multiple athenzDomain, exists adminDomain",
+			fields: fields{
+				res: &resolve{
+					athenzDomains: []string{
+						"athenz-domain-355",
+						"athenz-domain-356",
+					},
+					cfg: config.Platform{
+						APIGroupControlEnabled:     true,
+						ResourceNameControlEnabled: true,
+						AdminAccessList: []*config.RequestInfo{
+							{
+								Verb:      "verb-*",
+								Namespace: "namespace-*",
+								APIGroup:  "group-*",
+								Resource:  "resource-*",
+								Name:      "name-*",
+							},
+						},
+						AdminAthenzDomain: "athenz-admin-domain-370",
+					},
+				},
+			},
+			args: args{
+				spec: authz.SubjectAccessReviewSpec{
+					ResourceAttributes: &authz.ResourceAttributes{
+						Name:        "name-377",
+						Namespace:   "namespace-378",
+						Verb:        "verb-379",
+						Resource:    "resource-380",
+						Subresource: "sub-resource-381",
+						Group:       "group-382",
+					},
+					User: "user-384",
+				},
+			},
+			wantIdentity: "user-384",
+			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
+				{
+					Resource: "athenz-admin-domain-370:group-382.athenz-domain-355.resource-380.sub-resource-381.name-377",
+					Action:   "verb-379",
+				},
+				{
+					Resource: "athenz-admin-domain-370:group-382.athenz-domain-356.resource-380.sub-resource-381.name-377",
+					Action:   "verb-379",
+				},
+				{
+					Resource: "athenz-admin-domain-370:group-382.resource-380.sub-resource-381.name-377",
+					Action:   "verb-379",
+				},
+			},
+			wantError: nil,
+		},
+		{
 			name: "Check resourceMapper MapResource, not allowed, directly reject",
 			fields: fields{
 				res: &resolve{

@@ -108,22 +108,24 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 	}
 }
 
+// createAdminAccessCheck returns AthenzAccessChecks for admin domain.
+// Returns an array of the form "[ adminDomain+domain_0, adminDomain+domain_1 ... adminDomain ]"
 func (m *resourceMapper) createAdminAccessCheck(accessCheckParam athenzAccessCheckParam) []webhook.AthenzAccessCheck {
-	accessChecks := make([]webhook.AthenzAccessCheck, 0, len(accessCheckParam.domains)*2)
-	for _, domain := range accessCheckParam.domains {
-		accessChecks = append(accessChecks,
-			webhook.AthenzAccessCheck{
-				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s.%s", accessCheckParam.adminDomain, accessCheckParam.group, domain, accessCheckParam.resource, accessCheckParam.name)),
-				Action:   accessCheckParam.action,
-			},
-			webhook.AthenzAccessCheck{
-				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s", accessCheckParam.adminDomain, accessCheckParam.group, accessCheckParam.resource, accessCheckParam.name)),
-				Action:   accessCheckParam.action,
-			})
+	accessChecks := make([]webhook.AthenzAccessCheck, len(accessCheckParam.domains)+1)
+	for i, domain := range accessCheckParam.domains {
+		accessChecks[i] = webhook.AthenzAccessCheck{
+			Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s.%s", accessCheckParam.adminDomain, accessCheckParam.group, domain, accessCheckParam.resource, accessCheckParam.name)),
+			Action:   accessCheckParam.action,
+		}
+	}
+	accessChecks[len(accessChecks)-1] = webhook.AthenzAccessCheck{
+		Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s", accessCheckParam.adminDomain, accessCheckParam.group, accessCheckParam.resource, accessCheckParam.name)),
+		Action:   accessCheckParam.action,
 	}
 	return accessChecks
 }
 
+// createAdminAccessCheck returns AthenzAccessChecks service domain.
 func (m *resourceMapper) createAccessCheck(accessCheckParam athenzAccessCheckParam) []webhook.AthenzAccessCheck {
 	accessChecks := make([]webhook.AthenzAccessCheck, 0, len(accessCheckParam.domains))
 	for _, domain := range accessCheckParam.domains {
