@@ -125,7 +125,7 @@ func (m *resourceMapper) createAdminAccessCheck(accessCheckParam athenzAccessChe
 	return accessChecks
 }
 
-// createAdminAccessCheck returns AthenzAccessChecks service domain.
+// createAdminAccessCheck returns AthenzAccessChecks for service domains.
 func (m *resourceMapper) createAccessCheck(accessCheckParam athenzAccessCheckParam) []webhook.AthenzAccessCheck {
 	accessChecks := make([]webhook.AthenzAccessCheck, 0, len(accessCheckParam.domains))
 	for _, domain := range accessCheckParam.domains {
