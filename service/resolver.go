@@ -144,17 +144,17 @@ func (r *resolve) createAthenzDomains() []string {
 	return domains
 }
 
-// BuildDomainsFromNamespace return domains by processing athenzDomains.
+// BuildDomainsFromNamespace returns domains by processing athenzDomains.
 func (r *resolve) BuildDomainsFromNamespace(namespace string) []string {
 	return r.buildAthenzDomain(r.athenzDomains, namespace)
 }
 
-//  BuildServiceAccountPrefixFromNamespace return domains by processing AthenzServiceAccountPrefix.
+//  BuildServiceAccountPrefixFromNamespace returns domains by processing AthenzServiceAccountPrefix.
 func (r *resolve) BuildServiceAccountPrefixFromNamespace(namespace string) []string {
 	return r.buildAthenzDomain([]string{r.cfg.AthenzServiceAccountPrefix}, namespace)
 }
 
-// buildAthenzDomain return builtDomains by processing domains.
+// buildAthenzDomain returns builtDomains by processing domains.
 // if namespace != "", replace `/ = .`, then `.. => -`, then replace "_namespace_" in domain with namespace;
 // else replace "._namespace_" in domain with namespace;
 // trim ".", then "-", then ":"
