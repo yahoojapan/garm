@@ -15,18 +15,18 @@ data:
       probe_wait_time: 9s
       tls:
         enabled: true
-        cert_key: cert
-        key_key: key
+        cert_key: _cert_
+        key_key: _key_
     athenz:
       auth_header: Athenz-Principal-Auth
       url: https://www.athenz.io:4443/zts/v1
       timeout: 30s
-      root_ca: root_ca
+      root_ca: _root_ca_
     token:
       athenz_domain: _athenz_domain_
       service_name: _service_name_
       ntoken_path: ""
-      private_key_env_name: athenz_private_key
+      private_key_env_name: _athenz_private_key_
       validate_token: false
       refresh_duration: 5s
       key_version: v1.1
