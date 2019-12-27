@@ -36,8 +36,10 @@ data:
         name: garm
         platform:
           name: k8s
-          # service_athenz_domain: {{TLD}}.k8s.{{ENV}} # {{ENV}} = [prod, tool, dev]
-          service_athenz_domain: k8s.k8s.dev
+          # service_athenz_domains: 
+            - {{TLD}}.k8s.{{ENV}} # {{ENV}} = [prod, tool, dev]
+          service_athenz_domains: 
+            - k8s.k8s.dev
           resource_mappings:
           verb_mappings:
           api_group_control: true

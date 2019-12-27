@@ -76,7 +76,7 @@ athenz.token.*
 map_rule.tld.platform.black_list
 map_rule.tld.platform.white_list
 
-map_rule.tld.service_athenz_domain
+map_rule.tld.service_athenz_domains
 ```
 
 <a id="note-2"></a>
@@ -102,8 +102,8 @@ map_rule.tld.platform.admin_athenz_domain
 - Garm can map kube-apiserver requests using a separate admin domain in Athenz.
 - If the request matches any rules in `map_rule.tld.platform.admin_access_list`, garm will use `map_rule.tld.platform.admin_athenz_domain`.
 - Garm will send 2 requests to Athenz. The kube-apiserver request is allowed if any 1 is allowed in Athenz (OR logic).
-	1. Athenz resource **with** `map_rule.tld.service_athenz_domain`
-	1. Athenz resource **without** `map_rule.tld.service_athenz_domain`
+	1. Athenz resource **with** `map_rule.tld.service_athenz_domains`
+	1. Athenz resource **without** `map_rule.tld.service_athenz_domains`
 
 ---
 
