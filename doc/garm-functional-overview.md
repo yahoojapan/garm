@@ -69,15 +69,19 @@
 		1. remove `service_account_prefixes`
 		1. subsitute namespace
 		1. subsitute `:`
+		1. if service account, prepend `athenz_service_account_prefix`
 		1. if not service account, prepend `athenz_user_prefix`
 	- example
-		- `service_a:_namespace_:k8s_user` => `kaas_namespace.k8s_user`
+		- `service_a:_namespace_:k8s_user` => `domain_a.k8s.kaas_namespace.k8s_user`
 			+ `service_account_prefixes = []string{"service_a"}`
+			+ `athenz_service_account_prefix = "domain_a.k8s."`
 			+ `namespace = kaas_namespace`
-		- `service_b:service_c:k8s_user` => `service_c.k8s_user`
+		- `service_b:service_c:k8s_user` => `domain_b.serviceaccount.service_c.k8s_user`
 			+ `service_account_prefixes = []string{"service_b", "service_c"}`
-		- `service_b:k8s_user` => `k8s_user`
+			+ `athenz_service_account_prefix = "domain_b.k8s."`
+		- `service_b:k8s_user` => `domain_c.k8s.k8s_user`
 			+ `service_account_prefixes = []string{"service_a", "service_b"}`
+			+ `athenz_service_account_prefix = "domain_c.k8s."`
 		- `k8s_user` => `user.k8s_user`
 			+ `athenz_user_prefix = "user."`
 
