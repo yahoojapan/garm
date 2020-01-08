@@ -476,7 +476,7 @@ func Test_resolve_BuildDomainsFromNamespace(t *testing.T) {
 			want: []string{"athenz-domain-140"},
 		},
 		{
-			name: "Check resolve BuildDomainsFromNamespace, empty namespace, multi athenzDomains no replace & trim ",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, multi athenzDomains no replace & no trim ",
 			fields: fields{
 				athenzDomains: []string{
 					"athenz-domain-482",
@@ -590,7 +590,7 @@ func Test_resolve_BuildServiceAccountPrefixFromNamespace(t *testing.T) {
 			want: []string{""},
 		},
 		{
-			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, AthenzServiceAccountPrefix no replace & trim",
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, AthenzServiceAccountPrefix no replace & no trim",
 			fields: fields{
 				cfg: config.Platform{
 					AthenzServiceAccountPrefix: "athenz-domain-506",
