@@ -55,6 +55,7 @@ data:
             ":": "-"
             "--": "-"
           athenz_user_prefix: user.
+          athenz_service_account_prefix: user.
           service_account_prefixes:
             - ""
             - ""
