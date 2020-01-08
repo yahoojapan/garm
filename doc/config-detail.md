@@ -63,7 +63,7 @@ athenz.token.*
 - If `athenz.token.ntoken_path` is set ([Copper Argos](https://github.com/yahoo/athenz/blob/master/docs/copper_argos_dev.md)), garm will use the n-token in the file directly.
 	- It is better to set `athenz.token.validate_token: true` in this case.
 - If `athenz.token.ntoken_path` is NOT set, garm will handle the token generation and update automatically.
-	- As the token is signed by `athenz.token.private_key_env_name`, please make sure that the corresponding public key is configurated in Athenz with the same `athenz.token.key_version`.
+	- As the token is signed by `athenz.token.private_key`, please make sure that the corresponding public key is configurated in Athenz with the same `athenz.token.key_version`.
 
 ---
 

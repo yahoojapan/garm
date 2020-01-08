@@ -141,8 +141,8 @@ type Token struct {
 	// NTokenPath represents the n-token path. Only for Copper Argos.
 	NTokenPath string `yaml:"ntoken_path"`
 
-	// PrivateKeyEnvName represents the environment variable name having the private key file path for signing the n-token.
-	PrivateKeyEnvName string `yaml:"private_key_env_name"`
+	// PrivateKey represents the the private key file path for signing the n-token.
+	PrivateKey string `yaml:"private_key"`
 
 	// ValidateToken represents should validate the token or not. Set true when NTokenPath is set.
 	ValidateToken bool `yaml:"validate_token"`

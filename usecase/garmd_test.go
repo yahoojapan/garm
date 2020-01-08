@@ -65,13 +65,13 @@ func TestNew(t *testing.T) {
 				args: args{
 					cfg: config.Config{
 						Token: config.Token{
-							AthenzDomain:      keyKey,
-							ServiceName:       keyKey,
-							PrivateKeyEnvName: "_" + keyKey + "_",
-							ValidateToken:     false,
-							RefreshDuration:   "1m",
-							KeyVersion:        "1",
-							Expiration:        "1m",
+							AthenzDomain:    keyKey,
+							ServiceName:     keyKey,
+							PrivateKey:      "_" + keyKey + "_",
+							ValidateToken:   false,
+							RefreshDuration: "1m",
+							KeyVersion:      "1",
+							Expiration:      "1m",
 						},
 					},
 				},
@@ -89,14 +89,14 @@ func TestNew(t *testing.T) {
 			key := "../service/testdata/dummyServer.key"
 			cfg := config.Config{
 				Token: config.Token{
-					AthenzDomain:      keyKey,
-					ServiceName:       keyKey,
-					NTokenPath:        "",
-					PrivateKeyEnvName: "_" + keyKey + "_",
-					ValidateToken:     false,
-					RefreshDuration:   "1m",
-					KeyVersion:        "1",
-					Expiration:        "1m",
+					AthenzDomain:    keyKey,
+					ServiceName:     keyKey,
+					NTokenPath:      "",
+					PrivateKey:      "_" + keyKey + "_",
+					ValidateToken:   false,
+					RefreshDuration: "1m",
+					KeyVersion:      "1",
+					Expiration:      "1m",
 				},
 				Athenz: config.Athenz{
 					Timeout: "1m",
@@ -202,14 +202,14 @@ func Test_garm_Start(t *testing.T) {
 
 			cfg := config.Config{
 				Token: config.Token{
-					AthenzDomain:      keyKey,
-					ServiceName:       keyKey,
-					NTokenPath:        "",
-					PrivateKeyEnvName: "_" + keyKey + "_",
-					ValidateToken:     false,
-					RefreshDuration:   "1m",
-					KeyVersion:        "1",
-					Expiration:        "1m",
+					AthenzDomain:    keyKey,
+					ServiceName:     keyKey,
+					NTokenPath:      "",
+					PrivateKey:      "_" + keyKey + "_",
+					ValidateToken:   false,
+					RefreshDuration: "1m",
+					KeyVersion:      "1",
+					Expiration:      "1m",
 				},
 				Athenz: config.Athenz{
 					Timeout: "1m",

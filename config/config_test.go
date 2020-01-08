@@ -272,16 +272,16 @@ func TestNew(t *testing.T) {
 					ProbeWaitTime:    "3s",
 					TLS: TLS{
 						Enabled: true,
-						CertKey: "cert",
-						KeyKey:  "key",
-						CAKey:   "ca",
+						CertKey: "_cert_",
+						KeyKey:  "_key_",
+						CAKey:   "_ca_",
 					},
 				},
 				Athenz: Athenz{
 					AuthHeader:      "Athenz-Principal-Auth",
 					URL:             "https://www.athenz.com/zts/v1",
 					Timeout:         "5s",
-					AthenzRootCAKey: "root_ca",
+					AthenzRootCAKey: "_root_ca_",
 					AuthN: webhook.AuthenticationConfig{
 						Config: webhook.Config{
 							ZMSEndpoint: "",
@@ -321,14 +321,14 @@ func TestNew(t *testing.T) {
 					},
 				},
 				Token: Token{
-					AthenzDomain:      "_athenz_domain_",
-					ServiceName:       "_athenz_service_",
-					NTokenPath:        "/tmp/ntoken",
-					PrivateKeyEnvName: "privateKEY",
-					ValidateToken:     false,
-					RefreshDuration:   "10s",
-					KeyVersion:        "v1.0",
-					Expiration:        "5s",
+					AthenzDomain:    "_athenz_domain_",
+					ServiceName:     "_athenz_service_",
+					NTokenPath:      "/tmp/ntoken",
+					PrivateKey:      "_athenz_private_key_",
+					ValidateToken:   false,
+					RefreshDuration: "10s",
+					KeyVersion:      "v1.0",
+					Expiration:      "5s",
 				},
 				Mapping: Mapping{
 					TLD: TLD{

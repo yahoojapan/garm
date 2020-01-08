@@ -23,7 +23,7 @@ token:
   athenz_domain: _athenz_domain_
   service_name: _athenz_service_
   ntoken_path: /tmp/ntoken
-  private_key_env_name: _athenz_private_key_
+  private_key: _athenz_private_key_
   validate_token: false
   refresh_duration: 10s
   key_version: v1.0

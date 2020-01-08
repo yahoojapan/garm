@@ -65,7 +65,7 @@ func NewTokenService(cfg config.Token) (TokenService, error) {
 		return nil, errors.Wrapf(err, "invalid token expiration %s", cfg.Expiration)
 	}
 
-	keyData, err := ioutil.ReadFile(config.GetActualValue(cfg.PrivateKeyEnvName))
+	keyData, err := ioutil.ReadFile(config.GetActualValue(cfg.PrivateKey))
 	if err != nil && keyData == nil {
 		if cfg.NTokenPath == "" {
 			return nil, errors.Wrap(err, "invalid token certificate")
@@ -148,7 +148,7 @@ func (t *token) createTokenBuilder(athenzDomain, serviceName, keyVersion string,
 // loadToken returns a n-token string, or error.
 // It returns n-token, which is generated with the token builder. If the ntoken_path is set in the configuration YAML (Copper Argos),
 // it directly returns the token file content.
-// If ntoken_path is not set (k8s secret), the builder reads the private key file path from environment variable (private_key_env_name), and then generates and signs a new token.
+// If ntoken_path is not set (k8s secret), the builder reads the private key file path from config athenz.token.private_key, and then generates and signs a new token.
 // It can also validate the token generated or read. If validate_token flag is true, it verifies the token.
 func (t *token) loadToken() (ntoken string, err error) {
 	if t.tokenFilePath == "" {

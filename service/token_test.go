@@ -73,9 +73,9 @@ func TestNewTokenService(t *testing.T) {
 				args: func() args {
 					return args{
 						cfg: config.Token{
-							RefreshDuration:   "1m",
-							Expiration:        "1m",
-							PrivateKeyEnvName: "_" + keyKey + "_",
+							RefreshDuration: "1m",
+							Expiration:      "1m",
+							PrivateKey:      "_" + keyKey + "_",
 						},
 					}
 				}(),
@@ -98,10 +98,10 @@ func TestNewTokenService(t *testing.T) {
 
 					return args{
 						cfg: config.Token{
-							RefreshDuration:   "1m",
-							Expiration:        "1m",
-							PrivateKeyEnvName: "_" + keyKey + "_",
-							NTokenPath:        "",
+							RefreshDuration: "1m",
+							Expiration:      "1m",
+							PrivateKey:      "_" + keyKey + "_",
+							NTokenPath:      "",
 						},
 					}
 				}(),
@@ -118,14 +118,14 @@ func TestNewTokenService(t *testing.T) {
 			keyKey := "dummyKey"
 			key := "./testdata/dummyServer.key"
 			cfg := config.Token{
-				AthenzDomain:      keyKey,
-				ServiceName:       keyKey,
-				NTokenPath:        "",
-				PrivateKeyEnvName: "_" + keyKey + "_",
-				ValidateToken:     false,
-				RefreshDuration:   "1s",
-				KeyVersion:        "1",
-				Expiration:        "1s",
+				AthenzDomain:    keyKey,
+				ServiceName:     keyKey,
+				NTokenPath:      "",
+				PrivateKey:      "_" + keyKey + "_",
+				ValidateToken:   false,
+				RefreshDuration: "1s",
+				KeyVersion:      "1",
+				Expiration:      "1s",
 			}
 			keyData, _ := ioutil.ReadFile(key)
 			athenzDomain := config.GetActualValue(cfg.AthenzDomain)
@@ -246,14 +246,14 @@ func Test_token_StartTokenUpdater(t *testing.T) {
 			keyKey := "dummyKey"
 			key := "./testdata/dummyServer.key"
 			cfg := config.Token{
-				AthenzDomain:      keyKey,
-				ServiceName:       keyKey,
-				NTokenPath:        "",
-				PrivateKeyEnvName: "_" + keyKey + "_",
-				ValidateToken:     false,
-				RefreshDuration:   "1s",
-				KeyVersion:        "1",
-				Expiration:        "1s",
+				AthenzDomain:    keyKey,
+				ServiceName:     keyKey,
+				NTokenPath:      "",
+				PrivateKey:      "_" + keyKey + "_",
+				ValidateToken:   false,
+				RefreshDuration: "1s",
+				KeyVersion:      "1",
+				Expiration:      "1s",
 			}
 
 			return test{
@@ -286,14 +286,14 @@ func Test_token_StartTokenUpdater(t *testing.T) {
 			keyKey := "dummyKey"
 			key := "./testdata/dummyServer.key"
 			cfg := config.Token{
-				AthenzDomain:      keyKey,
-				ServiceName:       keyKey,
-				NTokenPath:        "",
-				PrivateKeyEnvName: "_" + keyKey + "_",
-				ValidateToken:     false,
-				RefreshDuration:   "2s",
-				KeyVersion:        "1",
-				Expiration:        "1s",
+				AthenzDomain:    keyKey,
+				ServiceName:     keyKey,
+				NTokenPath:      "",
+				PrivateKey:      "_" + keyKey + "_",
+				ValidateToken:   false,
+				RefreshDuration: "2s",
+				KeyVersion:      "1",
+				Expiration:      "1s",
 			}
 			ctx, cancel := context.WithCancel(context.Background())
 
@@ -337,14 +337,14 @@ func Test_token_StartTokenUpdater(t *testing.T) {
 			keyKey := "dummyKey"
 			key := "./testdata/dummyServer.key"
 			cfg := config.Token{
-				AthenzDomain:      keyKey,
-				ServiceName:       keyKey,
-				NTokenPath:        "",
-				PrivateKeyEnvName: "_" + keyKey + "_",
-				ValidateToken:     false,
-				RefreshDuration:   "100ms",
-				KeyVersion:        "1",
-				Expiration:        "1s",
+				AthenzDomain:    keyKey,
+				ServiceName:     keyKey,
+				NTokenPath:      "",
+				PrivateKey:      "_" + keyKey + "_",
+				ValidateToken:   false,
+				RefreshDuration: "100ms",
+				KeyVersion:      "1",
+				Expiration:      "1s",
 			}
 
 			return test{
@@ -428,14 +428,14 @@ func Test_token_GetToken(t *testing.T) {
 			keyKey := "dummyKey"
 			key := "./testdata/dummyServer.key"
 			cfg := config.Token{
-				AthenzDomain:      keyKey,
-				ServiceName:       keyKey,
-				NTokenPath:        "",
-				PrivateKeyEnvName: "_" + keyKey + "_",
-				ValidateToken:     false,
-				RefreshDuration:   "1s",
-				KeyVersion:        "1",
-				Expiration:        "1s",
+				AthenzDomain:    keyKey,
+				ServiceName:     keyKey,
+				NTokenPath:      "",
+				PrivateKey:      "_" + keyKey + "_",
+				ValidateToken:   false,
+				RefreshDuration: "1s",
+				KeyVersion:      "1",
+				Expiration:      "1s",
 			}
 
 			return test{
@@ -469,14 +469,14 @@ func Test_token_GetToken(t *testing.T) {
 			keyKey := "dummyKey"
 			key := "./testdata/dummyServer.key"
 			cfg := config.Token{
-				AthenzDomain:      keyKey,
-				ServiceName:       keyKey,
-				NTokenPath:        "",
-				PrivateKeyEnvName: "_" + keyKey + "_",
-				ValidateToken:     false,
-				RefreshDuration:   "2s",
-				KeyVersion:        "1",
-				Expiration:        "1s",
+				AthenzDomain:    keyKey,
+				ServiceName:     keyKey,
+				NTokenPath:      "",
+				PrivateKey:      "_" + keyKey + "_",
+				ValidateToken:   false,
+				RefreshDuration: "2s",
+				KeyVersion:      "1",
+				Expiration:      "1s",
 			}
 			return test{
 				name: "Check error",
