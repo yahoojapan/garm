@@ -4,8 +4,8 @@ data:
   athenz-private-key: /etc/garm/ssl/athenz-private.key
   athenz-root-ca: /etc/garm/ssl/athenz-root.crt
   ca-public-key: /etc/garm/ssl/k8s-ca.pem
-  server-cert: /etc/garm/ssl/k8s-public.pem
-  server-key: /etc/garm/ssl/k8s-key.pem
+  server-cert: /etc/garm/ssl/garm-server-cert.pem
+  server-key: /etc/garm/ssl/garm-server-key.pem
   server-p12: /etc/garm/ssl/ypki.p12
   service-name: auth-webhook
 kind: ConfigMap
