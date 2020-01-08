@@ -120,13 +120,13 @@ func (r *resolve) MapK8sResourceAthenzResource(k8sRes string) string {
 }
 
 // createAthenzDomains use cfg.ServiceAthenzDomains;
-
 // do the following for each cfg.ServiceAthenzDomains
 // split it with ".";
 // for each token, if it match /^_.*_$/ but not "_namespace_", replace the token with config.GetActualValue(token);
 // and then return the processed value
 func (r *resolve) createAthenzDomains() []string {
 	domains := make([]string, 0, len(r.cfg.ServiceAthenzDomains))
+	// reps stores information for replacement.
 	// Default domain string length is 128. so, maxi domain depth is 64.
 	// If this size is exceeded, it is a slice, so there is no problem.
 	// https://github.com/yahoo/athenz/blob/b92bd87bf65cf605a1abc2c6263974d85b4bb5d1/servers/zms/conf/zms.properties#L269
