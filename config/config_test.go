@@ -272,16 +272,16 @@ func TestNew(t *testing.T) {
 					ProbeWaitTime:    "3s",
 					TLS: TLS{
 						Enabled: true,
-						CertKey: "_cert_",
-						KeyKey:  "_key_",
-						CAKey:   "_ca_",
+						Cert:    "_cert_",
+						Key:     "_key_",
+						CA:      "_ca_",
 					},
 				},
 				Athenz: Athenz{
-					AuthHeader:      "Athenz-Principal-Auth",
-					URL:             "https://www.athenz.com/zts/v1",
-					Timeout:         "5s",
-					AthenzRootCAKey: "_root_ca_",
+					AuthHeader:   "Athenz-Principal-Auth",
+					URL:          "https://www.athenz.com/zts/v1",
+					Timeout:      "5s",
+					AthenzRootCA: "_root_ca_",
 					AuthN: webhook.AuthenticationConfig{
 						Config: webhook.Config{
 							ZMSEndpoint: "",

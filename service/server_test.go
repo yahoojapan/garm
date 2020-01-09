@@ -122,9 +122,9 @@ func Test_server_ListenAndServe(t *testing.T) {
 		func() test {
 			ctx, cancelFunc := context.WithCancel(context.Background())
 
-			keyKey := "dummy_key"
+			keyEnvName := "dummy_key"
 			key := "./testdata/dummyServer.key"
-			certKey := "dummy_cert"
+			certEnvName := "dummy_cert"
 			cert := "./testdata/dummyServer.crt"
 
 			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -160,8 +160,8 @@ func Test_server_ListenAndServe(t *testing.T) {
 						Port: apiSrvPort,
 						TLS: config.TLS{
 							Enabled: true,
-							CertKey: "_" + certKey + "_",
-							KeyKey:  "_" + keyKey + "_",
+							Cert:    "_" + certEnvName + "_",
+							Key:     "_" + keyEnvName + "_",
 						},
 					},
 					mu: &sync.RWMutex{},
@@ -170,10 +170,10 @@ func Test_server_ListenAndServe(t *testing.T) {
 					ctx: ctx,
 				},
 				beforeFunc: func() error {
-					if err := os.Setenv(keyKey, key); err != nil {
+					if err := os.Setenv(keyEnvName, key); err != nil {
 						return err
 					}
-					return os.Setenv(certKey, cert)
+					return os.Setenv(certEnvName, cert)
 				},
 				checkFunc: func(s *server, got chan []error, want error) error {
 					time.Sleep(time.Millisecond * 150)
@@ -213,10 +213,10 @@ func Test_server_ListenAndServe(t *testing.T) {
 				},
 				afterFunc: func() error {
 					cancelFunc()
-					if err := os.Unsetenv(keyKey); err != nil {
+					if err := os.Unsetenv(keyEnvName); err != nil {
 						return err
 					}
-					if err := os.Unsetenv(certKey); err != nil {
+					if err := os.Unsetenv(certEnvName); err != nil {
 						return nil
 					}
 					return nil
@@ -224,9 +224,9 @@ func Test_server_ListenAndServe(t *testing.T) {
 			}
 		}(),
 		func() test {
-			keyKey := "dummy_key"
+			keyEnvName := "dummy_key"
 			key := "./testdata/dummyServer.key"
-			certKey := "dummy_cert"
+			certEnvName := "dummy_cert"
 			cert := "./testdata/dummyServer.crt"
 
 			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -264,8 +264,8 @@ func Test_server_ListenAndServe(t *testing.T) {
 						Port: apiSrvPort,
 						TLS: config.TLS{
 							Enabled: true,
-							CertKey: "_" + certKey + "_",
-							KeyKey:  "_" + keyKey + "_",
+							Cert:    "_" + certEnvName + "_",
+							Key:     "_" + keyEnvName + "_",
 						},
 					},
 					mu: &sync.RWMutex{},
@@ -274,10 +274,10 @@ func Test_server_ListenAndServe(t *testing.T) {
 					ctx: context.Background(),
 				},
 				beforeFunc: func() error {
-					if err := os.Setenv(keyKey, key); err != nil {
+					if err := os.Setenv(keyEnvName, key); err != nil {
 						return err
 					}
-					return os.Setenv(certKey, cert)
+					return os.Setenv(certEnvName, cert)
 				},
 				checkFunc: func(s *server, got chan []error, want error) error {
 					time.Sleep(time.Millisecond * 150)
@@ -316,10 +316,10 @@ func Test_server_ListenAndServe(t *testing.T) {
 					return nil
 				},
 				afterFunc: func() error {
-					if err := os.Unsetenv(keyKey); err != nil {
+					if err := os.Unsetenv(keyEnvName); err != nil {
 						return err
 					}
-					if err := os.Unsetenv(certKey); err != nil {
+					if err := os.Unsetenv(certEnvName); err != nil {
 						return nil
 					}
 					return nil
@@ -328,9 +328,9 @@ func Test_server_ListenAndServe(t *testing.T) {
 		}(),
 
 		func() test {
-			keyKey := "dummy_key"
+			keyEnvName := "dummy_key"
 			key := "./testdata/dummyServer.key"
-			certKey := "dummy_cert"
+			certEnvName := "dummy_cert"
 			cert := "./testdata/dummyServer.crt"
 
 			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -368,8 +368,8 @@ func Test_server_ListenAndServe(t *testing.T) {
 						Port: apiSrvPort,
 						TLS: config.TLS{
 							Enabled: true,
-							CertKey: "_" + certKey + "_",
-							KeyKey:  "_" + keyKey + "_",
+							Cert:    "_" + certEnvName + "_",
+							Key:     "_" + keyEnvName + "_",
 						},
 					},
 					mu: &sync.RWMutex{},
@@ -378,10 +378,10 @@ func Test_server_ListenAndServe(t *testing.T) {
 					ctx: context.Background(),
 				},
 				beforeFunc: func() error {
-					if err := os.Setenv(keyKey, key); err != nil {
+					if err := os.Setenv(keyEnvName, key); err != nil {
 						return err
 					}
-					return os.Setenv(certKey, cert)
+					return os.Setenv(certEnvName, cert)
 				},
 				checkFunc: func(s *server, got chan []error, want error) error {
 					time.Sleep(time.Millisecond * 150)
@@ -420,10 +420,10 @@ func Test_server_ListenAndServe(t *testing.T) {
 					return nil
 				},
 				afterFunc: func() error {
-					if err := os.Unsetenv(keyKey); err != nil {
+					if err := os.Unsetenv(keyEnvName); err != nil {
 						return err
 					}
-					if err := os.Unsetenv(certKey); err != nil {
+					if err := os.Unsetenv(certEnvName); err != nil {
 						return nil
 					}
 					return nil
@@ -762,9 +762,9 @@ func Test_server_listenAndServeAPI(t *testing.T) {
 	}
 	tests := []test{
 		func() test {
-			keyKey := "dummy_key"
+			keyEnvName := "dummy_key"
 			key := "./testdata/dummyServer.key"
-			certKey := "dummy_cert"
+			certEnvName := "dummy_cert"
 			cert := "./testdata/dummyServer.crt"
 
 			return test{
@@ -780,17 +780,17 @@ func Test_server_listenAndServeAPI(t *testing.T) {
 						Port: 9999,
 						TLS: config.TLS{
 							Enabled: true,
-							CertKey: "_" + certKey + "_",
-							KeyKey:  "_" + keyKey + "_",
+							Cert:    "_" + certEnvName + "_",
+							Key:     "_" + keyEnvName + "_",
 						},
 					},
 				},
 				beforeFunc: func() error {
-					err := os.Setenv(keyKey, key)
+					err := os.Setenv(keyEnvName, key)
 					if err != nil {
 						return err
 					}
-					err = os.Setenv(certKey, cert)
+					err = os.Setenv(certEnvName, cert)
 					if err != nil {
 						return err
 					}
@@ -814,8 +814,8 @@ func Test_server_listenAndServeAPI(t *testing.T) {
 					return nil
 				},
 				afterFunc: func() error {
-					os.Unsetenv(keyKey)
-					os.Unsetenv(certKey)
+					os.Unsetenv(keyEnvName)
+					os.Unsetenv(certEnvName)
 					return nil
 				},
 				want: http.ErrServerClosed,

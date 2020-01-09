@@ -35,19 +35,19 @@ func trim(str string) string {
 
 func TestNewTLSConfig(t *testing.T) {
 	type args struct {
-		CertKeyPath string
-		KeyKeyPath  string
-		CAKeyPath   string
-		cfg         config.TLS
+		CertPath string
+		KeyPath  string
+		CAPath   string
+		cfg      config.TLS
 	}
 	defaultArgs := args{
-		CertKeyPath: "./testdata/dummyServer.crt",
-		KeyKeyPath:  "./testdata/dummyServer.key",
-		CAKeyPath:   "./testdata/dummyCa.pem",
+		CertPath: "./testdata/dummyServer.crt",
+		KeyPath:  "./testdata/dummyServer.key",
+		CAPath:   "./testdata/dummyCa.pem",
 		cfg: config.TLS{
-			CertKey: "_test1_CertKey_",
-			KeyKey:  "_test1_KeyKey_",
-			CAKey:   "_test1_CAKey_",
+			Cert: "_test1_Cert_",
+			Key:  "_test1_Key_",
+			CA:   "_test1_CA_",
 		},
 	}
 
@@ -73,20 +73,20 @@ func TestNewTLSConfig(t *testing.T) {
 				},
 				SessionTicketsDisabled: true,
 				Certificates: func() []tls.Certificate {
-					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertKeyPath, defaultArgs.KeyKeyPath)
+					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertPath, defaultArgs.KeyPath)
 					return []tls.Certificate{cert}
 				}(),
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
-				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
-				os.Setenv(trim(args.cfg.CAKey), args.CAKeyPath)
+				os.Setenv(trim(args.cfg.Cert), args.CertPath)
+				os.Setenv(trim(args.cfg.Key), args.KeyPath)
+				os.Setenv(trim(args.cfg.CA), args.CAPath)
 			},
 			afterFunc: func(args args) {
-				os.Unsetenv(trim(args.cfg.CertKey))
-				os.Unsetenv(trim(args.cfg.KeyKey))
-				os.Unsetenv(trim(args.cfg.CAKey))
+				os.Unsetenv(trim(args.cfg.Cert))
+				os.Unsetenv(trim(args.cfg.Key))
+				os.Unsetenv(trim(args.cfg.CA))
 
 			},
 			checkFunc: func(got, want *tls.Config) error {
@@ -110,20 +110,20 @@ func TestNewTLSConfig(t *testing.T) {
 				},
 				SessionTicketsDisabled: true,
 				Certificates: func() []tls.Certificate {
-					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertKeyPath, defaultArgs.KeyKeyPath)
+					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertPath, defaultArgs.KeyPath)
 					return []tls.Certificate{cert}
 				}(),
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
-				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
-				os.Setenv(trim(args.cfg.CAKey), args.CAKeyPath)
+				os.Setenv(trim(args.cfg.Cert), args.CertPath)
+				os.Setenv(trim(args.cfg.Key), args.KeyPath)
+				os.Setenv(trim(args.cfg.CA), args.CAPath)
 			},
 			afterFunc: func(args args) {
-				os.Unsetenv(trim(args.cfg.CertKey))
-				os.Unsetenv(trim(args.cfg.KeyKey))
-				os.Unsetenv(trim(args.cfg.CAKey))
+				os.Unsetenv(trim(args.cfg.Cert))
+				os.Unsetenv(trim(args.cfg.Key))
+				os.Unsetenv(trim(args.cfg.CA))
 			},
 			checkFunc: func(got, want *tls.Config) error {
 				if len(got.CurvePreferences) != len(want.CurvePreferences) {
@@ -160,20 +160,20 @@ func TestNewTLSConfig(t *testing.T) {
 				},
 				SessionTicketsDisabled: true,
 				Certificates: func() []tls.Certificate {
-					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertKeyPath, defaultArgs.KeyKeyPath)
+					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertPath, defaultArgs.KeyPath)
 					return []tls.Certificate{cert}
 				}(),
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
-				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
-				os.Setenv(trim(args.cfg.CAKey), args.CAKeyPath)
+				os.Setenv(trim(args.cfg.Cert), args.CertPath)
+				os.Setenv(trim(args.cfg.Key), args.KeyPath)
+				os.Setenv(trim(args.cfg.CA), args.CAPath)
 			},
 			afterFunc: func(args args) {
-				os.Unsetenv(trim(args.cfg.CertKey))
-				os.Unsetenv(trim(args.cfg.KeyKey))
-				os.Unsetenv(trim(args.cfg.CAKey))
+				os.Unsetenv(trim(args.cfg.Cert))
+				os.Unsetenv(trim(args.cfg.Key))
+				os.Unsetenv(trim(args.cfg.CA))
 			},
 			checkFunc: func(got, want *tls.Config) error {
 				if got.SessionTicketsDisabled != want.SessionTicketsDisabled {
@@ -195,20 +195,20 @@ func TestNewTLSConfig(t *testing.T) {
 				},
 				SessionTicketsDisabled: true,
 				Certificates: func() []tls.Certificate {
-					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertKeyPath, defaultArgs.KeyKeyPath)
+					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertPath, defaultArgs.KeyPath)
 					return []tls.Certificate{cert}
 				}(),
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
-				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
-				os.Setenv(trim(args.cfg.CAKey), args.CAKeyPath)
+				os.Setenv(trim(args.cfg.Cert), args.CertPath)
+				os.Setenv(trim(args.cfg.Key), args.KeyPath)
+				os.Setenv(trim(args.cfg.CA), args.CAPath)
 			},
 			afterFunc: func(args args) {
-				os.Unsetenv(trim(args.cfg.CertKey))
-				os.Unsetenv(trim(args.cfg.KeyKey))
-				os.Unsetenv(trim(args.cfg.CAKey))
+				os.Unsetenv(trim(args.cfg.Cert))
+				os.Unsetenv(trim(args.cfg.Key))
+				os.Unsetenv(trim(args.cfg.CA))
 			},
 			checkFunc: func(got, want *tls.Config) error {
 
@@ -245,20 +245,20 @@ func TestNewTLSConfig(t *testing.T) {
 				},
 				SessionTicketsDisabled: true,
 				Certificates: func() []tls.Certificate {
-					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertKeyPath, defaultArgs.KeyKeyPath)
+					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertPath, defaultArgs.KeyPath)
 					return []tls.Certificate{cert}
 				}(),
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
-				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
-				os.Setenv(trim(args.cfg.CAKey), args.CAKeyPath)
+				os.Setenv(trim(args.cfg.Cert), args.CertPath)
+				os.Setenv(trim(args.cfg.Key), args.KeyPath)
+				os.Setenv(trim(args.cfg.CA), args.CAPath)
 			},
 			afterFunc: func(args args) {
-				os.Unsetenv(trim(args.cfg.CertKey))
-				os.Unsetenv(trim(args.cfg.KeyKey))
-				os.Unsetenv(trim(args.cfg.CAKey))
+				os.Unsetenv(trim(args.cfg.Cert))
+				os.Unsetenv(trim(args.cfg.Key))
+				os.Unsetenv(trim(args.cfg.CA))
 			},
 			checkFunc: func(got, want *tls.Config) error {
 
@@ -309,12 +309,12 @@ func TestNewTLSConfig(t *testing.T) {
 				ClientAuth:             tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-				os.Setenv(trim(args.cfg.CertKey), "notexists")
-				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
+				os.Setenv(trim(args.cfg.Cert), "notexists")
+				os.Setenv(trim(args.cfg.Key), args.KeyPath)
 			},
 			afterFunc: func(args args) {
-				os.Unsetenv(trim(args.cfg.CertKey))
-				os.Unsetenv(trim(args.cfg.KeyKey))
+				os.Unsetenv(trim(args.cfg.Cert))
+				os.Unsetenv(trim(args.cfg.Key))
 			},
 			wantErr: fmt.Errorf("failed to load x509 key pair: open notexists: no such file or directory"),
 		},
@@ -331,20 +331,20 @@ func TestNewTLSConfig(t *testing.T) {
 				},
 				SessionTicketsDisabled: true,
 				Certificates: func() []tls.Certificate {
-					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertKeyPath, defaultArgs.KeyKeyPath)
+					cert, _ := tls.LoadX509KeyPair(defaultArgs.CertPath, defaultArgs.KeyPath)
 					return []tls.Certificate{cert}
 				}(),
 				ClientAuth: tls.RequireAndVerifyClientCert,
 			},
 			beforeFunc: func(args args) {
-				os.Setenv(trim(args.cfg.CertKey), args.CertKeyPath)
-				os.Setenv(trim(args.cfg.KeyKey), args.KeyKeyPath)
-				os.Setenv(trim(args.cfg.CAKey), "notexists")
+				os.Setenv(trim(args.cfg.Cert), args.CertPath)
+				os.Setenv(trim(args.cfg.Key), args.KeyPath)
+				os.Setenv(trim(args.cfg.CA), "notexists")
 			},
 			afterFunc: func(args args) {
-				os.Unsetenv(trim(args.cfg.CertKey))
-				os.Unsetenv(trim(args.cfg.KeyKey))
-				os.Unsetenv(trim(args.cfg.CAKey))
+				os.Unsetenv(trim(args.cfg.Cert))
+				os.Unsetenv(trim(args.cfg.Key))
+				os.Unsetenv(trim(args.cfg.CA))
 			},
 			wantErr: fmt.Errorf("failed to load x509 ca: failed to read pem file: open notexists: no such file or directory"),
 		},
