@@ -110,12 +110,11 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 	default:
 		return identity, m.createAccessCheck(
 			athenzAccessCheckParam{
-				action:      m.res.MapVerbAction(verb),
-				group:       m.res.MapAPIGroup(group),
-				resource:    m.res.MapK8sResourceAthenzResource(resource),
-				name:        m.res.MapResourceName(name),
-				adminDomain: m.res.GetAdminDomain(namespace),
-				domains:     m.res.BuildDomainsFromNamespace(namespace),
+				action:   m.res.MapVerbAction(verb),
+				group:    m.res.MapAPIGroup(group),
+				resource: m.res.MapK8sResourceAthenzResource(resource),
+				name:     m.res.MapResourceName(name),
+				domains:  m.res.BuildDomainsFromNamespace(namespace),
 			}), nil
 	}
 }
