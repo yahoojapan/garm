@@ -84,27 +84,39 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 		namespace = m.res.GetNonResourceNamespace()
 	}
 
-	accessCheckParam := athenzAccessCheckParam{
-		action:      m.res.MapVerbAction(verb),
-		group:       m.res.MapAPIGroup(group),
-		resource:    m.res.MapK8sResourceAthenzResource(resource),
-		name:        m.res.MapResourceName(name),
-		adminDomain: m.res.GetAdminDomain(namespace),
-		domains:     m.res.BuildDomainsFromNamespace(namespace),
-	}
+	verb = m.res.MapVerbAction(verb)
+	resource = m.res.MapK8sResourceAthenzResource(resource)
+	group = m.res.MapAPIGroup(group)
+	name = m.res.MapResourceName(name)
 
 	identity := m.res.PrincipalFromUser(spec.User)
 
 	switch {
-	case !m.res.IsAllowed(accessCheckParam.action, namespace, group, accessCheckParam.resource, accessCheckParam.name): // Not Allowed
+	case !m.res.IsAllowed(verb, namespace, group, resource, name): // Not Allowed
 		return "", nil,
 			fmt.Errorf(
 				"----%s's request is not allowed----\nVerb:\t%s\nNamespaceb:\t%s\nAPI Group:\t%s\nResource:\t%s\nResource Name:\t%s\n",
-				identity, accessCheckParam.action, namespace, accessCheckParam.group, accessCheckParam.resource, accessCheckParam.name)
-	case m.res.IsAdminAccess(accessCheckParam.action, namespace, accessCheckParam.group, accessCheckParam.resource, accessCheckParam.name):
-		return identity, m.createAdminAccessCheck(accessCheckParam), nil
+				identity, verb, namespace, group, resource, name)
+	case m.res.IsAdminAccess(verb, namespace, group, resource, name):
+		return identity, m.createAdminAccessCheck(
+			athenzAccessCheckParam{
+				action:      m.res.MapVerbAction(verb),
+				group:       m.res.MapAPIGroup(group),
+				resource:    m.res.MapK8sResourceAthenzResource(resource),
+				name:        m.res.MapResourceName(name),
+				adminDomain: m.res.GetAdminDomain(namespace),
+				domains:     m.res.BuildDomainsFromNamespace(namespace),
+			}), nil
 	default:
-		return identity, m.createAccessCheck(accessCheckParam), nil
+		return identity, m.createAccessCheck(
+			athenzAccessCheckParam{
+				action:      m.res.MapVerbAction(verb),
+				group:       m.res.MapAPIGroup(group),
+				resource:    m.res.MapK8sResourceAthenzResource(resource),
+				name:        m.res.MapResourceName(name),
+				adminDomain: m.res.GetAdminDomain(namespace),
+				domains:     m.res.BuildDomainsFromNamespace(namespace),
+			}), nil
 	}
 }
 
