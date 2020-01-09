@@ -12,8 +12,8 @@ server:
   tls:
     enabled: true
     cet_key: cert
-key_key: key
-    ca_key: ca
+key: key
+    ca: ca
 athenz:
 auth_header: Athenz-Principal-Auth
   url: https://www.athenz.io/zts/v1

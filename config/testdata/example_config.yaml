@@ -11,9 +11,9 @@ server:
   probe_wait_time: 3s
   tls:
     enabled: true
-    cert_key: _cert_
-    key_key: _key_
-    ca_key: _ca_
+    cert: _cert_
+    key: _key_
+    ca: _ca_
 athenz:
   auth_header: Athenz-Principal-Auth
   url: https://www.athenz.com/zts/v1
