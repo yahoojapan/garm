@@ -96,14 +96,14 @@ type TLS struct {
 	// Enable represents the webhook server enable TLS or not.
 	Enabled bool `yaml:"enabled"`
 
-	// CertKey represents the environment variable name having the certificate file path of webhook server.
-	CertKey string `yaml:"cert_key"`
+	// Cert represents the environment variable name having the certificate file path of webhook server.
+	Cert string `yaml:"cert"`
 
 	// KeyKey represents the environment variable name having the private key file path of webhook server certificate.
-	KeyKey string `yaml:"key_key"`
+	Key string `yaml:"key"`
 
 	// CAKey represents the environment variable name having the CA certificates file path for verifying clients connecting to webhook server.
-	CAKey string `yaml:"ca_key"`
+	CA string `yaml:"ca"`
 }
 
 // Athenz represents the configuration for webhook server to connect to Athenz.
@@ -118,7 +118,7 @@ type Athenz struct {
 	Timeout string `yaml:"timeout"`
 
 	// AthenzRootCAKey is the environment variable name having the Athenz root CA certificate file path for connecting to Athenz.
-	AthenzRootCAKey string `yaml:"root_ca"`
+	AthenzRootCA string `yaml:"root_ca"`
 
 	// AuthN represents the authentication configuration.
 	AuthN webhook.AuthenticationConfig
