@@ -22,9 +22,9 @@
 ### Related configuration
 1. For garm, `config.yaml`
 	```yaml
-	server.tls.ca_key
-	server.tls.cert_key
-	server.tls.key_key
+	server.tls.ca
+	server.tls.cert
+	server.tls.key
 
 	athenz.root_ca
 	```
@@ -41,7 +41,7 @@
 <a id="note"></a>
 #### Note
 - Garm uses the same server certificate for /authn and /authz.
-- If `server.tls.ca_key` is not set, garm will not verify the client certificate of kube-apiserver.
+- If `server.tls.ca` is not set, garm will not verify the client certificate of kube-apiserver.
 
 ---
 
