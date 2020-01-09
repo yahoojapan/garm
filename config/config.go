@@ -96,13 +96,13 @@ type TLS struct {
 	// Enable represents the webhook server enable TLS or not.
 	Enabled bool `yaml:"enabled"`
 
-	// Cert represents the environment variable name having the certificate file path of webhook server.
+	// Cert represents the certificate file path of webhook server.
 	Cert string `yaml:"cert"`
 
-	// KeyKey represents the environment variable name having the private key file path of webhook server certificate.
+	// Key represents the private key file path of webhook server certificate.
 	Key string `yaml:"key"`
 
-	// CAKey represents the environment variable name having the CA certificates file path for verifying clients connecting to webhook server.
+	// CA represents the CA certificates file path for verifying clients connecting to webhook server.
 	CA string `yaml:"ca"`
 }
 
@@ -117,7 +117,7 @@ type Athenz struct {
 	// Timeout represents the request timeout duration to Athenz server.
 	Timeout string `yaml:"timeout"`
 
-	// AthenzRootCAKey is the environment variable name having the Athenz root CA certificate file path for connecting to Athenz.
+	// AthenzRootCA is the Athenz root CA certificate file path for connecting to Athenz.
 	AthenzRootCA string `yaml:"root_ca"`
 
 	// AuthN represents the authentication configuration.
@@ -141,7 +141,7 @@ type Token struct {
 	// NTokenPath represents the n-token path. Only for Copper Argos.
 	NTokenPath string `yaml:"ntoken_path"`
 
-	// PrivateKey represents the the private key file path for signing the n-token.
+	// PrivateKey represents the private key file path for signing the n-token.
 	PrivateKey string `yaml:"private_key"`
 
 	// ValidateToken represents should validate the token or not. Set true when NTokenPath is set.
