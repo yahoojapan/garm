@@ -96,10 +96,10 @@ func TestNewAthenz(t *testing.T) {
 				name: "Check NewAthenz success",
 				args: args{
 					cfg: config.Athenz{
-						AuthHeader:      "auth-header-31",
-						URL:             "url-32",
-						Timeout:         "3.3s",
-						AthenzRootCAKey: "",
+						AuthHeader:   "auth-header-31",
+						URL:          "url-32",
+						Timeout:      "3.3s",
+						AthenzRootCA: "",
 						AuthN: webhook.AuthenticationConfig{
 							Config: webhook.Config{},
 							Mapper: dummyMapper("dummy-mapper-61"),
@@ -120,10 +120,10 @@ func TestNewAthenz(t *testing.T) {
 				},
 				want: &athenz{
 					authConfig: config.Athenz{
-						AuthHeader:      "auth-header-31",
-						URL:             "url-32",
-						Timeout:         "3.3s",
-						AthenzRootCAKey: "",
+						AuthHeader:   "auth-header-31",
+						URL:          "url-32",
+						Timeout:      "3.3s",
+						AthenzRootCA: "",
 						AuthN: webhook.AuthenticationConfig{
 							Config: webhook.Config{
 								ZMSEndpoint: "url-32",

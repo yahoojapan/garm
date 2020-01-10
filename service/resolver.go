@@ -28,8 +28,8 @@ type Resolver interface {
 	MapVerbAction(string) string
 	// MapK8sResourceAthenzResource maps K8s resources to resources in Athenz resource.
 	MapK8sResourceAthenzResource(string) string
-	// BuildDomainFromNamespace creates Athenz domain with namespace.
-	BuildDomainFromNamespace(string) string
+	// BuildDomainsFromNamespace creates Athenz domains with namespace.
+	BuildDomainsFromNamespace(string) []string
 	// PrincipalFromUser creates principal name from user.
 	PrincipalFromUser(string) string
 	// GetAdminDomain creates Athenz admin domain with namespace.
@@ -57,8 +57,8 @@ type Resolver interface {
 type resolve struct {
 	// cfg specifies the mapping rules and platform specific information.
 	cfg config.Platform
-	// athenzDomain specifies the Athenz domain for request to Athenz.
-	athenzDomain string
+	// athenzDomains specifies the Athenz domains for request to Athenz.
+	athenzDomains []string
 }
 
 // K8SResolve implementation for K8S platform.
@@ -86,7 +86,7 @@ func NewResolver(cfg config.Mapping) Resolver {
 		cfg: cfg.TLD.Platform,
 	}
 
-	res.athenzDomain = res.createAthenzDomain()
+	res.athenzDomains = res.createAthenzDomains()
 
 	switch res.cfg.Name {
 	case "k8s":
@@ -119,40 +119,71 @@ func (r *resolve) MapK8sResourceAthenzResource(k8sRes string) string {
 	return athenzRes
 }
 
-// createAthenzDomain use cfg.ServiceAthenzDomain;
-
+// createAthenzDomains use cfg.ServiceAthenzDomains;
+// do the following for each cfg.ServiceAthenzDomains
 // split it with ".";
 // for each token, if it match /^_.*_$/ but not "_namespace_", replace the token with config.GetActualValue(token);
 // and then return the processed value
-func (r *resolve) createAthenzDomain() string {
-	reps := make([]string, 0, strings.Count(r.cfg.ServiceAthenzDomain, ".")+1)
-	for _, v := range strings.Split(r.cfg.ServiceAthenzDomain, ".") {
-		if v != "_namespace_" && strings.HasPrefix(v, "_") && strings.HasSuffix(v, "_") {
-			// Note: If deploying in a different namespace than the kube-public namespace, change it to get information from kube api
-			reps = append(reps, v, config.GetActualValue(v))
-		}
+func (r *resolve) createAthenzDomains() []string {
+	domains := make([]string, 0, len(r.cfg.ServiceAthenzDomains))
+	if len(r.cfg.ServiceAthenzDomains) == 0 {
+		return domains
 	}
-	return strings.NewReplacer(reps...).Replace(r.cfg.ServiceAthenzDomain)
+	// reps stores information for replacement.
+	// cap uses the average length of  r.cfg.ServiceAthenzDomains separated by dots
+	reps := make([]string, 0, (strings.Count(strings.Join(r.cfg.ServiceAthenzDomains, "-"), ".")/len(r.cfg.ServiceAthenzDomains))+1)
+	for _, domain := range r.cfg.ServiceAthenzDomains {
+		reps = reps[:0]
+		for _, v := range strings.Split(domain, ".") {
+			if v != "_namespace_" && strings.HasPrefix(v, "_") && strings.HasSuffix(v, "_") {
+				// Note: If deploying in a different namespace than the kube-public namespace, change it to get information from kube api
+				reps = append(reps, v, config.GetActualValue(v))
+			}
+		}
+		domains = append(domains, strings.NewReplacer(reps...).Replace(domain))
+	}
+	return domains
 }
 
-// BuildDomainFromNamespace return domain by processing athenzDomain.
-// if namespace != "", replace `/ = .`, then `.. => -`, then replace "_namespace_" in athenzDomain with namespace;
-// else replace "._namespace_" in athenzDomain with namespace;
+// BuildDomainsFromNamespace returns domains by processing athenzDomains.
+// if namespace != "", replace `/ = .`, then `.. => -`, then replace "_namespace_" in athenzDomains with namespace;
+// else replace "._namespace_" in athenzDomains with namespace;
 // trim ".", then "-", then ":"
-func (r *resolve) BuildDomainFromNamespace(namespace string) string {
+func (r *resolve) BuildDomainsFromNamespace(namespace string) []string {
+	return r.buildAthenzDomain(r.athenzDomains, namespace)
+}
 
-	if namespace == "" {
-		return strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
-			strings.Replace(r.athenzDomain, "._namespace_", namespace, -1),
-			"."), "."), "-"), "-"), ":"), ":")
+//  BuildServiceAccountPrefixFromNamespace returns domains by processing AthenzServiceAccountPrefix.
+// if namespace != "", replace `/ = .`, then `.. => -`, then replace "_namespace_" in AthenzServiceAccountPrefix with namespace;
+// else replace "._namespace_" in AthenzServiceAccountPrefix with namespace;
+// trim ".", then "-", then ":"
+func (r *resolve) BuildServiceAccountPrefixFromNamespace(namespace string) []string {
+	return r.buildAthenzDomain([]string{r.cfg.AthenzServiceAccountPrefix}, namespace)
+}
+
+// buildAthenzDomain returns builtDomains by processing domains.
+// if namespace != "", replace `/ = .`, then `.. => -`, then replace "_namespace_" in domain with namespace;
+// else replace "._namespace_" in domain with namespace;
+// trim ".", then "-", then ":"
+func (r *resolve) buildAthenzDomain(domains []string, namespace string) []string {
+	builtDomains := make([]string, len(domains))
+	for i, domain := range domains {
+		if namespace == "" {
+			builtDomains[i] = r.trimToValidAsDomain(strings.Replace(domain, "._namespace_", namespace, -1))
+			continue
+		}
+
+		builtDomains[i] = r.trimToValidAsDomain(strings.Replace(domain, "_namespace_", r.replacePunctuationInNamespace(namespace), -1))
 	}
+	return builtDomains
+}
 
-	return strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(
-		strings.Replace(r.athenzDomain, "_namespace_", strings.Replace(strings.Replace(namespace,
-			"/", ".", -1),
-			"..", "-", -1),
-			-1),
-		"."), "."), "-"), "-"), ":"), ":")
+func (r *resolve) replacePunctuationInNamespace(namespace string) string {
+	return strings.Replace(strings.Replace(namespace, "/", ".", -1), "..", "-", -1)
+}
+
+func (r *resolve) trimToValidAsDomain(target string) string {
+	return strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSuffix(target, "."), "."), "-"), "-"), ":"), ":")
 }
 
 // MapAPIGroup returns "" if cfg.APIGroupControlEnabled == false;
@@ -211,11 +242,10 @@ func (r *resolve) PrincipalFromUser(user string) string {
 		if strings.HasPrefix(user, prefix) {
 			parts := strings.Split(strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":"), ":")
 			if len(parts) >= 2 {
-				return strings.TrimPrefix(strings.TrimSuffix(strings.Join(append([]string{
-					r.BuildDomainFromNamespace(parts[0]),
-				}, parts[1:]...), "."), ":"), ":")
+				return strings.TrimPrefix(strings.TrimSuffix(strings.Join(
+					append(r.BuildServiceAccountPrefixFromNamespace(parts[0]), parts[1:]...), "."), ":"), ":")
 			}
-			return strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":")
+			return r.cfg.AthenzServiceAccountPrefix + strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":")
 		}
 	}
 

@@ -1,4 +1,4 @@
-version: v1.0.0
+version: v2.0.0
 logger:
   log_path: /var/log/athenz/webhook.log
   log_trace: server,athenz,mapping
@@ -11,19 +11,19 @@ server:
   probe_wait_time: 3s
   tls:
     enabled: true
-    cert_key: cert
-    key_key: key
-    ca_key: ca
+    cert: _cert_
+    key: _key_
+    ca: _ca_
 athenz:
   auth_header: Athenz-Principal-Auth
   url: https://www.athenz.com/zts/v1
   timeout: 5s
-  root_ca: root_ca
+  root_ca: _root_ca_
 token:
   athenz_domain: _athenz_domain_
   service_name: _athenz_service_
   ntoken_path: /tmp/ntoken
-  private_key_env_name: privateKEY
+  private_key: _athenz_private_key_
   validate_token: false
   refresh_duration: 10s
   key_version: v1.0
@@ -33,10 +33,15 @@ map_rule:
     name: aks
     platform:
       name: aks
-      # service_athenz_domain: _tld_.k8s._segment_._uk-cluster_._namespace_._env_._k8s-cluster_._k8s-namespace_
-      service_athenz_domain: _kaas_namespace_.k8s._k8s_cluster_._namespace_ # max-length = 44
-      # service_athenz_domain: _namespace_.aks
-      # service_athenz_domain: _namespace_.k8s
+      # service_athenz_domains:
+        # - _tld_.k8s._segment_._uk-cluster_._namespace_._env_._k8s-cluster_._k8s-namespace_
+      service_athenz_domains:
+        - _kaas_namespace_.k8s._k8s_cluster_1._namespace_ # max-length = 44
+        - _kaas_namespace_.k8s._k8s_cluster_2._namespace_ # max-length = 44
+      # service_athenz_domains:
+        # - _namespace_.aks
+      # service_athenz_domains:
+        # - _namespace_.k8s
       resource_mappings:
         k8sResource1: athenzResource1
         # k8sResource2: athenzResource2
@@ -58,4 +63,5 @@ map_rule:
         - "system:serviceaccount:" 
         - "system-serviceaccount-"
       athenz_user_prefix: user.
+      athenz_service_account_prefix: _kaas_namespace_.k8s._k8s_cluster_2._namespace_.service_account.
       admin_athenz_domain: aks.admin

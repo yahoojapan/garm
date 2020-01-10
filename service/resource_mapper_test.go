@@ -46,7 +46,10 @@ func TestNewResourceMapper(t *testing.T) {
 		},
 		func() testcase {
 			resolver := &resolve{
-				athenzDomain: "athenzDomain-24",
+				athenzDomains: []string{
+					"athenzDomain-24",
+					"athenzDomain-25",
+				},
 			}
 			return testcase{
 				name: "Check NewResourceMapper",
@@ -88,7 +91,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, all empty",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "",
+					athenzDomains: []string{""},
 				},
 			},
 			args: args{
@@ -121,7 +124,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, nil ResourceAttributes, use non-resources attributes",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-domain-106",
+					athenzDomains: []string{"athenz-domain-106"},
 					cfg: config.Platform{
 						NonResourceAPIGroup:  "non-resource-api-group-108",
 						NonResourceNamespace: "non-resource-namespace-109",
@@ -148,10 +151,47 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			wantError: nil,
 		},
 		{
+			name: "Check resourceMapper MapResource, nil ResourceAttributes, use non-resources attributes, multi domain",
+			fields: fields{
+				res: &resolve{
+					athenzDomains: []string{
+						"athenz-domain-158",
+						"athenz-domain-159",
+					},
+					cfg: config.Platform{
+						NonResourceAPIGroup:  "non-resource-api-group-162",
+						NonResourceNamespace: "non-resource-namespace-163",
+					},
+				},
+			},
+			args: args{
+				spec: authz.SubjectAccessReviewSpec{
+					ResourceAttributes: nil,
+					NonResourceAttributes: &authz.NonResourceAttributes{
+						Path: "path-171",
+						Verb: "verb-172",
+					},
+					User: "user-174",
+				},
+			},
+			wantIdentity: "user-174",
+			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
+				{
+					Resource: "athenz-domain-158:path-171",
+					Action:   "verb-172",
+				},
+				{
+					Resource: "athenz-domain-159:path-171",
+					Action:   "verb-172",
+				},
+			},
+			wantError: nil,
+		},
+		{
 			name: "Check resourceMapper MapResource, ResourceAttributes with empty namespace & non-empty sub-resource",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-domain-138._namespace_",
+					athenzDomains: []string{"athenz-domain-138._namespace_"},
 					cfg: config.Platform{
 						EmptyNamespace:             "empty-namespace-140",
 						APIGroupControlEnabled:     true,
@@ -185,7 +225,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, mapping verb & resource & group & name OK",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-domain-171",
+					athenzDomains: []string{"athenz-domain-171"},
 					cfg: config.Platform{
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,
@@ -230,11 +270,12 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, domain from namespace & principal from user",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-domain-216._namespace_",
+					athenzDomains: []string{"athenz-domain-216._namespace_"},
 					cfg: config.Platform{
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,
 						ServiceAccountPrefixes:     []string{"user."},
+						AthenzServiceAccountPrefix: "athenz-domain-278._namespace_.",
 					},
 				},
 			},
@@ -251,7 +292,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 					User: "user.namespace-234:sub-domain-234:user-234",
 				},
 			},
-			wantIdentity: "athenz-domain-216.namespace-234.sub-domain-234.user-234",
+			wantIdentity: "athenz-domain-278.namespace-234.sub-domain-234.user-234",
 			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
 				{
 					Resource: "athenz-domain-216.namespace-228:group-232.resource-230.sub-resource-231.name-227",
@@ -264,7 +305,7 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, admin access",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-admin-domain-250",
+					athenzDomains: []string{"athenz-admin-domain-250"},
 					cfg: config.Platform{
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,
@@ -307,10 +348,64 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			wantError: nil,
 		},
 		{
+			name: "Check resourceMapper MapResource, admin access, multiple athenzDomain, exists adminDomain",
+			fields: fields{
+				res: &resolve{
+					athenzDomains: []string{
+						"athenz-domain-355",
+						"athenz-domain-356",
+					},
+					cfg: config.Platform{
+						APIGroupControlEnabled:     true,
+						ResourceNameControlEnabled: true,
+						AdminAccessList: []*config.RequestInfo{
+							{
+								Verb:      "verb-*",
+								Namespace: "namespace-*",
+								APIGroup:  "group-*",
+								Resource:  "resource-*",
+								Name:      "name-*",
+							},
+						},
+						AdminAthenzDomain: "athenz-admin-domain-370",
+					},
+				},
+			},
+			args: args{
+				spec: authz.SubjectAccessReviewSpec{
+					ResourceAttributes: &authz.ResourceAttributes{
+						Name:        "name-377",
+						Namespace:   "namespace-378",
+						Verb:        "verb-379",
+						Resource:    "resource-380",
+						Subresource: "sub-resource-381",
+						Group:       "group-382",
+					},
+					User: "user-384",
+				},
+			},
+			wantIdentity: "user-384",
+			wantAthenzAccessChecks: []webhook.AthenzAccessCheck{
+				{
+					Resource: "athenz-admin-domain-370:group-382.athenz-domain-355.resource-380.sub-resource-381.name-377",
+					Action:   "verb-379",
+				},
+				{
+					Resource: "athenz-admin-domain-370:group-382.athenz-domain-356.resource-380.sub-resource-381.name-377",
+					Action:   "verb-379",
+				},
+				{
+					Resource: "athenz-admin-domain-370:group-382.resource-380.sub-resource-381.name-377",
+					Action:   "verb-379",
+				},
+			},
+			wantError: nil,
+		},
+		{
 			name: "Check resourceMapper MapResource, not allowed, directly reject",
 			fields: fields{
 				res: &resolve{
-					athenzDomain: "athenz-domain-296",
+					athenzDomains: []string{"athenz-domain-296"},
 					cfg: config.Platform{
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,

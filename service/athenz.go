@@ -63,7 +63,7 @@ func NewAthenz(cfg config.Athenz, log Logger) (Athenz, error) {
 	cfg.AuthN.Config = c
 	cfg.AuthZ.Config = c
 	cfg.AuthZ.AthenzX509 = func() (*tls.Config, error) {
-		pool, err := NewX509CertPool(config.GetActualValue(cfg.AthenzRootCAKey))
+		pool, err := NewX509CertPool(config.GetActualValue(cfg.AthenzRootCA))
 		if err != nil {
 			err = errors.Wrap(err, "authorization x509 certpool error")
 		}

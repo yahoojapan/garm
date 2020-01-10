@@ -22,9 +22,9 @@
 ### Related configuration
 1. For garm, `config.yaml`
 	```yaml
-	server.tls.ca_key
-	server.tls.cert_key
-	server.tls.key_key
+	server.tls.ca
+	server.tls.cert
+	server.tls.key
 
 	athenz.root_ca
 	```
@@ -41,7 +41,7 @@
 <a id="note"></a>
 #### Note
 - Garm uses the same server certificate for /authn and /authz.
-- If `server.tls.ca_key` is not set, garm will not verify the client certificate of kube-apiserver.
+- If `server.tls.ca` is not set, garm will not verify the client certificate of kube-apiserver.
 
 ---
 
@@ -63,7 +63,7 @@ athenz.token.*
 - If `athenz.token.ntoken_path` is set ([Copper Argos](https://github.com/yahoo/athenz/blob/master/docs/copper_argos_dev.md)), garm will use the n-token in the file directly.
 	- It is better to set `athenz.token.validate_token: true` in this case.
 - If `athenz.token.ntoken_path` is NOT set, garm will handle the token generation and update automatically.
-	- As the token is signed by `athenz.token.private_key_env_name`, please make sure that the corresponding public key is configurated in Athenz with the same `athenz.token.key_version`.
+	- As the token is signed by `athenz.token.private_key`, please make sure that the corresponding public key is configurated in Athenz with the same `athenz.token.key_version`.
 
 ---
 
@@ -76,7 +76,7 @@ athenz.token.*
 map_rule.tld.platform.black_list
 map_rule.tld.platform.white_list
 
-map_rule.tld.service_athenz_domain
+map_rule.tld.service_athenz_domains
 ```
 
 <a id="note-2"></a>
@@ -101,9 +101,28 @@ map_rule.tld.platform.admin_athenz_domain
 #### Note
 - Garm can map kube-apiserver requests using a separate admin domain in Athenz.
 - If the request matches any rules in `map_rule.tld.platform.admin_access_list`, garm will use `map_rule.tld.platform.admin_athenz_domain`.
-- Garm will send 2 requests to Athenz. The kube-apiserver request is allowed if any 1 is allowed in Athenz (OR logic).
-	1. Athenz resource **with** `map_rule.tld.service_athenz_domain`
-	1. Athenz resource **without** `map_rule.tld.service_athenz_domain`
+- Garm will send 1 more request than the number of `map_rule.tld.service_athenz_domains` to Athenz. The kube-apiserver request is allowed if any 1 is allowed in Athenz (OR logic).
+- If `service_domain_a` and `service_domain_b` are specified in `map_rule.tld.service_athenz_domains`, it is requested 3 times.
+	1. Athenz resource **with** `service_domain_a` (One of those specified in `map_rule.tld.service_athenz_domains`)
+	1. Athenz resource **with** `service_domain_b` (One of those specified in `map_rule.tld.service_athenz_domains`)
+	1. Athenz resource **without** `map_rule.tld.service_athenz_domains`
+
+---
+
+<a id="service-domain"></a>
+## Service domains
+
+<a id="related-configuration-3"></a>
+### Related configuration
+```yaml
+map_rule.tld.service_athenz_domains
+```
+
+<a id="note-3"></a>
+#### Note
+- If the request not matches any rules in `map_rule.tld.platform.admin_access_list`, garm will use `map_rule.tld.service_athenz_domains`.
+- Garm will send request number of `map_rule.tld.service_athenz_domains` to Athenz. The kube-apiserver request is allowed if any 1 is allowed in Athenz (OR logic).
+- If `service_domain_a` and `service_domain_b` are specified, garm will be requested twice.
 
 ---
 

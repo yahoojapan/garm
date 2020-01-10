@@ -272,16 +272,16 @@ func TestNew(t *testing.T) {
 					ProbeWaitTime:    "3s",
 					TLS: TLS{
 						Enabled: true,
-						CertKey: "cert",
-						KeyKey:  "key",
-						CAKey:   "ca",
+						Cert:    "_cert_",
+						Key:     "_key_",
+						CA:      "_ca_",
 					},
 				},
 				Athenz: Athenz{
-					AuthHeader:      "Athenz-Principal-Auth",
-					URL:             "https://www.athenz.com/zts/v1",
-					Timeout:         "5s",
-					AthenzRootCAKey: "root_ca",
+					AuthHeader:   "Athenz-Principal-Auth",
+					URL:          "https://www.athenz.com/zts/v1",
+					Timeout:      "5s",
+					AthenzRootCA: "_root_ca_",
 					AuthN: webhook.AuthenticationConfig{
 						Config: webhook.Config{
 							ZMSEndpoint: "",
@@ -321,21 +321,23 @@ func TestNew(t *testing.T) {
 					},
 				},
 				Token: Token{
-					AthenzDomain:      "_athenz_domain_",
-					ServiceName:       "_athenz_service_",
-					NTokenPath:        "/tmp/ntoken",
-					PrivateKeyEnvName: "privateKEY",
-					ValidateToken:     false,
-					RefreshDuration:   "10s",
-					KeyVersion:        "v1.0",
-					Expiration:        "5s",
+					AthenzDomain:    "_athenz_domain_",
+					ServiceName:     "_athenz_service_",
+					NTokenPath:      "/tmp/ntoken",
+					PrivateKey:      "_athenz_private_key_",
+					ValidateToken:   false,
+					RefreshDuration: "10s",
+					KeyVersion:      "v1.0",
+					Expiration:      "5s",
 				},
 				Mapping: Mapping{
 					TLD: TLD{
 						Name: "aks",
 						Platform: Platform{
-							Name:                "aks",
-							ServiceAthenzDomain: "_kaas_namespace_.k8s._k8s_cluster_._namespace_",
+							Name: "aks",
+							ServiceAthenzDomains: []string{
+								"_kaas_namespace_.k8s._k8s_cluster_1._namespace_",
+								"_kaas_namespace_.k8s._k8s_cluster_2._namespace_"},
 							ResourceMappings: map[string]string{
 								"k8sResource1": "athenzResource1",
 							},
@@ -357,11 +359,12 @@ func TestNew(t *testing.T) {
 								"system:serviceaccount:",
 								"system-serviceaccount-",
 							},
-							AthenzUserPrefix:  "user.",
-							AdminAthenzDomain: "aks.admin",
-							AdminAccessList:   nil,
-							WhiteList:         nil,
-							BlackList:         nil,
+							AthenzUserPrefix:           "user.",
+							AthenzServiceAccountPrefix: "_kaas_namespace_.k8s._k8s_cluster_2._namespace_.service_account.",
+							AdminAthenzDomain:          "aks.admin",
+							AdminAccessList:            nil,
+							WhiteList:                  nil,
+							BlackList:                  nil,
 						},
 					},
 				},
@@ -417,7 +420,7 @@ func TestGetVersion(t *testing.T) {
 	}{
 		{
 			name: "Test get version return garm version",
-			want: "v1.0.0",
+			want: "v2.0.0",
 		},
 	}
 	for _, tt := range tests {

@@ -1,4 +1,4 @@
-version: v1.0.0
+version: v2.0.0
 logger:
   log_path: /var/log/athenz/webhook.log
   log_trace: server,athenz,mapping
@@ -12,8 +12,8 @@ server:
   tls:
     enabled: true
     cet_key: cert
-key_key: key
-    ca_key: ca
+key: key
+    ca: ca
 athenz:
 auth_header: Athenz-Principal-Auth
   url: https://www.athenz.io/zts/v1
@@ -23,7 +23,7 @@ token:
   athenz_domain: _athenz_domain_
 service_name: _athenz_service_
   ntoken_path: /tmp/ntoken
-  private_key_env_name: privateKEY
+  private_key: privateKEY
   validate_token: false
   refresh_duration: 10s
   key_version: v1.0

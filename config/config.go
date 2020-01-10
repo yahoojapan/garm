@@ -29,7 +29,7 @@ import (
 
 const (
 	// currentVersion represents the configuration version.
-	currentVersion = "v1.0.0"
+	currentVersion = "v2.0.0"
 )
 
 // Config represents an application configuration content (config.yaml).
@@ -96,14 +96,14 @@ type TLS struct {
 	// Enable represents the webhook server enable TLS or not.
 	Enabled bool `yaml:"enabled"`
 
-	// CertKey represents the environment variable name having the certificate file path of webhook server.
-	CertKey string `yaml:"cert_key"`
+	// Cert represents the certificate file path of webhook server.
+	Cert string `yaml:"cert"`
 
-	// KeyKey represents the environment variable name having the private key file path of webhook server certificate.
-	KeyKey string `yaml:"key_key"`
+	// Key represents the private key file path of webhook server certificate.
+	Key string `yaml:"key"`
 
-	// CAKey represents the environment variable name having the CA certificates file path for verifying clients connecting to webhook server.
-	CAKey string `yaml:"ca_key"`
+	// CA represents the CA certificates file path for verifying clients connecting to webhook server.
+	CA string `yaml:"ca"`
 }
 
 // Athenz represents the configuration for webhook server to connect to Athenz.
@@ -117,8 +117,8 @@ type Athenz struct {
 	// Timeout represents the request timeout duration to Athenz server.
 	Timeout string `yaml:"timeout"`
 
-	// AthenzRootCAKey is the environment variable name having the Athenz root CA certificate file path for connecting to Athenz.
-	AthenzRootCAKey string `yaml:"root_ca"`
+	// AthenzRootCA is the Athenz root CA certificate file path for connecting to Athenz.
+	AthenzRootCA string `yaml:"root_ca"`
 
 	// AuthN represents the authentication configuration.
 	AuthN webhook.AuthenticationConfig
@@ -141,8 +141,8 @@ type Token struct {
 	// NTokenPath represents the n-token path. Only for Copper Argos.
 	NTokenPath string `yaml:"ntoken_path"`
 
-	// PrivateKeyEnvName represents the environment variable name having the private key file path for signing the n-token.
-	PrivateKeyEnvName string `yaml:"private_key_env_name"`
+	// PrivateKey represents the private key file path for signing the n-token.
+	PrivateKey string `yaml:"private_key"`
 
 	// ValidateToken represents should validate the token or not. Set true when NTokenPath is set.
 	ValidateToken bool `yaml:"validate_token"`
@@ -177,8 +177,8 @@ type Platform struct {
 	// Name represents the platform name. Currently, it supports "k8s", "aks" and "k8s".
 	Name string `yaml:"name"`
 
-	// ServiceAthenzDomain represents the Athenz domain name used for non-administrative K8s webhook requests.
-	ServiceAthenzDomain string `yaml:"service_athenz_domain"`
+	// ServiceAthenzDomains represents the Athenz domain name used for non-administrative K8s webhook requests.
+	ServiceAthenzDomains []string `yaml:"service_athenz_domains"`
 
 	// ResourceMappings maps the K8s webhook request "resource" to the "resource" part of Athenz resource name.
 	ResourceMappings map[string]string `yaml:"resource_mappings,omitempty"`
@@ -215,6 +215,9 @@ type Platform struct {
 
 	// AthenzUserPrefix represents the Athenz user prefix used when the K8s webhook request is from a user account.
 	AthenzUserPrefix string `yaml:"athenz_user_prefix"`
+
+	// AthenzServiceAccountPrefix represents the Athenz service account prefix used when the K8s webhook request is from a service account.
+	AthenzServiceAccountPrefix string `yaml:"athenz_service_account_prefix"`
 
 	// AdminAthenzDomain represents the Athenz domain name used for administrative K8s webhook requests.
 	AdminAthenzDomain string `yaml:"admin_athenz_domain"`

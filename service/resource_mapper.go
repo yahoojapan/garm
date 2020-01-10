@@ -36,6 +36,17 @@ type resourceMapper struct {
 	res Resolver
 }
 
+// athenzAccessCheckParam is parameters for creating accesscheck.
+// Each member is a mapped string.
+type athenzAccessCheckParam struct {
+	action      string
+	group       string
+	resource    string
+	name        string
+	adminDomain string
+	domains     []string
+}
+
 // NewResourceMapper creates a new ResourceMapper for mapping K8s resources to Athenz principals.
 func NewResourceMapper(resolver Resolver) ResourceMapper {
 	return &resourceMapper{
@@ -78,9 +89,6 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 	group = m.res.MapAPIGroup(group)
 	name = m.res.MapResourceName(name)
 
-	adminDomain := m.res.GetAdminDomain(namespace)
-	domain := m.res.BuildDomainFromNamespace(namespace)
-
 	identity := m.res.PrincipalFromUser(spec.User)
 
 	switch {
@@ -90,22 +98,53 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 				"----%s's request is not allowed----\nVerb:\t%s\nNamespaceb:\t%s\nAPI Group:\t%s\nResource:\t%s\nResource Name:\t%s\n",
 				identity, verb, namespace, group, resource, name)
 	case m.res.IsAdminAccess(verb, namespace, group, resource, name):
-		return identity, []webhook.AthenzAccessCheck{
-			{
-				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s.%s", adminDomain, group, domain, resource, name)),
-				Action:   verb,
-			},
-			{
-				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s", adminDomain, group, resource, name)),
-				Action:   verb,
-			},
-		}, nil
+		return identity, m.createAdminAccessCheck(
+			athenzAccessCheckParam{
+				action:      m.res.MapVerbAction(verb),
+				group:       m.res.MapAPIGroup(group),
+				resource:    m.res.MapK8sResourceAthenzResource(resource),
+				name:        m.res.MapResourceName(name),
+				adminDomain: m.res.GetAdminDomain(namespace),
+				domains:     m.res.BuildDomainsFromNamespace(namespace),
+			}), nil
 	default:
-		return identity, []webhook.AthenzAccessCheck{
-			{
-				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s", domain, group, resource, name)),
-				Action:   verb,
-			},
-		}, nil
+		return identity, m.createAccessCheck(
+			athenzAccessCheckParam{
+				action:   m.res.MapVerbAction(verb),
+				group:    m.res.MapAPIGroup(group),
+				resource: m.res.MapK8sResourceAthenzResource(resource),
+				name:     m.res.MapResourceName(name),
+				domains:  m.res.BuildDomainsFromNamespace(namespace),
+			}), nil
 	}
+}
+
+// createAdminAccessCheck returns AthenzAccessChecks for admin domain.
+// Returns an array of the form "[ adminDomain+domain_0, adminDomain+domain_1 ... adminDomain ]"
+func (m *resourceMapper) createAdminAccessCheck(accessCheckParam athenzAccessCheckParam) []webhook.AthenzAccessCheck {
+	accessChecks := make([]webhook.AthenzAccessCheck, len(accessCheckParam.domains)+1)
+	for i, domain := range accessCheckParam.domains {
+		accessChecks[i] = webhook.AthenzAccessCheck{
+			Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s.%s", accessCheckParam.adminDomain, accessCheckParam.group, domain, accessCheckParam.resource, accessCheckParam.name)),
+			Action:   accessCheckParam.action,
+		}
+	}
+	accessChecks[len(accessChecks)-1] = webhook.AthenzAccessCheck{
+		Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s", accessCheckParam.adminDomain, accessCheckParam.group, accessCheckParam.resource, accessCheckParam.name)),
+		Action:   accessCheckParam.action,
+	}
+	return accessChecks
+}
+
+// createAdminAccessCheck returns AthenzAccessChecks for service domains.
+func (m *resourceMapper) createAccessCheck(accessCheckParam athenzAccessCheckParam) []webhook.AthenzAccessCheck {
+	accessChecks := make([]webhook.AthenzAccessCheck, 0, len(accessCheckParam.domains))
+	for _, domain := range accessCheckParam.domains {
+		accessChecks = append(accessChecks,
+			webhook.AthenzAccessCheck{
+				Resource: m.res.TrimResource(fmt.Sprintf("%s:%s.%s.%s", domain, accessCheckParam.group, accessCheckParam.resource, accessCheckParam.name)),
+				Action:   accessCheckParam.action,
+			})
+	}
+	return accessChecks
 }

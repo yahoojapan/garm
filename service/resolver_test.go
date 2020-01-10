@@ -123,8 +123,8 @@ func TestNewResolver(t *testing.T) {
 
 func Test_resolve_MapVerbAction(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	type args struct {
 		verb string
@@ -179,8 +179,8 @@ func Test_resolve_MapVerbAction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.MapVerbAction(tt.args.verb); got != tt.want {
 				t.Errorf("resolve.MapVerbAction() = %v, want %v", got, tt.want)
@@ -191,8 +191,8 @@ func Test_resolve_MapVerbAction(t *testing.T) {
 
 func Test_resolve_MapK8sResourceAthenzResource(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	type args struct {
 		k8sRes string
@@ -247,8 +247,8 @@ func Test_resolve_MapK8sResourceAthenzResource(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.MapK8sResourceAthenzResource(tt.args.k8sRes); got != tt.want {
 				t.Errorf("resolve.MapK8sResourceAthenzResource() = %v, want %v", got, tt.want)
@@ -257,49 +257,64 @@ func Test_resolve_MapK8sResourceAthenzResource(t *testing.T) {
 	}
 }
 
-func Test_resolve_createAthenzDomain(t *testing.T) {
+func Test_resolve_createAthenzDomains(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	type testcase struct {
 		name       string
 		fields     fields
-		want       string
+		want       []string
 		beforeFunc func() error
 		afterFunc  func() error
 	}
 	tests := []testcase{
 		{
-			name: "Check resolve createAthenzDomain, empty serviceAthenzDomain",
+			name: "Check resolve createAthenzDomains, empty serviceAthenzDomains",
 			fields: fields{
 				cfg: config.Platform{
-					ServiceAthenzDomain: "",
+					ServiceAthenzDomains: []string{""},
 				},
 			},
-			want: "",
+			want: []string{""},
 		},
 		{
-			name: "Check resolve createAthenzDomain, serviceAthenzDomain no split, no replace",
+			name: "Check resolve createAthenzDomains, serviceAthenzDomains no split, no replace",
 			fields: fields{
 				cfg: config.Platform{
-					ServiceAthenzDomain: "service-athenz-domain-192",
+					ServiceAthenzDomains: []string{"service-athenz-domain-192"},
 				},
 			},
-			want: "service-athenz-domain-192",
+			want: []string{"service-athenz-domain-192"},
+		},
+		{
+			name: "Check resolve createAthenzDomains, multi serviceAthenzDomains",
+			fields: fields{
+				cfg: config.Platform{
+					ServiceAthenzDomains: []string{
+						"service-athenz-domain-296",
+						"service-athenz-domain-297._namespace_",
+					},
+				},
+			},
+			want: []string{
+				"service-athenz-domain-296",
+				"service-athenz-domain-297._namespace_",
+			},
 		},
 		func() testcase {
 			env := map[string]string{
 				"env-199": "evalue-199",
 				"env-200": "evalue-200",
 			}
-			serviceAthenzDomain := "_namespace_._env-200_._env-199_"
+			serviceAthenzDomains := []string{"_namespace_._env-200_._env-199_"}
 
 			return testcase{
-				name: "Check resolve createAthenzDomain, serviceAthenzDomain, multiple replace, skip _namespace_",
+				name: "Check resolve createAthenzDomains, serviceAthenzDomains, multiple replace, skip _namespace_",
 				fields: fields{
 					cfg: config.Platform{
-						ServiceAthenzDomain: serviceAthenzDomain,
+						ServiceAthenzDomains: serviceAthenzDomains,
 					},
 				},
 				beforeFunc: func() error {
@@ -320,7 +335,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 					}
 					return nil
 				},
-				want: "_namespace_.evalue-200.evalue-199",
+				want: []string{"_namespace_.evalue-200.evalue-199"},
 			}
 		}(),
 		func() testcase {
@@ -328,13 +343,13 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 				"env-235": "evalue-235",
 				"env-236": "evalue-236",
 			}
-			serviceAthenzDomain := "_env-236_.env-235."
+			serviceAthenzDomains := []string{"_env-236_.env-235."}
 
 			return testcase{
-				name: "Check resolve createAthenzDomain, serviceAthenzDomain, single replace",
+				name: "Check resolve createAthenzDomains, serviceAthenzDomains, single replace",
 				fields: fields{
 					cfg: config.Platform{
-						ServiceAthenzDomain: serviceAthenzDomain,
+						ServiceAthenzDomains: serviceAthenzDomains,
 					},
 				},
 				beforeFunc: func() error {
@@ -355,7 +370,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 					}
 					return nil
 				},
-				want: "evalue-236.env-235.",
+				want: []string{"evalue-236.env-235."},
 			}
 		}(),
 		func() testcase {
@@ -364,13 +379,13 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 				"env-271": "evalue-271",
 				"env-272": "evalue-272",
 			}
-			serviceAthenzDomain := ".env-270.env-271.env-272"
+			serviceAthenzDomains := []string{".env-270.env-271.env-272"}
 
 			return testcase{
-				name: "Check resolve createAthenzDomain, serviceAthenzDomain, split but no replace",
+				name: "Check resolve createAthenzDomains, serviceAthenzDomains, split but no replace",
 				fields: fields{
 					cfg: config.Platform{
-						ServiceAthenzDomain: serviceAthenzDomain,
+						ServiceAthenzDomains: serviceAthenzDomains,
 					},
 				},
 				beforeFunc: func() error {
@@ -391,7 +406,7 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 					}
 					return nil
 				},
-				want: ".env-270.env-271.env-272",
+				want: []string{".env-270.env-271.env-272"},
 			}
 		}(),
 	}
@@ -415,21 +430,21 @@ func Test_resolve_createAthenzDomain(t *testing.T) {
 			}
 
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
-			if got := r.createAthenzDomain(); got != tt.want {
-				t.Errorf("resolve.createAthenzDomain() = %v, want %v", got, tt.want)
+			if got := r.createAthenzDomains(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("resolve.createAthenzDomains() = %v, want %v", got, tt.want)
 				return
 			}
 		})
 	}
 }
 
-func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
+func Test_resolve_BuildDomainsFromNamespace(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	type args struct {
 		namespace string
@@ -438,97 +453,234 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want   string
+		want   []string
 	}{
 		{
-			name: "Check resolve BuildDomainFromNamespace, empty namespace, empty athenzDomain",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, empty athenzDomains",
 			fields: fields{
-				athenzDomain: "",
+				athenzDomains: []string{""},
 			},
 			args: args{
 				namespace: "",
 			},
-			want: "",
+			want: []string{""},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, empty namespace, athenzDomain no replace & trim",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, athenzDomains no replace & trim",
 			fields: fields{
-				athenzDomain: "athenz-domain-140",
+				athenzDomains: []string{"athenz-domain-140"},
 			},
 			args: args{
 				namespace: "",
 			},
-			want: "athenz-domain-140",
+			want: []string{"athenz-domain-140"},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, empty namespace, athenzDomain no replace, full trim",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, multi athenzDomains no replace & no trim ",
 			fields: fields{
-				athenzDomain: ".-:athenz-domain-150:-.",
+				athenzDomains: []string{
+					"athenz-domain-482",
+					"athenz-domain-483",
+				},
 			},
 			args: args{
 				namespace: "",
 			},
-			want: "athenz-domain-150",
+			want: []string{
+				"athenz-domain-482",
+				"athenz-domain-483",
+			},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, empty namespace, athenzDomain no replace, partially trim",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, athenzDomains no replace, full trim",
 			fields: fields{
-				athenzDomain: ":-.athenz-domain-160.:-",
+				athenzDomains: []string{".-:athenz-domain-150:-."},
 			},
 			args: args{
 				namespace: "",
 			},
-			want: "-.athenz-domain-160.",
+			want: []string{"athenz-domain-150"},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, empty namespace, athenzDomain no trim, replace",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, athenzDomains no replace, partially trim",
 			fields: fields{
-				athenzDomain: "athenz-|._namespace_||._namespace_|-domain-170",
+				athenzDomains: []string{":-.athenz-domain-160.:-"},
 			},
 			args: args{
 				namespace: "",
 			},
-			want: "athenz-||||-domain-170",
+			want: []string{"-.athenz-domain-160."},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, athenzDomain no trim, no replace namespace",
+			name: "Check resolve BuildDomainsFromNamespace, empty namespace, athenzDomains no trim, replace",
 			fields: fields{
-				athenzDomain: "athenz-|.namespace||.namespace|-domain-180",
+				athenzDomains: []string{"athenz-|._namespace_||._namespace_|-domain-170"},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{"athenz-||||-domain-170"},
+		},
+		{
+			name: "Check resolve BuildDomainsFromNamespace, athenzDomains no trim, no replace namespace",
+			fields: fields{
+				athenzDomains: []string{"athenz-|.namespace||.namespace|-domain-180"},
 			},
 			args: args{
 				namespace: "namespace-183",
 			},
-			want: "athenz-|.namespace||.namespace|-domain-180",
+			want: []string{"athenz-|.namespace||.namespace|-domain-180"},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, athenzDomain no trim, replace namespace",
+			name: "Check resolve BuildDomainsFromNamespace, athenzDomains no trim, replace namespace",
 			fields: fields{
-				athenzDomain: "athenz-|._namespace_||._namespace_|-domain-190",
+				athenzDomains: []string{"athenz-|._namespace_||._namespace_|-domain-190"},
 			},
 			args: args{
 				namespace: "namespace-193",
 			},
-			want: "athenz-|.namespace-193||.namespace-193|-domain-190",
+			want: []string{"athenz-|.namespace-193||.namespace-193|-domain-190"},
 		},
 		{
-			name: "Check resolve BuildDomainFromNamespace, namspace replace, athenzDomain no trim, replace namespace",
+			name: "Check resolve BuildDomainsFromNamespace, namspace replace, athenzDomains no trim, replace namespace",
 			fields: fields{
-				athenzDomain: "athenz-<._namespace_>-domain-200",
+				athenzDomains: []string{"athenz-<._namespace_>-domain-200"},
 			},
 			args: args{
 				namespace: "namespace|//|/./|./.././../.|./n-s/.ns/../nn-ss//sss|-183",
 			},
-			want: "athenz-<.namespace|-|-.|-----.|-n-s-ns--nn-ss-sss|-183>-domain-200",
+			want: []string{"athenz-<.namespace|-|-.|-----.|-n-s-ns--nn-ss-sss|-183>-domain-200"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
-			if got := r.BuildDomainFromNamespace(tt.args.namespace); got != tt.want {
-				t.Errorf("resolve.BuildDomainFromNamespace() = %v, want %v", got, tt.want)
+			if got := r.BuildDomainsFromNamespace(tt.args.namespace); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("resolve.BuildDomainsFromNamespace() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+func Test_resolve_BuildServiceAccountPrefixFromNamespace(t *testing.T) {
+	type fields struct {
+		cfg config.Platform
+	}
+	type args struct {
+		namespace string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   []string
+	}{
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, empty AthenzServiceAccountPrefix",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "",
+				},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{""},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, AthenzServiceAccountPrefix no replace & no trim",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "athenz-domain-506",
+				},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{"athenz-domain-506"},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, AthenzServiceAccountPrefix no replace, full trim",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: ".-:athenz-domain-608:-.",
+				},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{"athenz-domain-608"},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, AthenzServiceAccountPrefix no replace, partially trim",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: ":-.athenz-domain-620.:-",
+				},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{"-.athenz-domain-620."},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, empty namespace, AthenzServiceAccountPrefix no trim, replace",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "athenz-|._namespace_||._namespace_|-domain-632",
+				},
+			},
+			args: args{
+				namespace: "",
+			},
+			want: []string{"athenz-||||-domain-632"},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, AthenzServiceAccountPrefix no trim, no replace namespace",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "athenz-|.namespace||.namespace|-domain-644",
+				},
+			},
+			args: args{
+				namespace: "namespace-648",
+			},
+			want: []string{"athenz-|.namespace||.namespace|-domain-644"},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, AthenzServiceAccountPrefix no trim, replace namespace",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "athenz-|._namespace_||._namespace_|-domain-656",
+				},
+			},
+			args: args{
+				namespace: "namespace-660",
+			},
+			want: []string{"athenz-|.namespace-660||.namespace-660|-domain-656"},
+		},
+		{
+			name: "Check resolve BuildServiceAccountPrefixFromNamespace, namspace replace, AthenzServiceAccountPrefix no trim, replace namespace",
+			fields: fields{
+				cfg: config.Platform{
+					AthenzServiceAccountPrefix: "athenz-<._namespace_>-domain-668",
+				},
+			},
+			args: args{
+				namespace: "namespace|//|/./|./.././../.|./n-s/.ns/../nn-ss//sss|-672",
+			},
+			want: []string{"athenz-<.namespace|-|-.|-----.|-n-s-ns--nn-ss-sss|-672>-domain-668"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &resolve{
+				cfg: tt.fields.cfg,
+			}
+			if got := r.BuildServiceAccountPrefixFromNamespace(tt.args.namespace); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("resolve.BuildServiceAccountPrefixFromNamespace() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -536,8 +688,8 @@ func Test_resolve_BuildDomainFromNamespace(t *testing.T) {
 
 func Test_resolve_MapAPIGroup(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	type args struct {
 		group string
@@ -608,8 +760,8 @@ func Test_resolve_MapAPIGroup(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.MapAPIGroup(tt.args.group); got != tt.want {
 				t.Errorf("resolve.MapAPIGroup() = %v, want %v", got, tt.want)
@@ -620,8 +772,8 @@ func Test_resolve_MapAPIGroup(t *testing.T) {
 
 func Test_resolve_MapResourceName(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	type args struct {
 		name string
@@ -692,8 +844,8 @@ func Test_resolve_MapResourceName(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.MapResourceName(tt.args.name); got != tt.want {
 				t.Errorf("resolve.MapResourceName() = %v, want %v", got, tt.want)
@@ -704,8 +856,8 @@ func Test_resolve_MapResourceName(t *testing.T) {
 
 func Test_resolve_GetEmptyNamespace(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	tests := []struct {
 		name   string
@@ -725,8 +877,8 @@ func Test_resolve_GetEmptyNamespace(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.GetEmptyNamespace(); got != tt.want {
 				t.Errorf("resolve.GetEmptyNamespace() = %v, want %v", got, tt.want)
@@ -737,8 +889,8 @@ func Test_resolve_GetEmptyNamespace(t *testing.T) {
 
 func Test_resolve_GetNonResourceGroup(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	tests := []struct {
 		name   string
@@ -758,8 +910,8 @@ func Test_resolve_GetNonResourceGroup(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.GetNonResourceGroup(); got != tt.want {
 				t.Errorf("resolve.GetNonResourceGroup() = %v, want %v", got, tt.want)
@@ -770,8 +922,8 @@ func Test_resolve_GetNonResourceGroup(t *testing.T) {
 
 func Test_resolve_GetNonResourceNamespace(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	tests := []struct {
 		name   string
@@ -791,8 +943,8 @@ func Test_resolve_GetNonResourceNamespace(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.GetNonResourceNamespace(); got != tt.want {
 				t.Errorf("resolve.GetNonResourceNamespace() = %v, want %v", got, tt.want)
@@ -803,8 +955,8 @@ func Test_resolve_GetNonResourceNamespace(t *testing.T) {
 
 func Test_resolve_PrincipalFromUser(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	type args struct {
 		user string
@@ -868,9 +1020,9 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 		{
 			name: "Check resolve PrincipalFromUser ServiceAccountPrefixes match user prefix, multiple parts, empty namespace",
 			fields: fields{
-				athenzDomain: "athenz-|._namespace_||._namespace_|-domain-342",
 				cfg: config.Platform{
-					ServiceAccountPrefixes: []string{"prefix-not-match", "prefix-344"},
+					ServiceAccountPrefixes:     []string{"prefix-not-match", "prefix-344"},
+					AthenzServiceAccountPrefix: "athenz-|._namespace_||._namespace_|-domain-342",
 				},
 			},
 			args: args{
@@ -881,9 +1033,9 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 		{
 			name: "Check resolve PrincipalFromUser ServiceAccountPrefixes match user prefix, multiple parts, non-empty namespace",
 			fields: fields{
-				athenzDomain: "athenz-|._namespace_||._namespace_|-domain-356",
 				cfg: config.Platform{
-					ServiceAccountPrefixes: []string{"prefix-not-match", "prefix-358"},
+					ServiceAccountPrefixes:     []string{"prefix-not-match", "prefix-358"},
+					AthenzServiceAccountPrefix: "athenz-|._namespace_||._namespace_|-domain-356",
 				},
 			},
 			args: args{
@@ -907,8 +1059,8 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.PrincipalFromUser(tt.args.user); got != tt.want {
 				t.Errorf("resolve.PrincipalFromUser() = %v, want %v", got, tt.want)
@@ -919,8 +1071,8 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 
 func Test_resolve_TrimResource(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	type args struct {
 		res string
@@ -967,8 +1119,8 @@ func Test_resolve_TrimResource(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.TrimResource(tt.args.res); got != tt.want {
 				t.Errorf("resolve.TrimResource() = %v, want %v", got, tt.want)
@@ -979,8 +1131,8 @@ func Test_resolve_TrimResource(t *testing.T) {
 
 func Test_resolve_IsAllowed(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	type args struct {
 		verb      string
@@ -1096,8 +1248,8 @@ func Test_resolve_IsAllowed(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.IsAllowed(tt.args.verb, tt.args.namespace, tt.args.apiGroup, tt.args.resource, tt.args.name); got != tt.want {
 				t.Errorf("resolve.IsAllowed() = %v, want %v", got, tt.want)
@@ -1108,8 +1260,8 @@ func Test_resolve_IsAllowed(t *testing.T) {
 
 func Test_resolve_IsAdminAccess(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	type args struct {
 		verb      string
@@ -1271,8 +1423,8 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.IsAdminAccess(tt.args.verb, tt.args.namespace, tt.args.apiGroup, tt.args.resource, tt.args.name); got != tt.want {
 				t.Errorf("resolve.IsAdminAccess() = %v, want %v", got, tt.want)
@@ -1283,8 +1435,8 @@ func Test_resolve_IsAdminAccess(t *testing.T) {
 
 func Test_resolve_GetAdminDomain(t *testing.T) {
 	type fields struct {
-		cfg          config.Platform
-		athenzDomain string
+		cfg           config.Platform
+		athenzDomains []string
 	}
 	type args struct {
 		namespace string
@@ -1359,8 +1511,8 @@ func Test_resolve_GetAdminDomain(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:          tt.fields.cfg,
-				athenzDomain: tt.fields.athenzDomain,
+				cfg:           tt.fields.cfg,
+				athenzDomains: tt.fields.athenzDomains,
 			}
 			if got := r.GetAdminDomain(tt.args.namespace); got != tt.want {
 				t.Errorf("resolve.GetAdminDomain() = %v, want %v", got, tt.want)
