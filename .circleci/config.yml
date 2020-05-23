@@ -11,7 +11,7 @@ alias:
           GITHUB_API: "https://api.github.com/"
           DOCKER_USER: "kpango"
   setup_remote_docker: &setup_remote_docker
-    version: 19.03.8-ce
+    version: 19.03.8
 
 version: 2
 jobs:
