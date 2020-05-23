@@ -2,7 +2,7 @@ alias:
   default: &default
     working_directory: /go/src/github.com/yahoojapan/garm
     docker:
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.14
         environment:
           GOPATH: "/go"
           GO111MODULE: "on"
@@ -11,7 +11,7 @@ alias:
           GITHUB_API: "https://api.github.com/"
           DOCKER_USER: "kpango"
   setup_remote_docker: &setup_remote_docker
-    version: 18.06.0-ce
+    version: 19.03.8-ce
 
 version: 2
 jobs:
