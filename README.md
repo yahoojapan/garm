@@ -5,13 +5,14 @@
 ---
 
 ## What is Garm
-Garm is API for a Kubernetes authorization webhook that integrates with [Athenz](https://github.com/yahoo/athenz) 
-for access checks. It allows flexible resource mapping from K8s resources to Athenz ones.
 
-You can also use just the authorization hook without also using the authentication hook.
-Use of the authentication hook requires Athenz to be able to sign tokens for users.
+![concept](./doc/assets/concept.png)
 
-Requires go 1.11 or later.
+Garm implements the Kubernetes authorization webhook interface to provide access control on your K8s resources with [Athenz](https://github.com/yahoo/athenz) RBAC policy. It allows flexible resource mapping from K8s resources to Athenz ones, mutli-tenacy, and black/white list.
+
+By default, Garm replies the native Kubernetes authentication for authorization. However, it also supports the Kubernetes authentication webhook. Using the authentication hook requires Athenz to be able to sign tokens for users.
+
+Requires go 1.13 or later.
 
 ## Use case
 ### Authorization
