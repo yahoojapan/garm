@@ -201,7 +201,6 @@ jobs:
               echo $TAG
               git tag $TAG
               git push https://${GITHUB_ACCESS_TOKEN}:x-oauth-basic@github.com/${REPO_NAME}/${IMAGE_NAME} --tags
-              # git push git@github.com:${REPO_NAME}/${IMAGE_NAME} --tags
             fi
       - persist_to_workspace:
           root: .
@@ -248,6 +247,7 @@ workflows:
               only:
                 - master
           requires:
+            - test
             - versioning
       - gh_release:
           requires:
