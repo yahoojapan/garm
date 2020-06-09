@@ -123,8 +123,14 @@ func main() {
 	}
 
 	if p.showVersion {
-		glg.Infof("garm version -> %s", getVersion())
-		glg.Infof("garm config version -> %s", config.GetVersion())
+		err := glg.Infof("garm version -> %s", getVersion())
+		if err != nil {
+			glg.Fatal(err)
+		}
+		err = glg.Infof("garm config version -> %s", config.GetVersion())
+		if err != nil {
+			glg.Fatal(err)
+		}
 		return
 	}
 
