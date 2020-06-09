@@ -18,6 +18,8 @@ jobs:
   test:
     <<: *default
     steps:
+      - attach_workspace:
+          at: .
       - checkout
       - restore_cache:
           key: gosum-{{ .Branch }}-{{ checksum "go.sum" }}
@@ -32,19 +34,30 @@ jobs:
             go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
             go tool cover -html=coverage.out -o coverage.html
             bash <(curl -s https://codecov.io/bash)
-      - run:
-          name: codebeat
-          command: |
-            npm install -g codeclimate-test-reporter
-            CODECLIMATE_API_HOST='https://codebeat.co/webhooks/code_coverage' \
-            CODECLIMATE_REPO_TOKEN='305b2168-bb1d-41ed-b2f0-3bab411537a7' \
-            codeclimate-test-reporter < coverage.out
       - store_artifacts:
           path: ./coverage.html
       - save_cache:
           key: gosum-{{ .Branch }}-{{ checksum "go.sum" }}
           paths:
             - ./vendor
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  coverage:
+    docker:
+      - image: circleci/node:12.18.0
+        environment:
+          CODECLIMATE_API_HOST: "https://codebeat.co/webhooks/code_coverage"
+          CODECLIMATE_REPO_TOKEN: "305b2168-bb1d-41ed-b2f0-3bab411537a7"
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: upload
+          command: |
+            npm install -g codeclimate-test-reporter
+            codeclimate-test-reporter < coverage.out
   build:
     <<: *default
     steps:
@@ -236,6 +249,9 @@ workflows:
   build:
     jobs:
       - test
+      - coverage:
+          requires:
+            - test
       - versioning
       - build:
           requires:
