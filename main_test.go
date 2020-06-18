@@ -24,7 +24,7 @@ func TestParseParams(t *testing.T) {
 				},
 				checkFunc: func(p *params) error {
 					if p.configFilePath != "/etc/garm/config.yaml" {
-						return errors.Errorf("unexpected file path. got: %s, want: /etc/athenz/client/config.yaml", p.configFilePath)
+						return errors.Errorf("unexpected file path. got: %s, want: /etc/garm/config.yaml", p.configFilePath)
 					}
 					if p.showVersion != false {
 						return errors.Errorf("unexpected showVersion flag. got: %v, want : false", p.showVersion)
