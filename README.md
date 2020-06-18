@@ -6,7 +6,7 @@
 
 ## What is Garm
 
-![concept](./doc/assets/concept.png)
+![concept](./docs/assets/concept.png)
 
 Garm implements the Kubernetes authorization webhook interface to provide access control on your K8s resources with [Athenz](https://github.com/yahoo/athenz) RBAC policy. It allows flexible resource mapping from K8s resources to Athenz ones, mutli-tenacy, and black/white list.
 
@@ -16,7 +16,7 @@ Requires go 1.14 or later.
 
 ## Use case
 ### Authorization
-![Use case](./doc/assets/use-case.png)
+![Use case](./docs/assets/use-case.png)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fyahoojapan%2Fgarm.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fyahoojapan%2Fgarm?ref=badge_shield)
 
  1. K8s webhook request (SubjectAccessReview) ([Webhook Mode - Kubernetes](https://kubernetes.io/docs/reference/access-authn-authz/webhook/))
@@ -26,8 +26,8 @@ Requires go 1.14 or later.
     - ask Athenz server is the user action is allowed based on pre-configurated policy
 
 Garm convert the K8s request to Athenz request based on the mapping rules in `config.yaml` ([example](./config/testdata/example_config.yaml)).
-  - [Conversion logic](./doc/garm-functional-overview.md)
-  - [Config details](./doc/config-detail.md)
+  - [Conversion logic](./docs/garm-functional-overview.md)
+  - [Config details](./docs/config-detail.md)
 
 P.S. It is just a sample deployment solution above. Garm can work on any environment as long as it can access both the API server and the Athenz server.
 
@@ -37,9 +37,9 @@ $ docker pull yahoojapan/garm
 ```
 
 ### Usage
-  - [install Garm](https://github.com/yahoojapan/garm/blob/master/doc/installation/02.%20install-garm.md)
-  - [configure k8s webhook](https://github.com/yahoojapan/garm/blob/master/doc/installation/03.%20config-k8s-in-webhook-mode.md)
-  - [configure Athenz & Garm yaml](./doc/config-detail.md)
+  - [install Garm](https://github.com/yahoojapan/garm/blob/master/docs/installation/02.%20install-garm.md)
+  - [configure k8s webhook](https://github.com/yahoojapan/garm/blob/master/docs/installation/03.%20config-k8s-in-webhook-mode.md)
+  - [configure Athenz & Garm yaml](./docs/config-detail.md)
 
 ## CI/CD
   - [CircleCI](https://circleci.com/gh/yahoojapan/garm)
