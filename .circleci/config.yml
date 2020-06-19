@@ -2,7 +2,7 @@ alias:
   default: &default
     working_directory: /go/src/github.com/yahoojapan/garm
     docker:
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.14
         environment:
           GOPATH: "/go"
           GO111MODULE: "on"
@@ -11,7 +11,7 @@ alias:
           GITHUB_API: "https://api.github.com/"
           DOCKER_USER: "kpango"
   setup_remote_docker: &setup_remote_docker
-    version: 18.06.0-ce
+    version: 19.03.8
 
 version: 2
 jobs:
@@ -28,6 +28,7 @@ jobs:
       - run:
           name: run tests
           command: |
+            rm -rf example
             go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
             go tool cover -html=coverage.out -o coverage.html
             bash <(curl -s https://codecov.io/bash)
@@ -41,6 +42,8 @@ jobs:
     <<: *default
     steps:
       - setup_remote_docker: *setup_remote_docker
+      - attach_workspace:
+          at: .
       - checkout
       - run:
           name: check docker version
@@ -49,8 +52,22 @@ jobs:
       - run:
           name: docker image build
           command: |
-            # env DOCKER_BUILDKIT=1 docker build -t ${REPO_NAME}/${IMAGE_NAME}:latest .
-            docker build -t ${REPO_NAME}/${IMAGE_NAME}:latest .
+            if [ ! -z "$CIRCLE_TAG" ]; then
+              echo '$CIRCLE_TAG exists, use: '"$CIRCLE_TAG"
+              TAG="$CIRCLE_TAG"
+            elif [ -f ./.tag ]; then
+              TAG=`cat ./.tag`
+            fi
+            if [ ! -z "$TAG" ]; then
+              docker build --build-arg APP_VERSION=${TAG} -t ${REPO_NAME}/${IMAGE_NAME}:latest .
+            else
+              # env DOCKER_BUILDKIT=1 docker build -t ${REPO_NAME}/${IMAGE_NAME}:latest .
+              docker build -t ${REPO_NAME}/${IMAGE_NAME}:latest .
+            fi
+      - run:
+          name: check build version
+          command: |
+            docker run --rm --name ${IMAGE_NAME} ${REPO_NAME}/${IMAGE_NAME}:latest --version
       - run:
           name: save image
           command: |
@@ -78,9 +95,9 @@ jobs:
           command: |
             docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
       - run:
-          name: push image to registory
+          name: push image to registry
           command: |
-            docker push ${REPO_NAME}/${IMAGE_NAME}
+            docker push ${REPO_NAME}/${IMAGE_NAME}:nightly
   publish:
     <<: *default
     steps:
@@ -100,7 +117,7 @@ jobs:
           command: |
             docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
       - run:
-          name: push image to registory
+          name: push image to registry
           command: |
             docker push ${REPO_NAME}/${IMAGE_NAME}
   versioning:
@@ -110,26 +127,62 @@ jobs:
       - run:
           name: check
           command: |
-            mkdir -p $HOME/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
-            LAST_COMMIT=`git log -1 --pretty=%B`
-            VERSION=`git describe --abbrev=0 --tags`
+            mkdir -p "$HOME/.ssh/" && echo -e 'Host github.com\n\tStrictHostKeyChecking no\n' > ~/.ssh/config
+            LAST_COMMIT="$(git log -1 --pretty=%B)"
+            if [ -n "$CIRCLE_PULL_REQUEST" ]; then
+              # If PR, use PR title instead of last commit msg
+              PR_NUM="${CIRCLE_PULL_REQUEST##*/}"
+              LAST_COMMIT="$(curl -s "${GITHUB_API}repos/${REPO_NAME}/${IMAGE_NAME}/pulls/${PR_NUM}" | jq -r .title)"
+            fi
+            printf 'LAST_COMMIT: %s\n' "${LAST_COMMIT}"
             touch ./.tag
-            if [ ! -z "`git diff $VERSION`" -o -z "$VERSION" ]; then
-              VERSION=${VERSION:-'0.0.0'}
-              MAJOR="${VERSION%%.*}"; VERSION="${VERSION#*.}"
+            VERSION="$(git describe --abbrev=0 --tags)"
+            # Diff to prevent pipeline re-runs.
+            if [ -n "$(git diff "$VERSION")" ]; then
+              VERSION=${VERSION:-'v0.0.0'}
+              MAJOR="${VERSION%%.*}"; MAJOR="${MAJOR#v}"; VERSION="${VERSION#*.}"
               MINOR="${VERSION%%.*}"; VERSION="${VERSION#*.}"
               PATCH="${VERSION%%.*}"; VERSION="${VERSION#*.}"
-              if echo $LAST_COMMIT | grep "\[\(major\|MAJOR\)\]" > /dev/null; then
-                MAJOR=$((MAJOR+1))
-                echo "$MAJOR.0.0" > ./.tag
-              elif echo $LAST_COMMIT | grep "\[\(minor\|MINOR\)\]" > /dev/null; then
-                MINOR=$((MINOR+1))
-                echo "$MAJOR.$MINOR.0" > ./.tag
-              elif echo $LAST_COMMIT | grep "\[\(patch\|PATCH\)\]" > /dev/null; then
+
+              case "$LAST_COMMIT" in
+              '[patch]'* | '[PATCH]'*)
                 PATCH=$((PATCH+1))
-                echo "$MAJOR.$MINOR.$PATCH" > ./.tag
+                echo "v$MAJOR.$MINOR.$PATCH" > ./.tag
+                ;;
+              '[minor]'* | '[MINOR]'*)
+                MINOR=$((MINOR+1))
+                echo "v$MAJOR.$MINOR.0" > ./.tag
+                ;;
+              '[major]'* | '[MAJOR]'*)
+                MAJOR=$((MAJOR+1))
+                echo "v$MAJOR.0.0" > ./.tag
+                ;;
+              # Don't release (nightly images only)
+              '[skip]'* | '[SKIP]'*)
+                echo "Skip release..."
+                ;;
+              # Don't want to run CI.
+              '[skip ci]'* | '[ci skip]'*)
+                echo "Will skip CI..."
+                ;;
+              *)
+                echo "Required prefixes: [major]/[minor]/[patch]/[skip]/[skip ci]"
+                exit 1
+                ;;
+              esac
+            else
+              if [ -n "$VERSION" ]; then
+                echo "No diff, skip tagging..."
+              else
+                echo "No diff, No tag. Tag it as \"v0.0.0\"."
+                echo "v0.0.0" > ./.tag
               fi
             fi
+      - run:
+          name: echo version
+          command: |
+            TAG_FILE='./.tag' \
+            && if [[ -s ${TAG_FILE} ]]; then echo "TAG: `cat "${TAG_FILE}"`"; else echo "TAG: (${TAG_FILE} is empty)"; fi
       - persist_to_workspace:
           root: .
           paths:
@@ -176,7 +229,10 @@ workflows:
   build:
     jobs:
       - test
-      - build
+      - versioning
+      - build:
+          requires:
+            - versioning
       - publish_nightly:
           requires:
             - test
@@ -185,13 +241,13 @@ workflows:
             branches:
               only:
                 - master
-      - versioning:
+      - push:
           filters:
             branches:
               only:
                 - master
-      - push:
           requires:
+            - test
             - versioning
       - gh_release:
           requires:
@@ -203,7 +259,7 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/
       - publish:
           requires:
             - build
@@ -211,4 +267,4 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /[0-9]+\.[0-9]+\.[0-9]+/
+              only: /v[0-9]+\.[0-9]+\.[0-9]+/

@@ -1,13 +1,14 @@
 module github.com/yahoojapan/garm
 
-go 1.13
+go 1.14
+
+replace k8s.io/client-go => k8s.io/client-go v0.18.3
 
 require (
-	github.com/kpango/glg v1.4.6
-	github.com/kr/pretty v0.1.0 // indirect
-	github.com/pkg/errors v0.8.1
-	github.com/yahoo/athenz v1.8.33
-	github.com/yahoo/k8s-athenz-webhook v0.0.0-20190725182459-949d9ed74720
-	gopkg.in/yaml.v2 v2.2.4
-	k8s.io/api v0.0.0-20190222213804-5cb15d344471
+	github.com/kpango/glg v1.5.1
+	github.com/pkg/errors v0.9.1
+	github.com/yahoo/athenz v1.9.6
+	github.com/yahoo/k8s-athenz-webhook v0.1.0
+	gopkg.in/yaml.v2 v2.3.0
+	k8s.io/api v0.18.3
 )

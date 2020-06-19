@@ -31,6 +31,9 @@ import (
 	"github.com/yahoojapan/garm/usecase"
 )
 
+// Version is set by the build command via LDFLAGS
+var Version string
+
 // params is the data model for Garm command line arguments.
 type params struct {
 	configFilePath string
@@ -120,7 +123,11 @@ func main() {
 	}
 
 	if p.showVersion {
-		err = glg.Infof("garm version -> %s", config.GetVersion())
+		err := glg.Infof("garm version -> %s", getVersion())
+		if err != nil {
+			glg.Fatal(err)
+		}
+		err = glg.Infof("garm config version -> %s", config.GetVersion())
 		if err != nil {
 			glg.Fatal(err)
 		}
@@ -148,4 +155,11 @@ func main() {
 		glg.Fatal(emsg)
 		return
 	}
+}
+
+func getVersion() string {
+	if Version == "" {
+		return "development version"
+	}
+	return Version
 }
