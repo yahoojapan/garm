@@ -26,8 +26,8 @@ import (
 	"strings"
 	"testing"
 
+	webhook "github.com/falz-tino/k8s-athenz-webhook"
 	"github.com/kpango/glg"
-	webhook "github.com/yahoo/k8s-athenz-webhook"
 	"github.com/yahoojapan/garm/config"
 	"github.com/yahoojapan/garm/log"
 )

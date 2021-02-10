@@ -21,8 +21,8 @@ import (
 	"net/http"
 	"time"
 
+	webhook "github.com/falz-tino/k8s-athenz-webhook"
 	"github.com/pkg/errors"
-	webhook "github.com/yahoo/k8s-athenz-webhook"
 	"github.com/yahoojapan/garm/config"
 )
 
