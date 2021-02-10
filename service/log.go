@@ -21,8 +21,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/falz-tino/k8s-athenz-webhook"
 	"github.com/kpango/glg"
-	"github.com/yahoo/k8s-athenz-webhook"
 	"github.com/yahoojapan/garm/config"
 	"github.com/yahoojapan/garm/log"
 )

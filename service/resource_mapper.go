@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 
-	webhook "github.com/yahoo/k8s-athenz-webhook"
+	webhook "github.com/falz-tino/k8s-athenz-webhook"
 	authz "k8s.io/api/authorization/v1beta1"
 )
 

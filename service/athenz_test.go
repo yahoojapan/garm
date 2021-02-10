@@ -28,7 +28,7 @@ import (
 	"testing"
 	"time"
 
-	webhook "github.com/yahoo/k8s-athenz-webhook"
+	webhook "github.com/falz-tino/k8s-athenz-webhook"
 	"github.com/yahoojapan/garm/config"
 
 	authn "k8s.io/api/authentication/v1beta1"
