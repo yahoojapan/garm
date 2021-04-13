@@ -234,22 +234,49 @@ func (r *resolve) GetNonResourceNamespace() string {
 	return r.cfg.NonResourceNamespace
 }
 
-// PrincipalFromUser returns AthenzUserPrefix + user if cfg.ServiceAccountPrefixes is empty or user not contains any cfg.ServiceAccountPrefixes;
-// else returns user by removing the prefix and trim ":", if any cfg.ServiceAccountPrefixes is a prefix of user;
-// else if user has ":" inside, split with ":", treat 1st part as namespace, replace athenzDomain with namespace, use replaced athenz domain as user prefix, join all with ".";
-func (r *resolve) PrincipalFromUser(user string) string {
-	for _, prefix := range r.cfg.ServiceAccountPrefixes {
-		if strings.HasPrefix(user, prefix) {
-			parts := strings.Split(strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":"), ":")
-			if len(parts) >= 2 {
-				return strings.TrimPrefix(strings.TrimSuffix(strings.Join(
-					append(r.BuildServiceAccountPrefixFromNamespace(parts[0]), parts[1:]...), "."), ":"), ":")
+// PrincipalFromUser maps K8s user to Athenz principal.
+// 1. service account: if has ServiceAccountPrefixes, remove prefix, map to AthenzServiceAccountPrefix
+// 1.1. if contains namespace, create domain by namespace and AthenzServiceAccountPrefix
+// 1.2. if no namespaces, prepend AthenzServiceAccountPrefix
+// 2. athenz user: if has AthenzUserPrefix, OR not contains ".", map to AthenzUserPrefix
+// 3. certificate: if not service account and athenz user, no mapping
+func (r *resolve) PrincipalFromUser(user string, groups []string) string {
+
+	// functions
+	hasSaGroup := func(groups []string) bool {
+		for _, g := range groups {
+			if g == "system:serviceaccounts" {
+				return true
 			}
-			return r.cfg.AthenzServiceAccountPrefix + strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":")
 		}
+		return false
+	}
+	hasSaPrefix := func(user string) string {
+		for _, prefix := range r.cfg.ServiceAccountPrefixes {
+			if strings.HasPrefix(user, prefix) {
+				return prefix
+			}
+		}
+		return ""
 	}
 
-	return r.cfg.AthenzUserPrefix + user
+	// cases
+	if prefix := hasSaPrefix(user); prefix != "" && hasSaGroup(groups) {
+		parts := strings.Split(strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":"), ":")
+		if len(parts) >= 2 {
+			return strings.TrimPrefix(strings.TrimSuffix(strings.Join(
+				append(r.BuildServiceAccountPrefixFromNamespace(parts[0]), parts[1:]...), "."), ":"), ":")
+		}
+		return r.cfg.AthenzServiceAccountPrefix + strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":")
+	}
+
+	// TODO:
+	if user == "user" {
+		return r.cfg.AthenzUserPrefix + user
+	}
+
+	// certificate, no mapping
+	return user
 }
 
 // TrimResource processes res by
