@@ -1008,6 +1008,20 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 			want: "user-323",
 		},
 		{
+			name: "Check resolve PrincipalFromUser ServiceAccountPrefixes match user prefix, single part, no groups",
+			fields: fields{
+				cfg: config.Platform{
+					ServiceAccountPrefixes: []string{"prefix-319:"},
+				},
+			},
+			args: args{
+				user:   "prefix-319:user-323",
+				groups: []string{},
+			},
+			want: "prefix-319:user-323",
+		},
+
+		{
 			name: "Check resolve PrincipalFromUser ServiceAccountPrefixes match user prefix, single part, need trim",
 			fields: fields{
 				cfg: config.Platform{
@@ -1074,6 +1088,19 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 				groups: []string{"system:serviceaccounts"},
 			},
 			want: "user-prefix.:user-373:",
+		},
+		{
+			name: "Check resolve PrincipalFromUser with a request without service account and athenz user",
+			fields: fields{
+				cfg: config.Platform{
+					ServiceAccountPrefixes: []string{"prefix-not-match", ""},
+					AthenzUserPrefix:       "user-prefix.",
+				},
+			},
+			args: args{
+				user: "domain.service",
+			},
+			want: "domain.service",
 		},
 	}
 	for _, tt := range tests {
