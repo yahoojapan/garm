@@ -959,7 +959,8 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 		athenzDomains []string
 	}
 	type args struct {
-		user string
+		user   string
+		groups []string
 	}
 	tests := []struct {
 		name   string
@@ -1001,7 +1002,8 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 				},
 			},
 			args: args{
-				user: "prefix-319:user-323",
+				user:   "prefix-319:user-323",
+				groups: []string{"system:serviceaccounts"},
 			},
 			want: "user-323",
 		},
@@ -1013,7 +1015,8 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 				},
 			},
 			args: args{
-				user: "prefix-331:user-335:",
+				user:   "prefix-331:user-335:",
+				groups: []string{"system:serviceaccounts"},
 			},
 			want: "user-335",
 		},
@@ -1026,7 +1029,8 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 				},
 			},
 			args: args{
-				user: "prefix-344::part-1:user-349:",
+				user:   "prefix-344::part-1:user-349:",
+				groups: []string{"system:serviceaccounts"},
 			},
 			want: "athenz-||||-domain-342.part-1.user-349",
 		},
@@ -1039,7 +1043,8 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 				},
 			},
 			args: args{
-				user: "prefix-358:ns-361:part-1:user-361:",
+				user:   "prefix-358:ns-361:part-1:user-361:",
+				groups: []string{"system:serviceaccounts"},
 			},
 			want: "athenz-|.ns-361||.ns-361|-domain-356.part-1.user-361",
 		},
@@ -1051,9 +1056,24 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 				},
 			},
 			args: args{
-				user: ":user-373:",
+				user:   ":user-373:",
+				groups: []string{"system:serviceaccounts"},
 			},
-			want: "user-373",
+			want: ":user-373:",
+		},
+		{
+			name: "Check resolve PrincipalFromUser ServiceAccountPrefixes with UserPrefix and empty ServiceAccountPrefixes",
+			fields: fields{
+				cfg: config.Platform{
+					ServiceAccountPrefixes: []string{"prefix-not-match", ""},
+					AthenzUserPrefix:       "user-prefix.",
+				},
+			},
+			args: args{
+				user:   ":user-373:",
+				groups: []string{"system:serviceaccounts"},
+			},
+			want: "user-prefix.:user-373:",
 		},
 	}
 	for _, tt := range tests {
@@ -1062,7 +1082,7 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 				cfg:           tt.fields.cfg,
 				athenzDomains: tt.fields.athenzDomains,
 			}
-			if got := r.PrincipalFromUser(tt.args.user); got != tt.want {
+			if got := r.PrincipalFromUser(tt.args.user, tt.args.groups); got != tt.want {
 				t.Errorf("resolve.PrincipalFromUser() = %v, want %v", got, tt.want)
 			}
 		})
