@@ -89,7 +89,7 @@ func (m *resourceMapper) MapResource(ctx context.Context, spec authz.SubjectAcce
 	group = m.res.MapAPIGroup(group)
 	name = m.res.MapResourceName(name)
 
-	identity := m.res.PrincipalFromUser(spec.User)
+	identity := m.res.PrincipalFromUser(spec.User, spec.Groups)
 
 	switch {
 	case !m.res.IsAllowed(verb, namespace, group, resource, name): // Not Allowed

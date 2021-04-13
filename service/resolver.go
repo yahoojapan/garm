@@ -31,7 +31,7 @@ type Resolver interface {
 	// BuildDomainsFromNamespace creates Athenz domains with namespace.
 	BuildDomainsFromNamespace(string) []string
 	// PrincipalFromUser creates principal name from user.
-	PrincipalFromUser(string) string
+	PrincipalFromUser(user string, groups []string) string
 	// GetAdminDomain creates Athenz admin domain with namespace.
 	GetAdminDomain(string) string
 	// MapAPIGroup maps K8s API group to API group in Athenz resource.
@@ -251,7 +251,7 @@ func (r *resolve) PrincipalFromUser(user string, groups []string) string {
 		}
 		return false
 	}
-	hasSaPrefix := func(user string) string {
+	getSaPrefix := func(user string) string {
 		for _, prefix := range r.cfg.ServiceAccountPrefixes {
 			if strings.HasPrefix(user, prefix) {
 				return prefix
@@ -260,8 +260,8 @@ func (r *resolve) PrincipalFromUser(user string, groups []string) string {
 		return ""
 	}
 
-	// cases
-	if prefix := hasSaPrefix(user); prefix != "" && hasSaGroup(groups) {
+	// service account
+	if prefix := getSaPrefix(user); prefix != "" && hasSaGroup(groups) {
 		parts := strings.Split(strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":"), ":")
 		if len(parts) >= 2 {
 			return strings.TrimPrefix(strings.TrimSuffix(strings.Join(
@@ -270,12 +270,12 @@ func (r *resolve) PrincipalFromUser(user string, groups []string) string {
 		return r.cfg.AthenzServiceAccountPrefix + strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":")
 	}
 
-	// TODO:
-	if user == "user" {
+	// athenz user
+	if !strings.Contains(user, ".") {
 		return r.cfg.AthenzUserPrefix + user
 	}
 
-	// certificate, no mapping
+	// no mapping
 	return user
 }
 
