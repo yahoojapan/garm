@@ -91,6 +91,29 @@ func TestNewResolver(t *testing.T) {
 				resolve{},
 			},
 		},
+		{
+			name: "Check NewResolver, ",
+			args: args{
+				cfg: config.Mapping{
+					TLD: config.TLD{
+						Platform: config.Platform{
+							ServiceAthenzDomains: []string{
+								"test-domain1",
+								"test-domain2",
+							},
+							AthenzServiceAccountPrefix: "test-prefix1.",
+						},
+					},
+				},
+			},
+			want: &resolve{
+				athenzDomains: []string{
+					"test-domain1",
+					"test-domain2",
+				},
+				athenzSAPrefix: "test-prefix1.",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -259,12 +282,17 @@ func Test_resolve_MapK8sResourceAthenzResource(t *testing.T) {
 
 func Test_resolve_createAthenzDomains(t *testing.T) {
 	type fields struct {
-		cfg           config.Platform
+		cfg            config.Platform
+		athenzDomains  []string
+		athenzSAPrefix string
+	}
+	type args struct {
 		athenzDomains []string
 	}
 	type testcase struct {
 		name       string
 		fields     fields
+		args       args
 		want       []string
 		beforeFunc func() error
 		afterFunc  func() error
@@ -272,35 +300,49 @@ func Test_resolve_createAthenzDomains(t *testing.T) {
 	tests := []testcase{
 		{
 			name: "Check resolve createAthenzDomains, empty serviceAthenzDomains",
-			fields: fields{
-				cfg: config.Platform{
-					ServiceAthenzDomains: []string{""},
-				},
+			args: args{
+				athenzDomains: []string{},
+			},
+			want: []string{},
+		},
+		{
+			name: "Check resolve createAthenzDomains, serviceAthenzDomains with empty string",
+			args: args{
+				athenzDomains: []string{""},
 			},
 			want: []string{""},
 		},
 		{
 			name: "Check resolve createAthenzDomains, serviceAthenzDomains no split, no replace",
-			fields: fields{
-				cfg: config.Platform{
-					ServiceAthenzDomains: []string{"service-athenz-domain-192"},
-				},
+			args: args{
+				athenzDomains: []string{"service-athenz-domain-192"},
 			},
 			want: []string{"service-athenz-domain-192"},
 		},
 		{
 			name: "Check resolve createAthenzDomains, multi serviceAthenzDomains",
-			fields: fields{
-				cfg: config.Platform{
-					ServiceAthenzDomains: []string{
-						"service-athenz-domain-296",
-						"service-athenz-domain-297._namespace_",
-					},
+			args: args{
+				athenzDomains: []string{
+					"service-athenz-domain-296",
+					"service-athenz-domain-297._namespace_",
 				},
 			},
 			want: []string{
 				"service-athenz-domain-296",
 				"service-athenz-domain-297._namespace_",
+			},
+		},
+		{
+			name: "Check resolve createAthenzDomains, multi serviceAthenzDomains end with dot",
+			args: args{
+				athenzDomains: []string{
+					"athenz-sa-prefix-296.",
+					"athenz-sa-prefix-297._namespace_.",
+				},
+			},
+			want: []string{
+				"athenz-sa-prefix-296.",
+				"athenz-sa-prefix-297._namespace_.",
 			},
 		},
 		func() testcase {
@@ -312,10 +354,8 @@ func Test_resolve_createAthenzDomains(t *testing.T) {
 
 			return testcase{
 				name: "Check resolve createAthenzDomains, serviceAthenzDomains, multiple replace, skip _namespace_",
-				fields: fields{
-					cfg: config.Platform{
-						ServiceAthenzDomains: serviceAthenzDomains,
-					},
+				args: args{
+					athenzDomains: serviceAthenzDomains,
 				},
 				beforeFunc: func() error {
 					for k, v := range env {
@@ -347,10 +387,8 @@ func Test_resolve_createAthenzDomains(t *testing.T) {
 
 			return testcase{
 				name: "Check resolve createAthenzDomains, serviceAthenzDomains, single replace",
-				fields: fields{
-					cfg: config.Platform{
-						ServiceAthenzDomains: serviceAthenzDomains,
-					},
+				args: args{
+					athenzDomains: serviceAthenzDomains,
 				},
 				beforeFunc: func() error {
 					for k, v := range env {
@@ -383,10 +421,8 @@ func Test_resolve_createAthenzDomains(t *testing.T) {
 
 			return testcase{
 				name: "Check resolve createAthenzDomains, serviceAthenzDomains, split but no replace",
-				fields: fields{
-					cfg: config.Platform{
-						ServiceAthenzDomains: serviceAthenzDomains,
-					},
+				args: args{
+					athenzDomains: serviceAthenzDomains,
 				},
 				beforeFunc: func() error {
 					for k, v := range env {
@@ -433,7 +469,7 @@ func Test_resolve_createAthenzDomains(t *testing.T) {
 				cfg:           tt.fields.cfg,
 				athenzDomains: tt.fields.athenzDomains,
 			}
-			if got := r.createAthenzDomains(); !reflect.DeepEqual(got, tt.want) {
+			if got := r.createAthenzDomains(tt.args.athenzDomains); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("resolve.createAthenzDomains() = %v, want %v", got, tt.want)
 				return
 			}
