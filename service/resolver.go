@@ -59,6 +59,8 @@ type resolve struct {
 	cfg config.Platform
 	// athenzDomains specifies the Athenz domains for request to Athenz.
 	athenzDomains []string
+	// athenzSAPrefix specifies the Athenz domain for service account.
+	athenzSAPrefix string
 }
 
 // K8SResolve implementation for K8S platform.
@@ -82,11 +84,13 @@ type EKSResolve struct {
 // aks => AKSResolve
 // eks => EKSResolve
 func NewResolver(cfg config.Mapping) Resolver {
+	pfConfig := cfg.TLD.Platform
 	res := resolve{
-		cfg: cfg.TLD.Platform,
+		cfg: pfConfig,
 	}
 
-	res.athenzDomains = res.createAthenzDomains()
+	res.athenzDomains = res.createAthenzDomains(pfConfig.ServiceAthenzDomains)
+	res.athenzSAPrefix = res.createAthenzDomains([]string{pfConfig.AthenzServiceAccountPrefix})[0]
 
 	switch res.cfg.Name {
 	case "k8s":
@@ -119,20 +123,20 @@ func (r *resolve) MapK8sResourceAthenzResource(k8sRes string) string {
 	return athenzRes
 }
 
-// createAthenzDomains use cfg.ServiceAthenzDomains;
-// do the following for each cfg.ServiceAthenzDomains
+// createAthenzDomains use athenzDomains;
+// do the following for each athenzDomains
 // split it with ".";
 // for each token, if it match /^_.*_$/ but not "_namespace_", replace the token with config.GetActualValue(token);
 // and then return the processed value
-func (r *resolve) createAthenzDomains() []string {
-	domains := make([]string, 0, len(r.cfg.ServiceAthenzDomains))
-	if len(r.cfg.ServiceAthenzDomains) == 0 {
-		return domains
+func (r *resolve) createAthenzDomains(athenzDomains []string) []string {
+	if len(athenzDomains) == 0 {
+		return athenzDomains
 	}
+	domains := make([]string, 0, len(athenzDomains))
 	// reps stores information for replacement.
-	// cap uses the average length of  r.cfg.ServiceAthenzDomains separated by dots
-	reps := make([]string, 0, (strings.Count(strings.Join(r.cfg.ServiceAthenzDomains, "-"), ".")/len(r.cfg.ServiceAthenzDomains))+1)
-	for _, domain := range r.cfg.ServiceAthenzDomains {
+	// cap uses the average length of athenzDomains separated by dots
+	reps := make([]string, 0, (strings.Count(strings.Join(athenzDomains, "-"), ".")/len(athenzDomains))+1)
+	for _, domain := range athenzDomains {
 		reps = reps[:0]
 		for _, v := range strings.Split(domain, ".") {
 			if v != "_namespace_" && strings.HasPrefix(v, "_") && strings.HasSuffix(v, "_") {
@@ -158,7 +162,7 @@ func (r *resolve) BuildDomainsFromNamespace(namespace string) []string {
 // else replace "._namespace_" in AthenzServiceAccountPrefix with namespace;
 // trim ".", then "-", then ":"
 func (r *resolve) BuildServiceAccountPrefixFromNamespace(namespace string) []string {
-	return r.buildAthenzDomain([]string{r.cfg.AthenzServiceAccountPrefix}, namespace)
+	return r.buildAthenzDomain([]string{r.athenzSAPrefix}, namespace)
 }
 
 // buildAthenzDomain returns builtDomains by processing domains.
