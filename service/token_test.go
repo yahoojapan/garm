@@ -52,7 +52,7 @@ func TestNewTokenService(t *testing.T) {
 					RefreshDuration: "test",
 				},
 			},
-			wantErr: fmt.Errorf("invalid token refresh duration %s: %v", "test", "time: invalid duration test"),
+			wantErr: fmt.Errorf("invalid token refresh duration %s: %v", "test", `time: invalid duration "test"`),
 		},
 		{
 			name: "Test error invalid expiration",
@@ -62,7 +62,7 @@ func TestNewTokenService(t *testing.T) {
 					Expiration:      "test",
 				},
 			},
-			wantErr: fmt.Errorf("invalid token expiration %s: %v", "test", "time: invalid duration test"),
+			wantErr: fmt.Errorf("invalid token expiration %s: %v", "test", `time: invalid duration "test"`),
 		},
 		func() test {
 			keyEnvName := "dummyKey"

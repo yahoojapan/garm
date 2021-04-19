@@ -39,7 +39,7 @@ Garm implements the Kubernetes authorization webhook interface to provide access
 
 By default, Garm replies the native Kubernetes authentication for authorization. However, it also supports the Kubernetes authentication webhook. Using the authentication hook requires Athenz to be able to sign tokens for users.
 
-Requires go 1.14 or later.
+Requires go 1.16 or later.
 
 ## Use Case
 
