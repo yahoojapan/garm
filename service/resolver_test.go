@@ -1060,8 +1060,7 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 			fields: fields{
 				athenzSAPrefix: "athenz-|._namespace_||._namespace_|-domain-342",
 				cfg: config.Platform{
-					ServiceAccountPrefixes:     []string{"prefix-not-match", "prefix-344"},
-					AthenzServiceAccountPrefix: "athenz-|._namespace_||._namespace_|-domain-342",
+					ServiceAccountPrefixes: []string{"prefix-not-match", "prefix-344"},
 				},
 			},
 			args: args{
@@ -1073,9 +1072,9 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 		{
 			name: "Check resolve PrincipalFromUser ServiceAccountPrefixes match user prefix, multiple parts, non-empty namespace",
 			fields: fields{
+				athenzSAPrefix: "athenz-|._namespace_||._namespace_|-domain-356",
 				cfg: config.Platform{
-					ServiceAccountPrefixes:     []string{"prefix-not-match", "prefix-358"},
-					AthenzServiceAccountPrefix: "athenz-|._namespace_||._namespace_|-domain-356",
+					ServiceAccountPrefixes: []string{"prefix-not-match", "prefix-358"},
 				},
 			},
 			args: args{
@@ -1128,8 +1127,9 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &resolve{
-				cfg:           tt.fields.cfg,
-				athenzDomains: tt.fields.athenzDomains,
+				cfg:            tt.fields.cfg,
+				athenzDomains:  tt.fields.athenzDomains,
+				athenzSAPrefix: tt.fields.athenzSAPrefix,
 			}
 			if got := r.PrincipalFromUser(tt.args.user, tt.args.groups); got != tt.want {
 				t.Errorf("resolve.PrincipalFromUser() = %v, want %v", got, tt.want)
