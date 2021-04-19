@@ -347,6 +347,46 @@ func Test_resolve_createAthenzDomains(t *testing.T) {
 		},
 		func() testcase {
 			env := map[string]string{
+				"env-350": "evalue-350",
+				"env-351": "evalue-351",
+				"env-352": "evalue-352",
+			}
+			serviceAthenzDomains := []string{
+				"_env-350_",
+				"_namespace_._env-351_._env-352_",
+			}
+
+			return testcase{
+				name: "Check resolve createAthenzDomains, multi serviceAthenzDomains, multiple replace, skip _namespace_",
+				args: args{
+					athenzDomains: serviceAthenzDomains,
+				},
+				beforeFunc: func() error {
+					for k, v := range env {
+						err := os.Setenv(k, v)
+						if err != nil {
+							return err
+						}
+					}
+					return nil
+				},
+				afterFunc: func() error {
+					for k := range env {
+						err := os.Unsetenv(k)
+						if err != nil {
+							return err
+						}
+					}
+					return nil
+				},
+				want: []string{
+					"evalue-350",
+					"_namespace_.evalue-351.evalue-352",
+				},
+			}
+		}(),
+		func() testcase {
+			env := map[string]string{
 				"env-199": "evalue-199",
 				"env-200": "evalue-200",
 			}
