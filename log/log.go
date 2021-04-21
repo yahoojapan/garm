@@ -19,8 +19,8 @@ package log
 import (
 	"io"
 
-	webhook "github.com/falz-tino/k8s-athenz-webhook"
 	"github.com/kpango/glg"
+	webhook "github.com/yahoo/k8s-athenz-webhook"
 )
 
 // Logger represents a logger interface for logging.

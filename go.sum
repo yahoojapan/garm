@@ -35,8 +35,6 @@ github.com/evanphx/json-patch v0.0.0-20190203023257-5858425f7550/go.mod h1:50XU6
 github.com/evanphx/json-patch v4.2.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
 github.com/evanphx/json-patch v4.5.0+incompatible h1:ouOWdg56aJriqS0huScTkVXPC5IcNrDCXZ6OoTAWu7M=
 github.com/evanphx/json-patch v4.5.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
-github.com/falz-tino/k8s-athenz-webhook v0.1.1-0.20210210051049-e59f25e8bd97 h1:UitB1+WP+pK+nQfyAeEBZJulObcO96Xhxm/KThBluSA=
-github.com/falz-tino/k8s-athenz-webhook v0.1.1-0.20210210051049-e59f25e8bd97/go.mod h1:cBDQ621b4xfXQZi6QdjtOHd7czBAdt3QjTTDIQ125gE=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
@@ -169,6 +167,8 @@ github.com/yahoo/athenz v1.9.6 h1:fIXRYHLsDWxWtamAaLZ08WNILwcX6HW6GQGqLGQFXi4=
 github.com/yahoo/athenz v1.9.6/go.mod h1:LyE/c1Pe3bEsMB/ZavwGOH+D3MIS6GS7fLtdEbzJfaI=
 github.com/yahoo/k8s-athenz-syncer v0.1.1 h1:bxRnqLo+V8uRDBV+LhDHg6Uh/mV6hCwVIEWXMlHgRVw=
 github.com/yahoo/k8s-athenz-syncer v0.1.1/go.mod h1:xDdcoyjhnBXRDk33JhTZnbjF2630w+MIDG+/BouNL24=
+github.com/yahoo/k8s-athenz-webhook v0.1.0 h1:3kGjY9Tl2qQ7XcRMXJn1n9BQb086oeHRp85DhN4iVeI=
+github.com/yahoo/k8s-athenz-webhook v0.1.0/go.mod h1:T+UkdXjsZS5r6HoVipzFMzDEwi65lyNR1wWNKMxF8o4=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.uber.org/atomic v1.5.0 h1:OI5t8sDa1Or+q8AeE+yKeB/SDYioSHAgcVljj9JIETY=
 go.uber.org/atomic v1.5.0/go.mod h1:sABNBOSYdrvTF6hTgEIbc7YasKWGhgEQZyfxyTvoXHQ=

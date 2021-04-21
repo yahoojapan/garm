@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	webhook "github.com/falz-tino/k8s-athenz-webhook"
+	webhook "github.com/yahoo/k8s-athenz-webhook"
 )
 
 func Test_requestInfo_Serialize(t *testing.T) {
