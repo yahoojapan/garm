@@ -270,12 +270,12 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 			name: "Check resourceMapper MapResource, domain from namespace & principal from user",
 			fields: fields{
 				res: &resolve{
-					athenzDomains: []string{"athenz-domain-216._namespace_"},
+					athenzDomains:  []string{"athenz-domain-216._namespace_"},
+					athenzSAPrefix: "athenz-domain-278._namespace_.",
 					cfg: config.Platform{
 						APIGroupControlEnabled:     true,
 						ResourceNameControlEnabled: true,
 						ServiceAccountPrefixes:     []string{"user."},
-						AthenzServiceAccountPrefix: "athenz-domain-278._namespace_.",
 					},
 				},
 			},
@@ -289,7 +289,8 @@ func Test_resourceMapper_MapResource(t *testing.T) {
 						Subresource: "sub-resource-231",
 						Group:       "group-232",
 					},
-					User: "user.namespace-234:sub-domain-234:user-234",
+					User:   "user.namespace-234:sub-domain-234:user-234",
+					Groups: []string{"system:serviceaccounts"},
 				},
 			},
 			wantIdentity: "athenz-domain-278.namespace-234.sub-domain-234.user-234",
