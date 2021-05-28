@@ -142,7 +142,7 @@ func main() {
 
 	// check versions between configuration file and config.go
 	if cfg.Version != config.GetVersion() {
-		glg.Fatal(errors.New("invalid webhook configuration version"))
+		glg.Fatal(errors.New("invalid garm config version"))
 		return
 	}
 
