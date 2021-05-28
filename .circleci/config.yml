@@ -6,10 +6,10 @@ alias:
         environment:
           GOPATH: "/go"
           GO111MODULE: "on"
-          REPO_NAME: "yahoojapan"
+          REPO_NAME: "athenzyahoojapan"
           IMAGE_NAME: "garm"
           GITHUB_API: "https://api.github.com/"
-          DOCKER_USER: "kpango"
+          DOCKER_USER: "tatyano"
   setup_remote_docker: &setup_remote_docker
     version: 19.03.8
 
