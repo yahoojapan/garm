@@ -7,7 +7,7 @@ alias:
           GOPATH: "/go"
           GO111MODULE: "on"
           REPO_NAME: "yahoojapan"
-          DOCKERHUB_REPO_NAME: "athenzyahoojapan"
+          DOCKERHUB_REPO_NAME: "yahoojapan"
           IMAGE_NAME: "garm"
           GITHUB_API: "https://api.github.com/"
           DOCKER_USER: "tatyano"
