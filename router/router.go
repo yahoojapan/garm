@@ -83,9 +83,11 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 							glg.Errorf("recover panic from athenz webhook: %+v", r)
 						}
 					}()
+					defer func() {
+						close(ech)
+					}()
 					// it is the responsibility for handler to close the request
 					ech <- h(w, r.WithContext(ctx))
-					close(ech)
 				}()
 
 				for {
