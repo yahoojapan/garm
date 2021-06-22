@@ -41,7 +41,7 @@ func New(cfg config.Server, h handler.Handler) *http.ServeMux {
 
 	// register (route, handler) tuple to server multiplexer
 	for _, route := range NewRoutes(h) {
-		mux.Handle(route.Pattern, routing(route.Methods, dur, route.HandlerFunc))
+		mux.Handle(route.Pattern, recoverWrap(routing(route.Methods, dur, route.HandlerFunc)))
 	}
 
 	return mux
@@ -77,6 +77,12 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 				// run the custom handler logic in go routine, report error to error channel
 				ech := make(chan error)
 				go func() {
+					defer func() {
+						r := recover()
+						if r != nil {
+							glg.Errorf("recover panic from athenz webhook: %+v", r)
+						}
+					}()
 					// it is the responsibility for handler to close the request
 					ech <- h(w, r.WithContext(ctx))
 					close(ech)
@@ -126,6 +132,32 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 				r.Method,
 				http.StatusText(http.StatusMethodNotAllowed)),
 			http.StatusMethodNotAllowed)
+	})
+}
+
+func recoverWrap(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			r := recover()
+			if r != nil {
+				err := glg.Errorf("recover from panic: %+v", r)
+				if err != nil {
+					glg.Fatal(errors.Wrap(err, "recover from panic failed"))
+				}
+
+				// may cause "panic: Header called after Handler finished", just let the request timeout
+				// switch t := r.(type) {
+				// case string:
+				// 	err = errors.New(t)
+				// case error:
+				// 	err = t
+				// default:
+				// 	err = errors.New("Unknown error")
+				// }
+				// http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		}()
+		h.ServeHTTP(w, r)
 	})
 }
 
