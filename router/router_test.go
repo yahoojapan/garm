@@ -569,6 +569,7 @@ func Test_routing(t *testing.T) {
 				panic("panic-566")
 			}
 			want := "response-body-565"
+			wantError := "recover panic from athenz webhook:"
 
 			return testcase{
 				name: "Check routing, panic in handlerFunc",
@@ -580,12 +581,18 @@ func Test_routing(t *testing.T) {
 					h: handlerFunc,
 				},
 				checkFunc: func(server http.Handler) error {
+					// overwrite log destination
+					glgMutex.Lock()
+					errorBuffer := new(bytes.Buffer)
+					glg.Get().SetMode(glg.WRITER).SetWriter(errorBuffer)
+
 					request, err := http.NewRequest(http.MethodGet, "/", nil)
 					if err != nil {
 						return err
 					}
 					recorder := httptest.NewRecorder()
 					server.ServeHTTP(recorder, request)
+					glgMutex.Unlock()
 
 					response := recorder.Result()
 					defer response.Body.Close()
@@ -597,6 +604,11 @@ func Test_routing(t *testing.T) {
 					got := string(gotByte)
 					if got != want {
 						return fmt.Errorf("routing() http.Handler on request %v, response body = %v, want %v", request, got, want)
+					}
+
+					gotError := errorBuffer.String()
+					if !strings.Contains(gotError, wantError) {
+						return fmt.Errorf("routing() http.Handler will have error log message = %v, want error %v", gotError, wantError)
 					}
 
 					return nil
