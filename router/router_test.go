@@ -560,6 +560,49 @@ func Test_routing(t *testing.T) {
 				},
 			}
 		}(),
+		func() testcase {
+			handlerFunc := func(rw http.ResponseWriter, r *http.Request) error {
+				_, err := rw.Write([]byte("response-body-565"))
+				if err != nil {
+					return err
+				}
+				panic("panic-566")
+			}
+			want := "response-body-565"
+
+			return testcase{
+				name: "Check routing, panic in handlerFunc",
+				args: args{
+					m: []string{
+						http.MethodGet,
+					},
+					t: time.Second * 3,
+					h: handlerFunc,
+				},
+				checkFunc: func(server http.Handler) error {
+					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					if err != nil {
+						return err
+					}
+					recorder := httptest.NewRecorder()
+					server.ServeHTTP(recorder, request)
+
+					response := recorder.Result()
+					defer response.Body.Close()
+					gotByte, err := ioutil.ReadAll(response.Body)
+					if err != nil {
+						return err
+					}
+
+					got := string(gotByte)
+					if got != want {
+						return fmt.Errorf("routing() http.Handler on request %v, response body = %v, want %v", request, got, want)
+					}
+
+					return nil
+				},
+			}
+		}(),
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
