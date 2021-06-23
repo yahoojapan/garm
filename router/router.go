@@ -54,7 +54,7 @@ func parseTimeout(timeout string) time.Duration {
 	if err != nil {
 		err = glg.Errorf("Invalid timeout value: %s", timeout)
 		if err != nil {
-			glg.Fatal(errors.Wrap(err, "timeout parse error out put failed"))
+			glg.Fatal(errors.Wrap(err, "timeout parse error output failed"))
 		}
 		dur = time.Second * 3
 	}
@@ -103,7 +103,7 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 								http.StatusInternalServerError)
 							err = glg.Error(err)
 							if err != nil {
-								glg.Fatal(errors.Wrap(err, "handler error out put failed"))
+								glg.Fatal(errors.Wrap(err, "handler error output failed"))
 							}
 						}
 						return
@@ -111,7 +111,7 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 						// timeout passed or parent context canceled first, it is the responsibility for handler to response to the user
 						err := glg.Errorf("Handler Time Out: %v", time.Since(start))
 						if err != nil {
-							glg.Fatal(errors.Wrap(err, "timeout error out put failed"))
+							glg.Fatal(errors.Wrap(err, "timeout error output failed"))
 						}
 						return
 					}
