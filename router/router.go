@@ -80,7 +80,10 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 					defer func() {
 						r := recover()
 						if r != nil {
-							glg.Errorf("recover panic from athenz webhook: %+v", r)
+							err := glg.Errorf("recover panic from athenz webhook: %+v", r)
+							if err != nil {
+								glg.Fatal(errors.Wrap(err, "webhook handler panic output failed"))
+							}
 						}
 					}()
 					defer func() {
