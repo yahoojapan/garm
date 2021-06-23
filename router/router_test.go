@@ -768,6 +768,44 @@ func Test_recoverWrap(t *testing.T) {
 	tests := []testcase{
 		func() testcase {
 			handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				_, err := w.Write([]byte("response-body-772"))
+				if err != nil {
+					return
+				}
+			})
+			want := "response-body-772"
+
+			return testcase{
+				name: "Check recoverWrap, success",
+				args: args{
+					h: handlerFunc,
+				},
+				checkFunc: func(server http.Handler) error {
+					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					if err != nil {
+						return err
+					}
+					recorder := httptest.NewRecorder()
+					server.ServeHTTP(recorder, request)
+
+					response := recorder.Result()
+					defer response.Body.Close()
+					gotByte, err := ioutil.ReadAll(response.Body)
+					if err != nil {
+						return err
+					}
+
+					got := string(gotByte)
+					if got != want {
+						return fmt.Errorf("recoverWrap() http.Handler on request %v, response body = %v, want %v", request, got, want)
+					}
+
+					return nil
+				},
+			}
+		}(),
+		func() testcase {
+			handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				_, err := w.Write([]byte("response-body-732"))
 				if err != nil {
 					return
