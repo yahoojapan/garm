@@ -279,6 +279,7 @@ func Test_routing(t *testing.T) {
 					}
 					recorder := httptest.NewRecorder()
 					server.ServeHTTP(recorder, request)
+					glg.Reset()
 					glgMutex.Unlock()
 
 					response := recorder.Result()
@@ -447,6 +448,7 @@ func Test_routing(t *testing.T) {
 					}
 					recorder := httptest.NewRecorder()
 					server.ServeHTTP(recorder, request)
+					glg.Reset()
 					glgMutex.Unlock()
 
 					// check error message to logger
@@ -497,6 +499,7 @@ func Test_routing(t *testing.T) {
 						cancel()
 					}()
 					server.ServeHTTP(recorder, request.WithContext(ctx))
+					glg.Reset()
 					glgMutex.Unlock()
 
 					// check error message to logger
@@ -545,6 +548,7 @@ func Test_routing(t *testing.T) {
 
 					// to catch the panic from glg below
 					defer func() {
+						glg.Reset()
 						glgMutex.Unlock()
 
 						gotError := recover()
@@ -581,19 +585,34 @@ func Test_routing(t *testing.T) {
 					h: handlerFunc,
 				},
 				checkFunc: func(server http.Handler) error {
-					// overwrite log destination
-					glgMutex.Lock()
-					errorBuffer := new(bytes.Buffer)
-					glg.Get().SetMode(glg.WRITER).SetWriter(errorBuffer)
-
+					pr, pw := io.Pipe()
 					request, err := http.NewRequest(http.MethodGet, "/", nil)
 					if err != nil {
 						return err
 					}
 					recorder := httptest.NewRecorder()
-					server.ServeHTTP(recorder, request)
-					glgMutex.Unlock()
 
+					// overwrite log destination
+					err = func() error {
+						glgMutex.Lock()
+						defer glgMutex.Unlock()
+
+						glg.Get().SetMode(glg.WRITER).SetWriter(pw)
+						server.ServeHTTP(recorder, request)
+						// glg.Reset()
+
+						err = pw.Close()
+						if err != nil {
+							return fmt.Errorf("routing() fail to close writer pipe: %v", err)
+						}
+
+						return nil
+					}()
+					if err != nil {
+						return err
+					}
+
+					// get request body
 					response := recorder.Result()
 					defer response.Body.Close()
 					gotByte, err := ioutil.ReadAll(response.Body)
@@ -601,12 +620,22 @@ func Test_routing(t *testing.T) {
 						return err
 					}
 
+					// check response
 					got := string(gotByte)
 					if got != want {
 						return fmt.Errorf("routing() http.Handler on request %v, response body = %v, want %v", request, got, want)
 					}
 
-					gotError := errorBuffer.String()
+					// check log message
+					bytes, err := ioutil.ReadAll(pr)
+					if err != nil {
+						return fmt.Errorf("routing() fail to read log from glg: %v", err)
+					}
+					err = pr.Close()
+					if err != nil {
+						return fmt.Errorf("routing() fail to close reader pipe: %v", err)
+					}
+					gotError := string(bytes)
 					if !strings.Contains(gotError, wantError) {
 						return fmt.Errorf("routing() http.Handler will have error log message = %v, want error %v", gotError, wantError)
 					}
@@ -756,6 +785,7 @@ func Test_recoverWrap(t *testing.T) {
 					}
 					recorder := httptest.NewRecorder()
 					server.ServeHTTP(recorder, request)
+					glg.Reset()
 					glgMutex.Unlock()
 
 					response := recorder.Result()
