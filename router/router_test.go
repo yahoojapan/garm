@@ -573,7 +573,7 @@ func Test_routing(t *testing.T) {
 				panic("panic-566")
 			}
 			want := "response-body-565"
-			wantError := "recover panic from athenz webhook:"
+			wantError := "recover panic from athenz webhook: panic-566"
 
 			return testcase{
 				name: "Check routing, panic in handlerFunc",
@@ -585,12 +585,23 @@ func Test_routing(t *testing.T) {
 					h: handlerFunc,
 				},
 				checkFunc: func(server http.Handler) error {
-					pr, pw := io.Pipe()
 					request, err := http.NewRequest(http.MethodGet, "/", nil)
 					if err != nil {
 						return err
 					}
 					recorder := httptest.NewRecorder()
+
+					// cache log message in background
+					pr, pw := io.Pipe()
+					logch := make(chan string)
+					go func() {
+						bytes, err := ioutil.ReadAll(pr)
+						if err != nil {
+							logch <- fmt.Errorf("routing() fail to read log from glg: %v", err).Error()
+							return
+						}
+						logch <- string(bytes)
+					}()
 
 					// overwrite log destination
 					err = func() error {
@@ -599,13 +610,15 @@ func Test_routing(t *testing.T) {
 
 						glg.Get().SetMode(glg.WRITER).SetWriter(pw)
 						server.ServeHTTP(recorder, request)
-						// glg.Reset()
 
+						// flush log message
+						glg.Error("\n")
 						err = pw.Close()
 						if err != nil {
 							return fmt.Errorf("routing() fail to close writer pipe: %v", err)
 						}
 
+						glg.Reset()
 						return nil
 					}()
 					if err != nil {
@@ -627,17 +640,13 @@ func Test_routing(t *testing.T) {
 					}
 
 					// check log message
-					bytes, err := ioutil.ReadAll(pr)
-					if err != nil {
-						return fmt.Errorf("routing() fail to read log from glg: %v", err)
-					}
+					gotLog := <-logch
 					err = pr.Close()
 					if err != nil {
 						return fmt.Errorf("routing() fail to close reader pipe: %v", err)
 					}
-					gotError := string(bytes)
-					if !strings.Contains(gotError, wantError) {
-						return fmt.Errorf("routing() http.Handler will have error log message = %v, want error %v", gotError, wantError)
+					if !strings.Contains(gotLog, wantError) {
+						return fmt.Errorf("routing() http.Handler will have error log message = %v, want error %v", gotLog, wantError)
 					}
 
 					return nil
