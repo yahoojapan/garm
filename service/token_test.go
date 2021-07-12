@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yahoo/athenz/libs/go/zmssvctoken"
+	"github.com/AthenZ/athenz/libs/go/zmssvctoken"
 	"github.com/yahoojapan/garm/config"
 )
 

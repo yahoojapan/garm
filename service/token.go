@@ -24,9 +24,9 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/AthenZ/athenz/libs/go/zmssvctoken"
 	"github.com/kpango/glg"
 	"github.com/pkg/errors"
-	"github.com/yahoo/athenz/libs/go/zmssvctoken"
 	webhook "github.com/yahoo/k8s-athenz-webhook"
 	"github.com/yahoojapan/garm/config"
 )

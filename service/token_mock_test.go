@@ -19,7 +19,7 @@ package service
 import (
 	"time"
 
-	"github.com/yahoo/athenz/libs/go/zmssvctoken"
+	"github.com/AthenZ/athenz/libs/go/zmssvctoken"
 )
 
 type mockTokenBuilder struct {
