@@ -35,7 +35,7 @@
 
 ![concept](./docs/assets/concept.png)
 
-Garm implements the Kubernetes authorization webhook interface to provide access control on your K8s resources with [Athenz](https://github.com/yahoo/athenz) RBAC policy. It allows flexible resource mapping from K8s resources to Athenz ones, mutli-tenancy, and black/white list.
+Garm implements the Kubernetes authorization webhook interface to provide access control on your K8s resources with [Athenz](https://github.com/AthenZ/athenz) RBAC policy. It allows flexible resource mapping from K8s resources to Athenz ones, mutli-tenancy, and black/white list.
 
 By default, Garm replies the native Kubernetes authentication for authorization. However, it also supports the Kubernetes authentication webhook. Using the authentication hook requires Athenz to be able to sign tokens for users.
 
