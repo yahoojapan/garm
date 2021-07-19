@@ -78,6 +78,9 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 				ech := make(chan error)
 				go func() {
 					defer func() {
+						close(ech)
+					}()
+					defer func() {
 						r := recover()
 						if r != nil {
 							err := glg.Errorf("recover panic from athenz webhook: %+v", r)
@@ -85,9 +88,6 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 								glg.Fatal(errors.Wrap(err, "webhook handler panic output failed"))
 							}
 						}
-					}()
-					defer func() {
-						close(ech)
 					}()
 					// it is the responsibility for handler to close the request
 					ech <- h(w, r.WithContext(ctx))
