@@ -105,7 +105,7 @@ func NewX509CertPool(path string) (*x509.CertPool, error) {
 		if err != nil || pool == nil {
 			err = glg.Error(errors.Wrap(err, "SystemCertPool not found"))
 			if err != nil {
-				return nil, errors.Wrap(err, "timeout parse error out put failed")
+				return nil, errors.Wrap(err, "timeout parse error output failed")
 			}
 			pool = x509.NewCertPool()
 		}

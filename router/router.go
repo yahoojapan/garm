@@ -41,7 +41,7 @@ func New(cfg config.Server, h handler.Handler) *http.ServeMux {
 
 	// register (route, handler) tuple to server multiplexer
 	for _, route := range NewRoutes(h) {
-		mux.Handle(route.Pattern, routing(route.Methods, dur, route.HandlerFunc))
+		mux.Handle(route.Pattern, recoverWrap(routing(route.Methods, dur, route.HandlerFunc)))
 	}
 
 	return mux
@@ -54,7 +54,7 @@ func parseTimeout(timeout string) time.Duration {
 	if err != nil {
 		err = glg.Errorf("Invalid timeout value: %s", timeout)
 		if err != nil {
-			glg.Fatal(errors.Wrap(err, "timeout parse error out put failed"))
+			glg.Fatal(errors.Wrap(err, "timeout parse error output failed"))
 		}
 		dur = time.Second * 3
 	}
@@ -77,9 +77,20 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 				// run the custom handler logic in go routine, report error to error channel
 				ech := make(chan error)
 				go func() {
+					defer func() {
+						r := recover()
+						if r != nil {
+							err := glg.Errorf("recover panic from athenz webhook: %+v", r)
+							if err != nil {
+								glg.Fatal(errors.Wrap(err, "webhook handler panic output failed"))
+							}
+						}
+					}()
+					defer func() {
+						close(ech)
+					}()
 					// it is the responsibility for handler to close the request
 					ech <- h(w, r.WithContext(ctx))
-					close(ech)
 				}()
 
 				for {
@@ -95,7 +106,7 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 								http.StatusInternalServerError)
 							err = glg.Error(err)
 							if err != nil {
-								glg.Fatal(errors.Wrap(err, "handler error out put failed"))
+								glg.Fatal(errors.Wrap(err, "handler error output failed"))
 							}
 						}
 						return
@@ -103,7 +114,7 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 						// timeout passed or parent context canceled first, it is the responsibility for handler to response to the user
 						err := glg.Errorf("Handler Time Out: %v", time.Since(start))
 						if err != nil {
-							glg.Fatal(errors.Wrap(err, "timeout error out put failed"))
+							glg.Fatal(errors.Wrap(err, "timeout error output failed"))
 						}
 						return
 					}
@@ -126,6 +137,32 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 				r.Method,
 				http.StatusText(http.StatusMethodNotAllowed)),
 			http.StatusMethodNotAllowed)
+	})
+}
+
+func recoverWrap(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			r := recover()
+			if r != nil {
+				err := glg.Errorf("recover from panic: %+v", r)
+				if err != nil {
+					glg.Fatal(errors.Wrap(err, "recover from panic failed"))
+				}
+
+				// may cause "panic: Header called after Handler finished", just let the request timeout
+				// switch t := r.(type) {
+				// case string:
+				// 	err = errors.New(t)
+				// case error:
+				// 	err = t
+				// default:
+				// 	err = errors.New("Unknown error")
+				// }
+				// http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		}()
+		h.ServeHTTP(w, r)
 	})
 }
 

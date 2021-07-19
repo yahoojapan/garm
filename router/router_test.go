@@ -279,6 +279,7 @@ func Test_routing(t *testing.T) {
 					}
 					recorder := httptest.NewRecorder()
 					server.ServeHTTP(recorder, request)
+					glg.Reset()
 					glgMutex.Unlock()
 
 					response := recorder.Result()
@@ -447,6 +448,7 @@ func Test_routing(t *testing.T) {
 					}
 					recorder := httptest.NewRecorder()
 					server.ServeHTTP(recorder, request)
+					glg.Reset()
 					glgMutex.Unlock()
 
 					// check error message to logger
@@ -497,6 +499,7 @@ func Test_routing(t *testing.T) {
 						cancel()
 					}()
 					server.ServeHTTP(recorder, request.WithContext(ctx))
+					glg.Reset()
 					glgMutex.Unlock()
 
 					// check error message to logger
@@ -545,6 +548,7 @@ func Test_routing(t *testing.T) {
 
 					// to catch the panic from glg below
 					defer func() {
+						glg.Reset()
 						glgMutex.Unlock()
 
 						gotError := recover()
@@ -555,6 +559,95 @@ func Test_routing(t *testing.T) {
 
 					// panic from glg
 					server.ServeHTTP(recorder, request)
+
+					return nil
+				},
+			}
+		}(),
+		func() testcase {
+			handlerFunc := func(rw http.ResponseWriter, r *http.Request) error {
+				_, err := rw.Write([]byte("response-body-565"))
+				if err != nil {
+					return err
+				}
+				panic("panic-566")
+			}
+			want := "response-body-565"
+			wantError := "recover panic from athenz webhook: panic-566"
+
+			return testcase{
+				name: "Check routing, panic in handlerFunc",
+				args: args{
+					m: []string{
+						http.MethodGet,
+					},
+					t: time.Second * 3,
+					h: handlerFunc,
+				},
+				checkFunc: func(server http.Handler) error {
+					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					if err != nil {
+						return err
+					}
+					recorder := httptest.NewRecorder()
+
+					// cache log message in background
+					pr, pw := io.Pipe()
+					logch := make(chan string)
+					go func() {
+						bytes, err := ioutil.ReadAll(pr)
+						if err != nil {
+							logch <- fmt.Errorf("routing() fail to read log from glg: %v", err).Error()
+							return
+						}
+						logch <- string(bytes)
+					}()
+
+					// overwrite log destination
+					err = func() error {
+						glgMutex.Lock()
+						defer glgMutex.Unlock()
+
+						glg.Get().SetMode(glg.WRITER).SetWriter(pw)
+						server.ServeHTTP(recorder, request)
+
+						// flush log message
+						glg.Error("\n")
+						err = pw.Close()
+						if err != nil {
+							return fmt.Errorf("routing() fail to close writer pipe: %v", err)
+						}
+
+						glg.Reset()
+						return nil
+					}()
+					if err != nil {
+						return err
+					}
+
+					// get request body
+					response := recorder.Result()
+					defer response.Body.Close()
+					gotByte, err := ioutil.ReadAll(response.Body)
+					if err != nil {
+						return err
+					}
+
+					// check response
+					got := string(gotByte)
+					if got != want {
+						return fmt.Errorf("routing() http.Handler on request %v, response body = %v, want %v", request, got, want)
+					}
+
+					// check log message
+					gotLog := <-logch
+					err = pr.Close()
+					if err != nil {
+						return fmt.Errorf("routing() fail to close reader pipe: %v", err)
+					}
+					if !strings.Contains(gotLog, wantError) {
+						return fmt.Errorf("routing() http.Handler will have error log message = %v, want error %v", gotLog, wantError)
+					}
 
 					return nil
 				},
@@ -657,6 +750,119 @@ func Test_flushAndClose(t *testing.T) {
 			gotError := flushAndClose(tt.args.readCloser)
 			if !reflect.DeepEqual(errToStr(gotError), errToStr(tt.wantError)) {
 				t.Errorf("flushAndClose() error = %v, want %v", gotError, tt.wantError)
+			}
+		})
+	}
+}
+
+func Test_recoverWrap(t *testing.T) {
+	var glgMutex = &sync.Mutex{}
+	type args struct {
+		h http.Handler
+	}
+	type testcase struct {
+		name      string
+		args      args
+		checkFunc func(http.Handler) error
+	}
+	tests := []testcase{
+		func() testcase {
+			handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				_, err := w.Write([]byte("response-body-772"))
+				if err != nil {
+					return
+				}
+			})
+			want := "response-body-772"
+
+			return testcase{
+				name: "Check recoverWrap, success",
+				args: args{
+					h: handlerFunc,
+				},
+				checkFunc: func(server http.Handler) error {
+					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					if err != nil {
+						return err
+					}
+					recorder := httptest.NewRecorder()
+					server.ServeHTTP(recorder, request)
+
+					response := recorder.Result()
+					defer response.Body.Close()
+					gotByte, err := ioutil.ReadAll(response.Body)
+					if err != nil {
+						return err
+					}
+
+					got := string(gotByte)
+					if got != want {
+						return fmt.Errorf("recoverWrap() http.Handler on request %v, response body = %v, want %v", request, got, want)
+					}
+
+					return nil
+				},
+			}
+		}(),
+		func() testcase {
+			handlerFunc := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				_, err := w.Write([]byte("response-body-732"))
+				if err != nil {
+					return
+				}
+				panic("panic-736")
+			})
+			want := "response-body-732"
+			wantError := "recover from panic:"
+
+			return testcase{
+				name: "Check recoverWrap, panic in handlerFunc",
+				args: args{
+					h: handlerFunc,
+				},
+				checkFunc: func(server http.Handler) error {
+					// overwrite log destination
+					glgMutex.Lock()
+					errorBuffer := new(bytes.Buffer)
+					glg.Get().SetMode(glg.WRITER).SetWriter(errorBuffer)
+
+					request, err := http.NewRequest(http.MethodGet, "/", nil)
+					if err != nil {
+						return err
+					}
+					recorder := httptest.NewRecorder()
+					server.ServeHTTP(recorder, request)
+					glg.Reset()
+					glgMutex.Unlock()
+
+					response := recorder.Result()
+					defer response.Body.Close()
+					gotByte, err := ioutil.ReadAll(response.Body)
+					if err != nil {
+						return err
+					}
+
+					got := string(gotByte)
+					if got != want {
+						return fmt.Errorf("recoverWrap() http.Handler on request %v, response body = %v, want %v", request, got, want)
+					}
+
+					gotError := errorBuffer.String()
+					if !strings.Contains(gotError, wantError) {
+						return fmt.Errorf("recoverWrap() http.Handler will have error log message = %v, want error %v", gotError, wantError)
+					}
+
+					return nil
+				},
+			}
+		}(),
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := recoverWrap(tt.args.h)
+			if err := tt.checkFunc(got); err != nil {
+				t.Error(err)
 			}
 		})
 	}
