@@ -78,6 +78,7 @@ func routing(m []string, t time.Duration, h handler.Func) http.Handler {
 				ech := make(chan error)
 				go func() {
 					defer func() {
+						// should close the channel at last, to ensure panic handling before main go routine returns
 						close(ech)
 					}()
 					defer func() {
