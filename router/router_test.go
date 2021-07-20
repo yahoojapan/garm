@@ -35,6 +35,9 @@ import (
 	"github.com/yahoojapan/garm/handler"
 )
 
+// glgMutex prevent race condition on glg
+var glgMutex = &sync.Mutex{}
+
 // dummyHandler is a mock implement for handler.Handler
 type dummyHandler struct {
 	responseValue string
@@ -198,9 +201,6 @@ func Test_parseTimeout(t *testing.T) {
 }
 
 func Test_routing(t *testing.T) {
-
-	var glgMutex = &sync.Mutex{}
-
 	type args struct {
 		m []string
 		t time.Duration
@@ -756,7 +756,6 @@ func Test_flushAndClose(t *testing.T) {
 }
 
 func Test_recoverWrap(t *testing.T) {
-	var glgMutex = &sync.Mutex{}
 	type args struct {
 		h http.Handler
 	}
