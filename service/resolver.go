@@ -271,7 +271,8 @@ func (r *resolve) PrincipalFromUser(user string, groups []string) string {
 			return strings.TrimPrefix(strings.TrimSuffix(strings.Join(
 				append(r.BuildServiceAccountPrefixFromNamespace(parts[0]), parts[1:]...), "."), ":"), ":")
 		}
-		return r.cfg.AthenzServiceAccountPrefix + strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":")
+		return strings.TrimPrefix(strings.TrimSuffix(strings.Join(
+			append(r.BuildServiceAccountPrefixFromNamespace(r.cfg.EmptyNamespace), parts[0]), "."), ":"), ":")
 	}
 
 	// athenz user
