@@ -1060,13 +1060,15 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 			fields: fields{
 				cfg: config.Platform{
 					ServiceAccountPrefixes: []string{"prefix-319:"},
+					EmptyNamespace: "empty",
 				},
+				athenzSAPrefix: "athenz._namespace_.",
 			},
 			args: args{
 				user:   "prefix-319:user-323",
 				groups: []string{"system:serviceaccounts"},
 			},
-			want: "user-323",
+			want: "athenz.empty.user-323",
 		},
 		{
 			name: "Check resolve PrincipalFromUser ServiceAccountPrefixes match user prefix, single part, no groups",
@@ -1087,13 +1089,15 @@ func Test_resolve_PrincipalFromUser(t *testing.T) {
 			fields: fields{
 				cfg: config.Platform{
 					ServiceAccountPrefixes: []string{"prefix-331"},
+					EmptyNamespace: "empty",
 				},
+				athenzSAPrefix: "athenz._namespace_.",
 			},
 			args: args{
 				user:   "prefix-331:user-335:",
 				groups: []string{"system:serviceaccounts"},
 			},
-			want: "user-335",
+			want: "athenz.empty.user-335",
 		},
 		{
 			name: "Check resolve PrincipalFromUser ServiceAccountPrefixes match user prefix, multiple parts, empty namespace",

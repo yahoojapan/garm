@@ -240,8 +240,8 @@ func (r *resolve) GetNonResourceNamespace() string {
 
 // PrincipalFromUser maps K8s user to Athenz principal.
 // 1. service account: if has ServiceAccountPrefixes, remove prefix, map to AthenzServiceAccountPrefix
-// 1.1. if contains namespace, create domain by namespace and AthenzServiceAccountPrefix
-// 1.2. if no namespaces, prepend AthenzServiceAccountPrefix
+// 1.1. if contains namespace, create domain by the namespace and AthenzServiceAccountPrefix
+// 1.2. if no namespaces, create domain by EmptyNamespace and AthenzServiceAccountPrefix
 // 2. athenz user: if has AthenzUserPrefix, OR not contains ".", map to AthenzUserPrefix
 // 3. certificate: if not service account and athenz user, no mapping
 func (r *resolve) PrincipalFromUser(user string, groups []string) string {
@@ -271,7 +271,8 @@ func (r *resolve) PrincipalFromUser(user string, groups []string) string {
 			return strings.TrimPrefix(strings.TrimSuffix(strings.Join(
 				append(r.BuildServiceAccountPrefixFromNamespace(parts[0]), parts[1:]...), "."), ":"), ":")
 		}
-		return r.cfg.AthenzServiceAccountPrefix + strings.TrimSuffix(strings.TrimPrefix(strings.TrimPrefix(user, prefix), ":"), ":")
+		return strings.TrimPrefix(strings.TrimSuffix(strings.Join(
+			append(r.BuildServiceAccountPrefixFromNamespace(r.cfg.EmptyNamespace), parts[0]), "."), ":"), ":")
 	}
 
 	// athenz user
