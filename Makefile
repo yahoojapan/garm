@@ -22,6 +22,3 @@ clean:
 
 test:
 	go test --race -coverprofile=cover.out ./...
-
-scan:
-	srcclr scan .
