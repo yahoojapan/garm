@@ -2,7 +2,7 @@
 
 > ⚠️ **Warning**: This repository has been moved to [AthenZ/garm](https://github.com/AthenZ/garm).
 
-This project is donated to [Cloud Native Computing Foundation](https://www.cncf.io/). All ongoing developments and supports will continue in the new repository.
+This repository is submitted to [Athenz Open-Source Community](https://github.com/AthenZ). All ongoing developments and maintenances will continue in the new repository.
 
 ```sh
 # update your local clone
