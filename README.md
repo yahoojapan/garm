@@ -1,4 +1,15 @@
-# Garm
+# Garm (moved)
+
+> ⚠️ **Warning**: This repository has been moved to [AthenZ/garm](https://github.com/AthenZ/garm).
+
+This repository is submitted to [Athenz Open-Source Community](https://github.com/AthenZ). All ongoing developments and maintenances will continue in the new repository.
+
+```sh
+# update your local clone
+git remote set-url origin https://github.com/AthenZ/garm.git
+```
+
+---
 
 [![License: Apache](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/yahoojapan/garm?style=flat-square&label=Github%20version)](https://github.com/yahoojapan/garm/releases/latest)
@@ -121,4 +132,3 @@ Note that only for contributions to the garm repository on the [GitHub](https://
 - [WindzCUHK](https://github.com/WindzCUHK)
 - [tatyano](https://github.com/tatyano)
 - [rinx](https://github.com/rinx)
-
